@@ -6,7 +6,7 @@ class DLQL extends Component {
   render() {
     return (
       <div className={st.DLQL}>
-        <div className={st.content}>sstDLQL</div>
+        <div className={st.content}>ssttDLQL</div>
       </div>
     );
   }
