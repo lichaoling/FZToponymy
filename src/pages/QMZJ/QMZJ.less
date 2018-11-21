@@ -1,0 +1,70 @@
+@import '../../common/default.less';
+:global {
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.QMZJ {
+  height: 100%;
+  width: 100%;
+  @h-h: 54px;
+  @nave-w: 600px;
+  @logh-w: 458px;
+  .header {
+    height: @h-h;
+    background-image: url(../../common/Img/Header.png);
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    padding-bottom: 0;
+    .logo {
+      width: @logh-w;
+      height: 100%;
+      background-image: url(../../common/Img/地名地址审批管理系统.png);
+      background-repeat: no-repeat;
+    }
+    .nave {
+      display: flex;
+      width: @nave-w;
+      > a {
+        margin-right: 40px;
+        font-size: 16px;
+        display: block;
+        text-align: center;
+        color: rgb(166, 190, 223);
+        text-decoration: none;
+        padding: 10px 0;
+        cursor: pointer;
+        transition: @transition;
+        span {
+          display: block;
+        }
+        &:global(.active),
+        &:hover {
+          color: rgb(255, 214, 102);
+          border-bottom: 3px solid rgb(255, 214, 102);
+        }
+      }
+    }
+    .user {
+      flex: 1;
+      text-align: right;
+      padding-right: 40px;
+      > a {
+        font-size: 16px;
+        text-align: center;
+        color: rgb(166, 190, 223);
+      }
+    }
+  }
+  .body {
+    height: calc(~'100% - @{h-h}');
+    background-color: rgb(240, 240, 240);
+  }
+}
