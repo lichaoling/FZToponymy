@@ -47,7 +47,7 @@ class DLQL extends Component {
                         wrapperCol={{ span: 16 }}
                         label={
                           <span>
-                            <span className={st.ired}>*</span>行政区划
+                            <span className={st.ired}>*</span>所在（跨）行政区
                           </span>
                         }
                       >
@@ -55,7 +55,7 @@ class DLQL extends Component {
                           value={null} /*entity.Districts*/
                           expandTrigger="hover"
                           // options={districts}
-                          placeholder="行政区划"
+                          placeholder="所在（跨）行政区"
                           onChange={(a, b) => {
                             // this.mObj.districts = b;
                             // let { entity } = this.state;
