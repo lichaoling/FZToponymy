@@ -73,7 +73,7 @@ class DLQL extends Component {
                         wrapperCol={{ span: 16 }}
                         label={
                           <span>
-                            <span className={st.ired}>*</span>拟定标准名称
+                            <span className={st.ired}>*</span>标准名称
                           </span>
                         }
                       >
@@ -307,8 +307,8 @@ class DLQL extends Component {
                   <Row>
                     <Col span={16}>
                       <FormItem
-                        labelCol={{ span: 4 }}
-                        wrapperCol={{ span: 20 }}
+                        labelCol={{ span: 5 }}
+                        wrapperCol={{ span: 19 }}
                         label={
                           <span>
                             <span className={st.ired}>*</span>名称含义或理由
@@ -325,6 +325,28 @@ class DLQL extends Component {
                             }}
                             placeholder="名称含义或理由"
                             autosize={{ minRows: 2 }}
+                          />
+                        )}
+                      </FormItem>
+                    </Col>
+                    <Col span={8}>
+                      <FormItem
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>命名时间
+                          </span>
+                        }
+                      >
+                        {getFieldDecorator('BZTIME', {
+                          initialValue: null, // entity.BZTime,
+                        })(
+                          <DatePicker
+                            style={{ width: '100%' }}
+                            onChange={e => {
+                              // this.mObj.BZTime = e;
+                            }}
                           />
                         )}
                       </FormItem>
@@ -406,27 +428,6 @@ class DLQL extends Component {
                     </Col>
                   </Row>
                   <Row>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>命名时间
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('BZTIME', {
-                          initialValue: null, // entity.BZTime,
-                        })(
-                          <DatePicker
-                            onChange={e => {
-                              // this.mObj.BZTime = e;
-                            }}
-                          />
-                        )}
-                      </FormItem>
-                    </Col>
                     <Col span={16}>
                       <FormItem
                         labelCol={{ span: 4 }}

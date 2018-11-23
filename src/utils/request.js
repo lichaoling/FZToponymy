@@ -153,3 +153,59 @@ export default function request(url, option) {
       }
     });
 }
+function parseJSON(response) {
+  return response.json();
+}
+
+function request(
+  url,
+  options,
+  successHandle,
+  errorHandle = e => {
+    notification.error({
+      description: e.message,
+      message: '错误',
+    });
+  }
+) {
+  const defaultOptions = {
+    credentials: 'include',
+    mode: 'cors',
+    method: 'POST',
+  };
+  const newOptions = { ...defaultOptions, ...options };
+  if (newOptions.method === 'POST' || newOptions.method === 'GET') {
+    newOptions.headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
+      ...newOptions.headers,
+    };
+    newOptions.body = JSON.stringify(newOptions.body);
+  }
+
+  return fetch(url, newOptions)
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(data => {
+      if (data && data.ErrorMessage) {
+        throw new Error(data.ErrorMessage);
+      } else if (successHandle) {
+        successHandle(data.Data);
+      } else {
+        return { data };
+      }
+    })
+    .catch(err => {
+      if (errorHandle) {
+        errorHandle(err);
+      } else {
+        return { err };
+      }
+    });
+}
+
+async function Post(url, params, successHandle, errorHandle) {
+  return request(url, { method: 'POST', body: params }, successHandle, errorHandle);
+}
+
+export { Post };

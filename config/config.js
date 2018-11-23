@@ -67,11 +67,11 @@ export default {
     '@antv/data-set': 'DataSet',
   },
   proxy: {
-    "/api": {
-      target: "http://localhost:34455",
-      pathRewrite: {'^/api' : ''},
-      changeOrigin: true
-    }
+    '/api': {
+      target: 'http://localhost:34455',
+      pathRewrite: { '^/api': '' },
+      changeOrigin: true,
+    },
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
@@ -103,6 +103,6 @@ export default {
   manifest: {
     basePath: '/',
   },
-
+  history: 'hash',
   // chainWebpack: webpackPlugin,
 };
