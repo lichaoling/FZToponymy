@@ -1,19 +1,18 @@
 @import '../../../common/default.less';
-.MPH {
+.DLQLForm {
     height: 100%;
-    width: 100%;
-    background-color: rgba(250, 250, 250);
+    width: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
     .content {
-        width: 75%;
+        width: 100%;
         box-shadow: @box-shadow1;
-        overflow: auto; // flex: 1;
+        overflow: auto; 
         background-color: #fff;
-        margin-top: 30px;
+        margin: 10px;
         .ct_header {
             height: 80px;
             border-bottom: 1px solid rgba(105, 105, 105, 0.06);
@@ -60,6 +59,19 @@
                         .ant-row {
                             margin: 10px 0;
                         }
+                        .ant-form-item-children {
+                            display: flex;
+                            .iconfont {
+                                margin-left: 5px;
+                                font-size: 20px;
+                            }
+                            .iconfont.icon-iconcorrect {
+                                color: green
+                            }
+                            .iconfont.icon-cuowu {
+                                color: red
+                            }
+                        }
                     }
                     .ired {
                         color: red;
@@ -81,6 +93,23 @@
             padding: 10px;
             border-top: 1px solid @border-color;
             height: 50px;
+        }
+    }
+    :global {
+        .ant-spin {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .ant-spin.active {
+            z-index: 9;
         }
     }
 }
