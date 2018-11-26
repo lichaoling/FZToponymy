@@ -107,29 +107,29 @@ class XQLYForm extends Component {
     }
     // 如果验证的不是标准名称
     if (!bName) {
-      // 起点（东/南）起
-      if (!validateObj.STARTDIRECTION) {
-        errs.push('请填写起点（东/南）起');
+      // 功能
+      if (!validateObj.GN) {
+        errs.push('请填写功能');
       }
 
-      // 原规划名称
-      if (!validateObj.PLANENAME) {
-        errs.push('请填写原规划名称');
+      // 建筑面积
+      if (!validateObj.JZMJ) {
+        errs.push('请填写建筑面积');
       }
 
-      //止点（西/北）至
-      if (!validateObj.ENDDIRECTION) {
-        errs.push('请填写止点（西/北）至');
+      //占地面积
+      if (!validateObj.ZDMJ) {
+        errs.push('请填写占地面积');
       }
 
-      //长度
-      if (!validateObj.LENGTH) {
-        errs.push('请填写长度');
+      //绿化率
+      if (!validateObj.LHL) {
+        errs.push('请填写绿化率');
       }
 
-      //宽度
-      if (!validateObj.WIDTH) {
-        errs.push('请填写宽度');
+      //楼栋数
+      if (!validateObj.LZNUM) {
+        errs.push('请填写楼栋数');
       }
 
       //建成时间
@@ -137,14 +137,19 @@ class XQLYForm extends Component {
         errs.push('请填写建成时间');
       }
 
-      //性质
-      if (!validateObj.NATURE) {
-        errs.push('请填写性质');
+      //始建时间
+      if (!validateObj.SJSJ) {
+        errs.push('请填写始建时间');
       }
 
-      //门牌号范围
-      if (!validateObj.MPNUMRANGE) {
-        errs.push('请填写门牌号范围');
+      //宣传名
+      if (!validateObj.XCMC) {
+        errs.push('请填写宣传名');
+      }
+
+      //登记名
+      if (!validateObj.DJMC) {
+        errs.push('请填写登记名');
       }
 
       //命名时间
@@ -184,7 +189,7 @@ class XQLYForm extends Component {
     } else {
       let { DISTRICTID, NAME } = validateObj;
       await Post(
-        url_CheckRoadName,
+        url_CheckHouseName,
         {
           DISTRICTID,
           NAME,
@@ -213,7 +218,7 @@ class XQLYForm extends Component {
     return dom;
   }
   closeEditForm() {}
-  
+
   onSaveClick = e => {
     e.preventDefault();
     this.props.form.validateFields(
