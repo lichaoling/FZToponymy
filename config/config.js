@@ -65,6 +65,12 @@ export default {
   },
   externals: {
     '@antv/data-set': 'DataSet',
+    react: 'React',
+    'react-dom': 'ReactDOM',
+    leaflet: 'L',
+    echarts: 'echarts',
+    jquery: '$',
+    terraformer: 'terraformer',
   },
   proxy: {
     '/api': {

@@ -21,12 +21,14 @@ import {
   url_GetDistrictTree,
   url_CheckHouseName,
   url_SearchHouseByID,
-  url_HouseApplicant,
+  url_HouseAndBuildingApplicant,
 } from '../../../common/urls.js';
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
 import { Post } from '../../../utils/request.js';
 import st from './XQLYForm.less';
+import LocateMap from '../../../common/Components/Maps/LocateMap2.js';
+import { getDivIcons } from '../../../common/Components/Maps/icons';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -40,6 +42,10 @@ class XQLYForm extends Component {
     showLoading: false,
     showCheckIcon: 'empty',
   };
+
+  // 存储修改后的数据
+  mObj = {};
+
   showLocateMap() {
     this.setState({ showLocateMap: true });
   }
@@ -65,15 +71,20 @@ class XQLYForm extends Component {
     this.hideLoading();
   }
   async getFormData(id) {
-    this.showLoading();
     if (!id) {
       id = this.props.id;
     }
     // 获取小区楼宇的申请数据
     if (id) {
+      this.showLoading();
       let rt = await Post(url_SearchHouseByID, { id: id });
       rtHandle(rt, d => {
+        let dIDs = d.DistrictIDs.length > 0 ? d.DistrictIDs.pop() : null;
+        d.Districts = dIDs ? dIDs.reverse() : null;
+
         d.BZTIME = d.BZTIME ? moment(d.BZTIME) : null;
+        d.SJSJ = d.SJSJ ? moment(d.SJSJ) : null;
+        d.JCSJ = d.JCSJ ? moment(d.JCSJ) : null;
         this.setState({ entity: d });
         this.hideLoading();
       });
@@ -83,15 +94,22 @@ class XQLYForm extends Component {
     errs = errs || [];
     let { entity } = this.state;
     let saveObj = {
-      ...entity,
+      ID: entity.ID,
+      ...this.mObj,
     };
-    if (saveObj.Districts) {
-      let ds = saveObj.Districts;
+    if (saveObj.districts) {
+      let ds = saveObj.districts;
       saveObj.DISTRICTID = ds[ds.length - 1];
       delete saveObj.Districts;
     }
     if (saveObj.BZTIME) {
       saveObj.BZTIME = saveObj.BZTIME.toISOString();
+    }
+    if (saveObj.SJSJ) {
+      saveObj.SJSJ = saveObj.SJSJ.toISOString();
+    }
+    if (saveObj.JCSJ) {
+      saveObj.JCSJ = saveObj.JCSJ.toISOString();
     }
 
     let validateObj = {
@@ -107,10 +125,10 @@ class XQLYForm extends Component {
     }
     // 如果验证的不是标准名称
     if (!bName) {
-      // 功能
-      if (!validateObj.GN) {
-        errs.push('请填写功能');
-      }
+      //   // 功能
+      //   if (!validateObj.GN) {
+      //     errs.push('请填写功能');
+      //   }
 
       // 建筑面积
       if (!validateObj.JZMJ) {
@@ -122,35 +140,35 @@ class XQLYForm extends Component {
         errs.push('请填写占地面积');
       }
 
-      //绿化率
-      if (!validateObj.LHL) {
-        errs.push('请填写绿化率');
-      }
+      //   //绿化率
+      //   if (!validateObj.LHL) {
+      //     errs.push('请填写绿化率');
+      //   }
 
-      //楼栋数
-      if (!validateObj.LZNUM) {
-        errs.push('请填写楼栋数');
-      }
+      //   //地址分类
+      //   if (!validateObj.DZFLBM) {
+      //     errs.push('请填写地址分类');
+      //   }
 
-      //建成时间
-      if (!validateObj.JCSJ) {
-        errs.push('请填写建成时间');
-      }
+      //   //建成时间
+      //   if (!validateObj.JCSJ) {
+      //     errs.push('请填写建成时间');
+      //   }
 
-      //始建时间
-      if (!validateObj.SJSJ) {
-        errs.push('请填写始建时间');
-      }
+      //   //始建时间
+      //   if (!validateObj.SJSJ) {
+      //     errs.push('请填写始建时间');
+      //   }
 
-      //宣传名
-      if (!validateObj.XCMC) {
-        errs.push('请填写宣传名');
-      }
+      //   //宣传名
+      //   if (!validateObj.XCMC) {
+      //     errs.push('请填写宣传名');
+      //   }
 
-      //登记名
-      if (!validateObj.DJMC) {
-        errs.push('请填写登记名');
-      }
+      //   //登记名
+      //   if (!validateObj.DJMC) {
+      //     errs.push('请填写登记名');
+      //   }
 
       //命名时间
       if (!validateObj.BZTIME) {
@@ -214,7 +232,6 @@ class XQLYForm extends Component {
     let dom = null;
     if (showCheckIcon === 'yes') dom = <span className="iconfont icon-iconcorrect" />;
     else if (showCheckIcon === 'no') dom = <span className="iconfont icon-cuowu" />;
-    console.log(dom);
     return dom;
   }
   closeEditForm() {}
@@ -233,7 +250,6 @@ class XQLYForm extends Component {
             }
           }
         }
-
         let { errs, saveObj } = this.validate(errors);
         if (errs.length) {
           Modal.error({
@@ -252,18 +268,26 @@ class XQLYForm extends Component {
     );
   };
   async save(obj) {
-    await Post(url_HouseApplicant, { road: obj }, e => {
-      debugger;
+    await Post(url_HouseAndBuildingApplicant, { mObj: JSON.stringify(obj) }, e => {
       notification.success({ description: '保存成功！', message: '成功' });
+      this.mObj = {};
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
       }
-      this.setState({ showCheckIcon: 'empty', isSaved: true, entity: { BZTIME: moment() } });
-      this.getFormData();
+      this.setState({ showCheckIcon: 'empty' });
+      this.getFormData(this.state.entity.ID);
     });
   }
+  isSaved() {
+    let saved = true;
+    for (let i in this.mObj) {
+      saved = false;
+      break;
+    }
+    return saved;
+  }
   onCancel() {
-    if (!this.state.isSaved) {
+    if (!this.isSaved()) {
       Modal.confirm({
         title: '提醒',
         content: '是否放弃所做的修改？',
@@ -278,6 +302,7 @@ class XQLYForm extends Component {
       this.props.onCancel && this.props.onCancel();
     }
   }
+  onEmpty() {}
   componentDidMount() {
     this.getDistricts();
     this.getFormData();
@@ -285,6 +310,16 @@ class XQLYForm extends Component {
   render() {
     let { districts, entity, showLocateMap, showLoading, showCheckIcon } = this.state;
     const { getFieldDecorator } = this.props.form;
+    let shapeOptions = {
+      stroke: true,
+      color: 'red',
+      weight: 4,
+      opacity: 1,
+      fill: true,
+      fillColor: 'red',
+      fillOpacity: 0.2,
+      clickable: true,
+    };
     return (
       <div className={st.XQLYForm}>
         <Spin
@@ -316,14 +351,13 @@ class XQLYForm extends Component {
                         }
                       >
                         <Cascader
-                          value={entity.Districts ? entity.Districts : null}
+                          initalValue={entity.Districts ? entity.Districts : undefined}
                           expandTrigger="hover"
                           options={districts}
                           placeholder="所在行政区"
                           onChange={(a, b) => {
-                            let { entity } = this.state;
-                            entity.Districts = a;
-                            this.setState({ entity: entity });
+                            this.mObj.districts = a;
+                            this.setState({ showCheckIcon: 'empty' });
                           }}
                         />
                       </FormItem>
@@ -338,18 +372,14 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('NAME', {
-                          initialValue: entity.NAME,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="标准名称"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.NAME ? entity.NAME : undefined}
+                          onChange={e => {
+                            this.mObj.NAME = e.target.value;
+                            this.setState({ showCheckIcon: 'empty' });
+                          }}
+                          placeholder="标准名称"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={1}>
@@ -367,75 +397,36 @@ class XQLYForm extends Component {
                   </Row>
                   <Row>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>宣传名称
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('XCMC', {
-                          initialValue: entity.XCMC,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="宣传名称"
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="宣传名称">
+                        <Input
+                          initalValue={entity.XCMC ? entity.XCMC : undefined}
+                          onChange={e => {
+                            this.mObj.NAME = e.target.value;
+                          }}
+                          placeholder="宣传名称"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>登记名称
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('DJMC', {
-                          initialValue: entity.DJMC,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="登记名称"
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="登记名称">
+                        <Input
+                          initalValue={entity.DJMC ? entity.DJMC : undefined}
+                          onChange={e => {
+                            this.mObj.DJMC = e.target.value;
+                          }}
+                          placeholder="登记名称"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>功能
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('GN', {
-                          initialValue: entity.GN,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="功能"
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="功能">
+                        <Input
+                          initalValue={entity.GN ? entity.GN : undefined}
+                          onChange={e => {
+                            this.mObj.GN = e.target.value;
+                          }}
+                          placeholder="功能"
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -450,18 +441,13 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('JZMJ', {
-                          initialValue: entity.JZMJ,
-                        })(
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                        <InputNumber
+                          initalValue={entity.JZMJ ? entity.JZMJ : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.JZMJ = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
@@ -474,116 +460,59 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('ZDMJ', {
-                          initialValue: entity.ZDMJ,
-                        })(
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                        <InputNumber
+                          initalValue={entity.ZDMJ ? entity.ZDMJ : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.ZDMJ = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>楼栋数
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('LZNUM', {
-                          initialValue: entity.LZNUM,
-                        })(
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="地址分类">
+                        <Input
+                          initalValue={entity.DZFLBM ? entity.DZFLBM : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.DZFLBM = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>绿化率
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('LHL', {
-                          initialValue: entity.LHL,
-                        })(
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="绿化率">
+                        <InputNumber
+                          initalValue={entity.LHL ? entity.LHL : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.LHL = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>始建时间
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('SJSJ', {
-                          initialValue: entity.SJSJ,
-                        })(
-                          <DatePicker
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="始建时间">
+                        <DatePicker
+                          initalValue={entity.SJSJ ? entity.SJSJ : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.SJSJ = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>建成时间
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('JCSJ', {
-                          initialValue: entity.JCSJ,
-                        })(
-                          <DatePicker
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="建成时间">
+                        <DatePicker
+                          initalValue={entity.JCSJ ? entity.JCSJ : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.JCSJ = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -598,43 +527,29 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('BZTIME', {
-                          initialValue: entity.BZTime,
-                        })(
-                          <DatePicker
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e;
-                              this.setState({ entity: entity });
-                            }}
-                          />
-                        )}
+                        <DatePicker
+                          initalValue={entity.BZTIME ? entity.BZTIME : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.BZTIME = e;
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={16}>
                       <FormItem
                         labelCol={{ span: 5 }}
                         wrapperCol={{ span: 19 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>名称来历及含义
-                          </span>
-                        }
+                        label="名称来历及含义"
                       >
-                        {getFieldDecorator('MCHY', {
-                          initialValue: entity.MCHY,
-                        })(
-                          <TextArea
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="名称来历及含义"
-                            autosize={{ minRows: 2 }}
-                          />
-                        )}
+                        <TextArea
+                          initalValue={entity.MCHY ? entity.MCHY : undefined}
+                          onChange={e => {
+                            this.mObj.MCHY = e.target.value;
+                          }}
+                          placeholder="名称来历及含义"
+                          autosize={{ minRows: 2 }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -708,18 +623,13 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('LXR', {
-                          initialValue: entity.LXR,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="联系人"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.LXR ? entity.LXR : undefined}
+                          onChange={e => {
+                            this.mObj.LXR = e.target.value;
+                          }}
+                          placeholder="联系人"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
@@ -732,18 +642,13 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('LXDH', {
-                          initialValue: entity.LXDH,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="联系电话"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.LXDH ? entity.LXDH : undefined}
+                          onChange={e => {
+                            this.mObj.LXDH = e.target.value;
+                          }}
+                          placeholder="联系电话"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
@@ -756,45 +661,27 @@ class XQLYForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('SBDW', {
-                          initialValue: entity.SBDW,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="申报单位"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.SBDW ? entity.SBDW : undefined}
+                          onChange={e => {
+                            this.mObj.SBDW = e.target.value;
+                          }}
+                          placeholder="申报单位"
+                        />
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={16}>
-                      <FormItem
-                        labelCol={{ span: 4 }}
-                        wrapperCol={{ span: 20 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>备注
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('BZ', {
-                          initialValue: entity.BZ,
-                        })(
-                          <TextArea
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.Districts = e.target.value;
-                              this.setState({ entity: entity });
-                            }}
-                            placeholder="备注"
-                            autosize={{ minRows: 2 }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
+                        <TextArea
+                          initalValue={entity.BZ ? entity.BZ : undefined}
+                          onChange={e => {
+                            this.mObj.BZ = e.target.value;
+                          }}
+                          placeholder="备注"
+                          autosize={{ minRows: 2 }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -814,6 +701,110 @@ class XQLYForm extends Component {
             </div>
           </div>
         </div>
+        <Modal
+          wrapClassName={st.locatemap}
+          visible={showLocateMap}
+          destroyOnClose={true}
+          onCancel={this.closeLocateMap.bind(this)}
+          title="定位"
+          footer={null}
+        >
+          <LocateMap
+            onMapReady={lm => {
+              // let { Lat, Lng } = this.state.entity;
+              // if (Lat && Lng) {
+              //   lm.mpLayer = L.marker([Lat, Lng], { icon: mp }).addTo(lm.map);
+              //   lm.map.setView([Lat, Lng], 16);
+              // }
+              let { GEOM_WKT } = this.state.entity;
+              if (GEOM_WKT) {
+                let geometry = Terraformer.WKT.parse(GEOM_WKT);
+                lm.mpLayer = L.geoJSON(geometry, {
+                  style: function(feature) {
+                    return shapeOptions;
+                  },
+                }).addTo(lm.map);
+                let coordinates = geometry.coordinates[0].map(e => {
+                  return e.reverse();
+                });
+                lm.map.fitBounds(coordinates);
+              }
+            }}
+            onMapClear={lm => {
+              lm.mpLayer && lm.mpLayer.remove();
+              lm.mpLayer = null;
+              let { entity } = this.state;
+              entity.Lat = null;
+              entity.Lng = null;
+              this.mObj.Lng = entity.Lng;
+              this.mObj.Lat = entity.Lat;
+            }}
+            beforeBtns={[
+              {
+                id: 'locate',
+                name: '道路、桥梁定位',
+                icon: 'icon-dingwei',
+                onClick: (dom, i, lm) => {
+                  if (!lm.locatePen) {
+                    // lm.locatePen = new L.Draw.Marker(lm.map, { icon: mp });
+                    // lm.locatePen.on(L.Draw.Event.CREATED, e => {
+                    //   lm.mpLayer && lm.mpLayer.remove();
+                    //   var { layer } = e;
+                    //   lm.mpLayer = layer;
+                    //   layer.addTo(lm.map);
+                    // });
+                    lm.locatePen = new L.Draw.Polygon(lm.map, {
+                      shapeOptions: shapeOptions,
+                      icon: new L.DivIcon({
+                        iconSize: new L.Point(8, 8),
+                        className: 'leaflet-div-icon leaflet-editing-icon',
+                      }),
+                      touchIcon: new L.DivIcon({
+                        iconSize: new L.Point(10, 10),
+                        className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
+                      }),
+                    });
+                    lm.locatePen.on(L.Draw.Event.CREATED, e => {
+                      lm.mpLayer && lm.mpLayer.remove();
+                      var { layer } = e;
+                      lm.mpLayer = layer;
+                      layer.addTo(lm.map);
+                    });
+                  }
+                  lm.disableMSTools();
+                  if (lm.locatePen._enabled) {
+                    lm.locatePen.disable();
+                  } else {
+                    lm.locatePen.enable();
+                  }
+                },
+              },
+              {
+                id: 'savelocation',
+                name: '保存定位',
+                icon: 'icon-save',
+                onClick: (dom, item, lm) => {
+                  let geometry = lm.mpLayer.toGeoJSON().geometry;
+                  entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
+                  this.mObj.GEOM_WKT = entity.GEOM_WKT;
+                  // let { lat, lng } = lm.mpLayer.getLatLng();
+                  // let { entity } = this.state;
+
+                  // entity.Lng = lng.toFixed(8) - 0;
+                  // entity.Lat = lat.toFixed(8) - 0;
+
+                  // this.mObj.Lng = entity.Lng;
+                  // this.mObj.Lat = entity.Lat;
+
+                  this.setState({
+                    entity: entity,
+                  });
+                  this.closeLocateMap();
+                },
+              },
+            ]}
+          />
+        </Modal>
       </div>
     );
   }

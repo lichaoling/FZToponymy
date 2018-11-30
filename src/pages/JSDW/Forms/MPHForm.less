@@ -1,5 +1,5 @@
 @import '../../../common/default.less';
-.DLQLForm {
+.MPHForm {
     height: 100%;
     width: 80%;
     display: flex;
@@ -10,7 +10,7 @@
     .content {
         width: 100%;
         box-shadow: @box-shadow1;
-        overflow: auto; 
+        overflow: auto;
         background-color: #fff;
         margin: 10px;
         .ct_header {
@@ -59,33 +59,12 @@
                         .ant-row {
                             margin: 10px 0;
                         }
-                        .ant-form-item-children {
-                            display: flex;
-                            .iconfont {
-                                margin-left: 5px;
-                                font-size: 20px;
-                            }
-                            .iconfont.icon-iconcorrect {
-                                color: green
-                            }
-                            .iconfont.icon-cuowu {
-                                color: red
-                            }
-                        }
                     }
                     .ired {
                         color: red;
                         display: inline-block;
                         margin-right: 5px;
                     }
-                }
-            }
-            :global {
-                .ant-divider {
-                    margin: 5px 0;
-                }
-                .ant-form-item {
-                    margin: 5px 0;
                 }
             }
         }
@@ -110,33 +89,6 @@
         }
         .ant-spin.active {
             z-index: 9;
-        }
-    }
-}
-
-.locatemap {
-    :global {
-        .ant-modal,
-        .ant-modal-content {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            width: auto !important;
-        }
-        .ant-modal-body {
-            padding: 10px;
-            height: calc(~'100% - 45px');
-            background-color: #fafafa;
-        }
-    }
-}
-
-.locatemap {
-    :global {
-        .ant-modal-body {
-            padding: 0;
         }
     }
 }

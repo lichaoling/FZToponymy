@@ -1,4 +1,4 @@
-import L from '../../common/leaflet.extends.js';
+import L from '../../Extends/leaflet.extends.js';
 import './icons.less';
 
 let normalIcons = {

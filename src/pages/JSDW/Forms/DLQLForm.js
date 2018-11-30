@@ -27,9 +27,12 @@ import {
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
 import { Post } from '../../../utils/request.js';
+import LocateMap from '../../../common/Components/Maps/LocateMap2.js';
+import { getDivIcons } from '../../../common/Components/Maps/icons';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const { mp } = getDivIcons();
 
 class DLQLForm extends Component {
   state = {
@@ -38,8 +41,10 @@ class DLQLForm extends Component {
     showLocateMap: false,
     showLoading: false,
     showCheckIcon: 'empty',
-    isSaved: true,
   };
+
+  // 存储修改后的数据
+  mObj = {};
 
   showLocateMap() {
     this.setState({ showLocateMap: true });
@@ -77,6 +82,9 @@ class DLQLForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchRoadByID, { id: id });
       rtHandle(rt, d => {
+        let dIDs = d.DistrictIDs.length > 0 ? d.DistrictIDs.pop() : null;
+        d.Districts = dIDs ? dIDs.reverse() : null;
+
         d.BZTIME = d.BZTIME ? moment(d.BZTIME) : null;
         d.JCSJ = d.JCSJ ? moment(d.JCSJ) : null;
         this.setState({ entity: d });
@@ -93,12 +101,13 @@ class DLQLForm extends Component {
     errs = errs || [];
     let { entity } = this.state;
     let saveObj = {
-      ...entity,
+      ID: entity.ID,
+      ...this.mObj,
     };
-    if (saveObj.Districts) {
-      let ds = saveObj.Districts;
+    if (saveObj.districts) {
+      let ds = saveObj.districts;
       saveObj.DISTRICTID = ds[ds.length - 1];
-      delete saveObj.Districts;
+      delete saveObj.districts;
     }
     if (saveObj.BZTIME) {
       saveObj.BZTIME = saveObj.BZTIME.toISOString();
@@ -120,46 +129,45 @@ class DLQLForm extends Component {
     }
     // 如果验证的不是标准名称
     if (!bName) {
-      debugger;
-      // 起点（东/南）起
-      if (!validateObj.STARTDIRECTION) {
-        errs.push('请填写起点（东/南）起');
-      }
+      // // 起点（东/南）起
+      // if (!validateObj.STARTDIRECTION) {
+      //   errs.push('请填写起点（东/南）起');
+      // }
 
-      // 原规划名称
-      if (!validateObj.PLANNAME) {
-        errs.push('请填写原规划名称');
-      }
+      // // 原规划名称
+      // if (!validateObj.PLANNAME) {
+      //   errs.push('请填写原规划名称');
+      // }
 
-      //止点（西/北）至
-      if (!validateObj.ENDDIRECTION) {
-        errs.push('请填写止点（西/北）至');
-      }
+      // //止点（西/北）至
+      // if (!validateObj.ENDDIRECTION) {
+      //   errs.push('请填写止点（西/北）至');
+      // }
 
-      //长度
-      if (!validateObj.LENGTH) {
-        errs.push('请填写长度');
-      }
+      // //长度
+      // if (!validateObj.LENGTH) {
+      //   errs.push('请填写长度');
+      // }
 
-      //宽度
-      if (!validateObj.WIDTH) {
-        errs.push('请填写宽度');
-      }
+      // //宽度
+      // if (!validateObj.WIDTH) {
+      //   errs.push('请填写宽度');
+      // }
 
-      //建成时间
-      if (!validateObj.JCSJ) {
-        errs.push('请填写建成时间');
-      }
+      // //建成时间
+      // if (!validateObj.JCSJ) {
+      //   errs.push('请填写建成时间');
+      // }
 
-      //性质
-      if (!validateObj.NATURE) {
-        errs.push('请填写性质');
-      }
+      // //性质
+      // if (!validateObj.NATURE) {
+      //   errs.push('请填写性质');
+      // }
 
-      //门牌号范围
-      if (!validateObj.MPNUMRANGE) {
-        errs.push('请填写门牌号范围');
-      }
+      // //门牌号范围
+      // if (!validateObj.MPNUMRANGE) {
+      //   errs.push('请填写门牌号范围');
+      // }
 
       //命名时间
       if (!validateObj.BZTIME) {
@@ -206,7 +214,6 @@ class DLQLForm extends Component {
           NAME,
         },
         e => {
-          debugger;
           if (e.length === 0) {
             notification.success({ description: '“命名”有效、可用！', message: '成功' });
             this.setState({ showCheckIcon: 'yes' });
@@ -266,19 +273,27 @@ class DLQLForm extends Component {
   };
 
   async save(obj) {
-    await Post(url_RoadAndBridgeApplicant, { road: obj }, e => {
-      debugger;
+    await Post(url_RoadAndBridgeApplicant, { mObj: JSON.stringify(obj) }, e => {
       notification.success({ description: '保存成功！', message: '成功' });
+      this.mObj = {};
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
       }
-      this.setState({ showCheckIcon: 'empty', isSaved: true, entity: { BZTIME: moment() } });
-      this.getFormData();
+      this.setState({ showCheckIcon: 'empty' });
+      this.getFormData(this.state.entity.ID);
     });
+  }
+  isSaved() {
+    let saved = true;
+    for (let i in this.mObj) {
+      saved = false;
+      break;
+    }
+    return saved;
   }
 
   onCancel() {
-    if (!this.state.isSaved) {
+    if (!this.isSaved()) {
       Modal.confirm({
         title: '提醒',
         content: '是否放弃所做的修改？',
@@ -293,6 +308,8 @@ class DLQLForm extends Component {
       this.props.onCancel && this.props.onCancel();
     }
   }
+  onEmpty() {}
+
   componentDidMount() {
     this.getDistricts();
     this.getFormData();
@@ -300,7 +317,14 @@ class DLQLForm extends Component {
   render() {
     let { districts, entity, showLocateMap, showLoading, showCheckIcon } = this.state;
     const { getFieldDecorator } = this.props.form;
-    console.log(showLoading);
+    let shapeOptions = {
+      stroke: true,
+      color: 'red',
+      weight: 6,
+      opacity: 1,
+      fill: false,
+      clickable: true,
+    };
     return (
       <div className={st.DLQLForm}>
         <Spin
@@ -332,14 +356,16 @@ class DLQLForm extends Component {
                         }
                       >
                         <Cascader
-                          value={entity.Districts == null ? null : entity.Districts}
+                          initalValue={entity.Districts ? entity.Districts : undefined}
                           expandTrigger="hover"
                           options={districts}
                           placeholder="所在（跨）行政区"
                           onChange={(a, b) => {
-                            let { entity } = this.state;
-                            entity.Districts = a;
-                            this.setState({ entity: entity, isSaved: false });
+                            this.mObj.districts = a;
+                            this.setState({ showCheckIcon: 'empty' });
+                            // let { entity } = this.state;
+                            // entity.Districts = a;
+                            // this.setState({ entity: entity, isSaved: false });
                           }}
                         />
                       </FormItem>
@@ -354,22 +380,19 @@ class DLQLForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('NAME', {
-                          initialValue: entity.NAME,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.NAME = e.target.value;
-                              this.setState({
-                                entity: entity,
-                                showCheckIcon: 'empty',
-                                isSaved: false,
-                              });
-                            }}
-                            placeholder="标准名称"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.NAME ? entity.NAME : undefined}
+                          onChange={e => {
+                            // let { entity } = this.state;
+                            this.mObj.NAME = e.target.value;
+                            this.setState({
+                              // entity: entity,
+                              showCheckIcon: 'empty',
+                              // isSaved: false,
+                            });
+                          }}
+                          placeholder="标准名称"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={1}>
@@ -387,240 +410,164 @@ class DLQLForm extends Component {
                   </Row>
                   <Row>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>原规划名称
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('PLANNAME', {
-                          initialValue: entity.PLANNAME,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.PLANNAME = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="原规划名称"
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="原规划名称">
+                        <Input
+                          initalValue={entity.PLANNAME ? entity.PLANNAME : undefined}
+                          onChange={e => {
+                            // let { entity } = this.state;
+                            // entity.PLANNAME = e.target.value;
+                            this.mObj.PLANNAME = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="原规划名称"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
                       <FormItem
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>起点（东/南）起
-                          </span>
-                        }
+                        label="起点（东/南）起"
                       >
-                        {getFieldDecorator('STARTDIRECTION', {
-                          initialValue: entity.STARTDIRECTION,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.STARTDIRECTION = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="起点（东/南）起"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined}
+                          onChange={e => {
+                            this.mObj.STARTDIRECTION = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.STARTDIRECTION = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="起点（东/南）起"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
                       <FormItem
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>止点（西/北至）
-                          </span>
-                        }
+                        label="止点（西/北）至"
                       >
-                        {getFieldDecorator('ENDDIRECTION', {
-                          initialValue: entity.ENDDIRECTION,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.ENDDIRECTION = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="止点（西/北至）"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
+                          onChange={e => {
+                            this.mObj.ENDDIRECTION = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.ENDDIRECTION = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="止点（西/北）至"
+                        />
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={8}>
                       <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="走向">
-                        {getFieldDecorator('ZX', {
-                          initialValue: entity.ZX,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.ZX = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="走向"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.ZX ? entity.ZX : undefined}
+                          onChange={e => {
+                            this.mObj.ZX = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.ZX = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="走向"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>长度（米）
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('LENGTH', {
-                          initialValue: entity.LENGTH,
-                        })(
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.LENGTH = e;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="长度（米）">
+                        <InputNumber
+                          initalValue={entity.LENGTH ? entity.LENGTH : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.LENGTH = e;
+                            // let { entity } = this.state;
+                            // entity.LENGTH = e;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>宽度（米）
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('WIDTH', {
-                          initialValue: entity.WIDTH,
-                        })(
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.WIDTH = e;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="宽度（米）">
+                        <InputNumber
+                          initalValue={entity.WIDTH ? entity.WIDTH : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.WIDTH = e;
+                            // let { entity } = this.state;
+                            // entity.WIDTH = e;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>建成时间
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('JCSJ', {
-                          initialValue: entity.JCSJ,
-                        })(
-                          <DatePicker
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.JCSJ = e;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="建成时间">
+                        <DatePicker
+                          initalValue={entity.JCSJ ? entity.JCSJ : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.JCSJ = e;
+                            // let { entity } = this.state;
+                            // entity.JCSJ = e;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
                       <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="路面结构">
-                        {getFieldDecorator('LMJG', {
-                          initialValue: entity.LMJG,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.LMJG = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="路面结构"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.LMJG ? entity.LMJG : undefined}
+                          onChange={e => {
+                            this.mObj.LMJG = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.LMJG = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="路面结构"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>性质
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('NATURE', {
-                          initialValue: entity.NATURE,
-                        })(
-                          <Select
-                            allowClear
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.NATURE = e;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="性质"
-                          >
-                            {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
-                              <Select.Option key={d} value={d}>
-                                {d}
-                              </Select.Option>
-                            ))}
-                          </Select>
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="性质">
+                        <Select
+                          initalValue={entity.NATURE ? entity.NATURE : undefined}
+                          allowClear
+                          onChange={e => {
+                            this.mObj.NATURE = e;
+                            // let { entity } = this.state;
+                            // entity.NATURE = e;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="性质"
+                        >
+                          {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
+                            <Select.Option key={d} value={d}>
+                              {d}
+                            </Select.Option>
+                          ))}
+                        </Select>
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>门牌号范围
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('MPNUMRANGE', {
-                          initialValue: entity.MPNUMRANGE,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.MPNUMRANGE = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="门牌号范围"
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="门牌号范围">
+                        <Input
+                          initalValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
+                          onChange={e => {
+                            this.mObj.MPNUMRANGE = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.MPNUMRANGE = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="门牌号范围"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
@@ -633,18 +580,16 @@ class DLQLForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('BZTIME', {
-                          initialValue: entity.BZTIME,
-                        })(
-                          <DatePicker
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.BZTIME = e;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                          />
-                        )}
+                        <DatePicker
+                          initalValue={entity.BZTIME ? entity.BZTIME : undefined}
+                          style={{ width: '100%' }}
+                          onChange={e => {
+                            this.mObj.BZTIME = e;
+                            // let { entity } = this.state;
+                            // entity.BZTIME = e;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                        />
                       </FormItem>
                     </Col>
                     <Col span={2}>
@@ -667,25 +612,19 @@ class DLQLForm extends Component {
                       <FormItem
                         labelCol={{ span: 5 }}
                         wrapperCol={{ span: 19 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>名称含义或理由
-                          </span>
-                        }
+                        label="名称含义或理由"
                       >
-                        {getFieldDecorator('MCHY', {
-                          initialValue: entity.MCHY,
-                        })(
-                          <TextArea
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.MCHY = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="名称含义或理由"
-                            autosize={{ minRows: 2 }}
-                          />
-                        )}
+                        <TextArea
+                          initalValue={entity.MCHY ? entity.MCHY : undefined}
+                          onChange={e => {
+                            this.mObj.MCHY = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.MCHY = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="名称含义或理由"
+                          autosize={{ minRows: 2 }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -707,18 +646,16 @@ class DLQLForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('LXR', {
-                          initialValue: entity.LXR,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.LXR = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="联系人"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.LXR ? entity.LXR : undefined}
+                          onChange={e => {
+                            this.mObj.LXR = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.LXR = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="联系人"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
@@ -731,18 +668,16 @@ class DLQLForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('LXDH', {
-                          initialValue: entity.LXDH,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.LXDH = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="联系电话"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.LXDH ? entity.LXDH : undefined}
+                          onChange={e => {
+                            this.mObj.LXDH = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.LXDH = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="联系电话"
+                        />
                       </FormItem>
                     </Col>
                     <Col span={8}>
@@ -755,45 +690,33 @@ class DLQLForm extends Component {
                           </span>
                         }
                       >
-                        {getFieldDecorator('SBDW', {
-                          initialValue: entity.SBDW,
-                        })(
-                          <Input
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.SBDW = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="申报单位"
-                          />
-                        )}
+                        <Input
+                          initalValue={entity.SBDW ? entity.SBDW : undefined}
+                          onChange={e => {
+                            this.mObj.SBDW = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.SBDW = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="申报单位"
+                        />
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={16}>
-                      <FormItem
-                        labelCol={{ span: 4 }}
-                        wrapperCol={{ span: 20 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>备注
-                          </span>
-                        }
-                      >
-                        {getFieldDecorator('BZ', {
-                          initialValue: entity.BZ,
-                        })(
-                          <TextArea
-                            onChange={e => {
-                              let { entity } = this.state;
-                              entity.BZ = e.target.value;
-                              this.setState({ entity: entity, isSaved: false });
-                            }}
-                            placeholder="备注"
-                            autosize={{ minRows: 2 }}
-                          />
-                        )}
+                      <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
+                        <TextArea
+                          initalValue={entity.BZ ? entity.BZ : undefined}
+                          onChange={e => {
+                            this.mObj.BZ = e.target.value;
+                            // let { entity } = this.state;
+                            // entity.BZ = e.target.value;
+                            // this.setState({ entity: entity, isSaved: false });
+                          }}
+                          placeholder="备注"
+                          autosize={{ minRows: 2 }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -810,9 +733,117 @@ class DLQLForm extends Component {
               <Button type="default" onClick={this.onCancel.bind(this)}>
                 取消
               </Button>
+              &emsp;
+              <Button type="default" onClick={this.onEmpty.bind(this)}>
+                清空
+              </Button>
             </div>
           </div>
         </div>
+        <Modal
+          wrapClassName={st.locatemap}
+          visible={showLocateMap}
+          destroyOnClose={true}
+          onCancel={this.closeLocateMap.bind(this)}
+          title="定位"
+          footer={null}
+        >
+          <LocateMap
+            onMapReady={lm => {
+              // let { Lat, Lng } = this.state.entity;
+              // if (Lat && Lng) {
+              //   lm.mpLayer = L.marker([Lat, Lng], { icon: mp }).addTo(lm.map);
+              //   lm.map.setView([Lat, Lng], 16);
+              // }
+              let { GEOM_WKT } = this.state.entity;
+              if (GEOM_WKT) {
+                let geometry = Terraformer.WKT.parse(GEOM_WKT);
+                lm.mpLayer = L.geoJSON(geometry, {
+                  style: function(feature) {
+                    return shapeOptions;
+                  },
+                }).addTo(lm.map);
+                let coordinates = geometry.coordinates.map(e => {
+                  return e.reverse();
+                });
+                lm.map.fitBounds(coordinates);
+              }
+            }}
+            onMapClear={lm => {
+              lm.mpLayer && lm.mpLayer.remove();
+              lm.mpLayer = null;
+              let { entity } = this.state;
+              entity.Lat = null;
+              entity.Lng = null;
+              this.mObj.Lng = entity.Lng;
+              this.mObj.Lat = entity.Lat;
+            }}
+            beforeBtns={[
+              {
+                id: 'locate',
+                name: '道路、桥梁定位',
+                icon: 'icon-dingwei',
+                onClick: (dom, i, lm) => {
+                  if (!lm.locatePen) {
+                    // lm.locatePen = new L.Draw.Marker(lm.map, { icon: mp });
+                    // lm.locatePen.on(L.Draw.Event.CREATED, e => {
+                    //   lm.mpLayer && lm.mpLayer.remove();
+                    //   var { layer } = e;
+                    //   lm.mpLayer = layer;
+                    //   layer.addTo(lm.map);
+                    // });
+                    lm.locatePen = new L.Draw.Polyline(lm.map, {
+                      shapeOptions: shapeOptions,
+                      icon: new L.DivIcon({
+                        iconSize: new L.Point(8, 8),
+                        className: 'leaflet-div-icon leaflet-editing-icon',
+                      }),
+                      touchIcon: new L.DivIcon({
+                        iconSize: new L.Point(10, 10),
+                        className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
+                      }),
+                    });
+                    lm.locatePen.on(L.Draw.Event.CREATED, e => {
+                      lm.mpLayer && lm.mpLayer.remove();
+                      var { layer } = e;
+                      lm.mpLayer = layer;
+                      layer.addTo(lm.map);
+                    });
+                  }
+                  lm.disableMSTools();
+                  if (lm.locatePen._enabled) {
+                    lm.locatePen.disable();
+                  } else {
+                    lm.locatePen.enable();
+                  }
+                },
+              },
+              {
+                id: 'savelocation',
+                name: '保存定位',
+                icon: 'icon-save',
+                onClick: (dom, item, lm) => {
+                  let geometry = lm.mpLayer.toGeoJSON().geometry;
+                  entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
+                  this.mObj.GEOM_WKT = entity.GEOM_WKT;
+                  // let { lat, lng } = lm.mpLayer.getLatLng();
+                  // let { entity } = this.state;
+
+                  // entity.Lng = lng.toFixed(8) - 0;
+                  // entity.Lat = lat.toFixed(8) - 0;
+
+                  // this.mObj.Lng = entity.Lng;
+                  // this.mObj.Lat = entity.Lat;
+
+                  this.setState({
+                    entity: entity,
+                  });
+                  this.closeLocateMap();
+                },
+              },
+            ]}
+          />
+        </Modal>
       </div>
     );
   }

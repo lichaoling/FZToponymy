@@ -16,7 +16,7 @@ class LocateMap2 extends Component {
 
   defaultCenter = {
     zoom: 12,
-    center: [30.75, 120.75],
+    center: [26.077768, 119.311231],//119.311231,26.077768
   };
 
   baseLayers = {

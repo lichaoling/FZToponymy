@@ -23,9 +23,7 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 
 class DLQL extends Component {
-  componentDidMount() {
-    
-  }
+  componentDidMount() {}
   render() {
     return (
       <div className={st.DLQL}>

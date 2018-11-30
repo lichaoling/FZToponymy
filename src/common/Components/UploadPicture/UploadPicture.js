@@ -109,7 +109,7 @@ class UploadPicture extends React.Component {
       <div className={`${st.uploadpicture} clearfix`}>
         <Upload
           disabled={showLoading}
-          listType="picture-card"
+          listType={this.props.listType ? this.props.listType : 'picture-card'}
           fileList={fileList}
           onPreview={this.handlePreview}
           beforeUpload={this.beforeUpload}
