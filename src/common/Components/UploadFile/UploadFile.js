@@ -1,8 +1,8 @@
-import { Upload, Icon, Modal, Spin } from 'antd';
+import { Upload, Icon, Spin, Button } from 'antd';
 import { Post } from '../../../utils/request.js';
-import st from './UploadPicture.less';
+import st from './UploadFile.less';
 
-class UploadPicture extends React.Component {
+class UploadFile extends React.Component {
   constructor(ps) {
     super(ps);
 
@@ -12,8 +12,6 @@ class UploadPicture extends React.Component {
   }
   state = {
     showLoading: false,
-    previewVisible: false,
-    previewImage: '',
   };
 
   componentWillReceiveProps(ps) {
@@ -29,8 +27,7 @@ class UploadPicture extends React.Component {
       return {
         uid: e.FileID,
         name: e.FileName,
-        url: `${fileBasePath}/${e.TRelativePath}`,
-        previewUrl: `${fileBasePath}/${e.RelativePath}`,
+        url: `${fileBasePath}/${e.RelativePath}`,
       };
     });
   }
@@ -104,35 +101,23 @@ class UploadPicture extends React.Component {
   };
 
   render() {
-    const { showLoading, previewVisible, previewImage, fileList, progressContent } = this.state;
+    const { showLoading, fileList } = this.state;
     return (
-      <div className={`${st.uploadpicture} clearfix`}>
+      <div className={`${st.uploadfile} clearfix`}>
         <Upload
           disabled={showLoading}
-          listType="picture-card"
+          listType="text"
           fileList={fileList}
-          onPreview={this.handlePreview}
           beforeUpload={this.beforeUpload}
           onRemove={this.onRemove.bind(this)}
         >
-          <div>
-            <Spin spinning={showLoading} tip={progressContent}>
-              <Icon type="plus" />
-              <div className="ant-upload-text">上传</div>
-            </Spin>
-          </div>
+          <Button>
+            <Icon type="upload" /> 上传
+          </Button>
         </Upload>
-        <Modal
-          wrapClassName={st.upmodal}
-          visible={previewVisible}
-          footer={null}
-          onCancel={this.handleCancel}
-        >
-          <img src={previewImage} />
-        </Modal>
       </div>
     );
   }
 }
 
-export default UploadPicture;
+export default UploadFile;

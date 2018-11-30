@@ -27,8 +27,8 @@ import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
 import { Post } from '../../../utils/request.js';
 import st from './XQLYForm.less';
-import LocateMap from '../../../common/Components/Maps/LocateMap2.js';
-import { getDivIcons } from '../../../common/Components/Maps/icons';
+import LocateMap from '../Maps/LocateMap2.js';
+import { getDivIcons } from '../Maps/icons';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -742,7 +742,7 @@ class XQLYForm extends Component {
             beforeBtns={[
               {
                 id: 'locate',
-                name: '道路、桥梁定位',
+                name: '小区、楼宇定位',
                 icon: 'icon-dingwei',
                 onClick: (dom, i, lm) => {
                   if (!lm.locatePen) {

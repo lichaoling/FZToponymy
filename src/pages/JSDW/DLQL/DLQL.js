@@ -17,7 +17,7 @@ import {
   notification,
 } from 'antd';
 import st from './DLQL.less';
-import DLQLForm from '../Forms/DLQLForm';
+import DLQLForm from '../../../common/Components/Forms/DLQLForm';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;

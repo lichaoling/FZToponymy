@@ -31,8 +31,9 @@ import {
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
 import { Post } from '../../../utils/request.js';
-import UploadPicture from '../../../common/Components/UploadPicture/UploadPicture.js';
-import { fileType, HouseBZUploadFileType } from '../../../common/enums.js';
+import UploadPicture from '../UploadPicture/UploadPicture.js';
+import UploadFile from '../UploadFile/UploadFile.js';
+import { fileType, HouseBZUploadFileType } from '../../enums.js';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -343,7 +344,7 @@ class MPHForm extends Component {
                     </Col>
                     <Col span={12}>
                       <FormItem label="申请报告">
-                        <UploadPicture
+                        <UploadFile
                           fileList={entity.SQBG}
                           id={entity.ID}
                           fileBasePath={baseUrl}
@@ -351,7 +352,7 @@ class MPHForm extends Component {
                           uploadAction={url_UploadPicture}
                           removeAction={url_RemovePicture}
                           getAction={url_GetPictureUrls}
-                          listType='text'
+                          listType="text"
                         />
                       </FormItem>
                     </Col>

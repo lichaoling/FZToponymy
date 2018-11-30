@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import XQLYForm from '../Forms/XQLYForm';
+import XQLYForm from '../../../common/Components/Forms/XQLYForm';
 import st from './XQLY.less';
 
 class XQLY extends Component {
