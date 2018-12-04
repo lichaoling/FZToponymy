@@ -28,7 +28,9 @@ class MPH extends Component {
   render() {
     return (
       <div className={st.MPH}>
+      <div className={st.Content}>
         <MPHForm />
+        </div>
       </div>
     );
   }

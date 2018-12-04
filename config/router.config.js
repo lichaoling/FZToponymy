@@ -21,6 +21,8 @@ export default [
       { path: '/qmzj/dlql', name: '道路、桥梁命名审核', component: './QMZJ/DLQL/DLQL' },
       { path: '/qmzj/mph', name: '门牌号审核', component: './QMZJ/MPH/MPH' },
       { path: '/qmzj/mpbz', name: '门牌号编制', component: './QMZJ/MPBZ/MPBZ' },
+      { path: '/qmzj/xqly', name: '小区、楼宇命名审核', component: './QMZJ/XQLY/XQLY' },
+
     ],
   },
   //市民政局

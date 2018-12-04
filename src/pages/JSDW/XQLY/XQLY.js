@@ -4,11 +4,13 @@ import XQLYForm from '../../../common/Components/Forms/XQLYForm';
 import st from './XQLY.less';
 
 class XQLY extends Component {
-  componentDidMount() {}
+  componentDidMount() { }
   render() {
     return (
       <div className={st.XQLY}>
-        <XQLYForm />
+        <div className={st.Content}>
+          <XQLYForm />
+        </div>
       </div>
     );
   }
