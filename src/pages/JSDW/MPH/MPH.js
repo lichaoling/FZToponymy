@@ -15,7 +15,7 @@ import {
   notification,
 } from 'antd';
 import st from './MPH.less';
-import MPHForm from '../Forms/MPHForm';
+import MPHForm from '../../../common/Components/Forms/MPHForm';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
