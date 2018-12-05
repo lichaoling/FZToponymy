@@ -202,9 +202,9 @@ class DLQL extends Component {
     return (
       <div className={st.DLQL}>
         <div className={st.content} >
-          <div className={st.ct_header}>
+          {/* <div className={st.ct_header}>
             <div className={st.ct_title}>道路审批</div>
-          </div>
+          </div> */}
           <div className={st.ct_form}>
             <DLQLQueryForm />
           </div>

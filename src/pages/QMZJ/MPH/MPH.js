@@ -176,9 +176,9 @@ class MPH extends Component {
     return (
       <div className={st.MPH}>
         <div className={st.content} >
-          <div className={st.ct_header}>
+          {/* <div className={st.ct_header}>
             <div className={st.ct_title}>门牌号审批</div>
-          </div>
+          </div> */}
           <div className={st.ct_form}>
             <DLQLQueryForm />
           </div>

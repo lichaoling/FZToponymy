@@ -16,17 +16,13 @@ function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
 import {
-    // baseUrl,
-    url_GetDistrictTreeByUID,
-    // url_CheckRoadName,
-    // url_SearchRoadByID,
-    // url_RoadAndBridgeApplicant,
+    url_GetDistrictTree,
   } from '../../../common/urls.js';
 import { Post } from '../../../utils/request.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
-import st from './DLQLQueryForm.less';
+import st from './MPHBzQueryForm.less';
 import { getDistricts } from '../../../utils/utils.js';
-class DLQLQueryForm extends Component {
+class MPHBzQueryForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -48,9 +44,8 @@ class DLQLQueryForm extends Component {
     // 获取行政区数据
     async getDistricts() {
         this.showLoading();
-        let rt = await Post(url_GetDistrictTreeByUID);
+        let rt = await Post(url_GetDistrictTree);
         rtHandle(rt, d => {
-            debugger
         let districts = getDistricts(d);
         this.setState({ districts: districts });
         });
@@ -221,7 +216,7 @@ class DLQLQueryForm extends Component {
                 ],
             },];
         return (
-            <div className={st.DLQLQueryForm}>
+            <div className={st.MPHBzQueryForm}>
             <Spin
                 className={showLoading ? 'active' : ''}
                 spinning={showLoading}
@@ -236,7 +231,6 @@ class DLQLQueryForm extends Component {
                                     { required: false, message: '请选择' },
                                 ],
                             })(
-                                // <Cascader placeholder={"请选择"} options={areaSrc} />
                                 <Cascader
                                     initalValue={districts ? districts : undefined}
                                     expandTrigger="hover"
@@ -250,35 +244,26 @@ class DLQLQueryForm extends Component {
                                     />
                             )}
                         </FormItem>
-                        <FormItem label={`审批状态：`} /*{...formItemLayout}*/ className={st.edit_row}>
-                            {getFieldDecorator('spzt', {
+                        <FormItem label={`数据类别：`} /*{...formItemLayout}*/ className={st.edit_row}>
+                            {getFieldDecorator('sjlb', {
                                 rules: [
                                     { required: false, message: '请选择' },
                                 ],
                             })(
                                 <Select placeholder="请选择" name="xian" style={{ width: 130 }}>
-                                    <Option value="1">未审批</Option>
-                                    <Option value="2">已审批</Option>
+                                    <Option value="1">类别1</Option>
+                                    <Option value="2">类别2</Option>
+                                    <Option value="3">类别3</Option>
                                 </Select>
                             )}
                         </FormItem>
-                        <FormItem label={`审批时间：`} /*{...formItemLayout}*/  >
-                            {getFieldDecorator('spkssj', {
+                        <FormItem label={`道路名称：`} /*{...formItemLayout}*/ className={st.edit_row}>
+                            {getFieldDecorator('dlmc', {
                                 rules: [
-                                    { required: false, message: '请输入' },
+                                    { required: false, message: '请选择' },
                                 ],
                             })(
-                                <DatePicker />
-                            )}
-                        </FormItem>
-                        <span className={st.spanSpr}>~</span>
-                        <FormItem  className={st.edit_row} >
-                            {getFieldDecorator('spjssj', {
-                                rules: [
-                                    { required: false, message: '请输入' },
-                                ],
-                            })(
-                                <DatePicker />
+                                <Input placeholder="不同查询条件请以逗号隔开" />
                             )}
                         </FormItem>
                         <FormItem style={{ marginLeft: 15 }}>
@@ -292,5 +277,5 @@ class DLQLQueryForm extends Component {
     }
 }
 
-DLQLQueryForm = Form.create()(DLQLQueryForm);
-export default DLQLQueryForm;
+MPHBzQueryForm = Form.create()(MPHBzQueryForm);
+export default MPHBzQueryForm;

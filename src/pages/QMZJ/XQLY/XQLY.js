@@ -175,9 +175,9 @@ class XQLY extends Component {
     return (
       <div className={st.XQLY}>
         <div className={st.content} >
-          <div className={st.ct_header}>
+          {/* <div className={st.ct_header}>
             <div className={st.ct_title}>小区楼宇审批</div>
-          </div>
+          </div> */}
           <div className={st.ct_form}>
             <DLQLQueryForm />
           </div>
