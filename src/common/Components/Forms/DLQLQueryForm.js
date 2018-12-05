@@ -50,7 +50,6 @@ class DLQLQueryForm extends Component {
         this.showLoading();
         let rt = await Post(url_GetDistrictTreeByUID);
         rtHandle(rt, d => {
-            debugger
         let districts = getUserDistricts(d);
         this.setState({ districts: districts });
         });
