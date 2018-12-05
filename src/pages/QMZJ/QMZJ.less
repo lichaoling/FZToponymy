@@ -13,11 +13,12 @@
 .QMZJ {
     height: 100%;
     width: 100%;
-    @h-h: 80px;
+    @hh: 80px;
+    @nh:44px;
     @jz-w: 350px;
     @logh-w: 400px;
     .header {
-        height: @h-h;
+        height: @hh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -47,11 +48,12 @@
     .nave {
         background-color: #0077d6;
         width: 100%;
+        height: @nh;
         .nave_ct {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 60%;
+            width: 75%;
             >a {
                 position: relative;
                 margin-right: 40px;
@@ -87,7 +89,7 @@
         }
     }
     .body {
-        height: calc(~'100% - @{h-h}');
+        height: calc(~'100% - @{hh} - @{nh}');
         background-color: rgb(240, 240, 240);
     }
 }

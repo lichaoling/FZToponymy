@@ -1,19 +1,19 @@
 import { Component } from 'react';
 import { } from 'antd';
 import { Route, Redirect } from 'react-router-dom';
-import st from './Home.less';
+import st from './JSDWHome.less';
 
-class Home extends Component {
+class JSDWHome extends Component {
   componentDidMount() {
   
   }
   render() {
     return (
-      <div className={st.Home}>
+      <div className={st.JSDWHome}>
         Home
       </div>
     );
   }
 }
 
-export default Home;
+export default JSDWHome;

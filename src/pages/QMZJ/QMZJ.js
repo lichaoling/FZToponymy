@@ -53,7 +53,6 @@ class QMZJ extends Component {
   }
   onClick(e) {}
   render() {
-    console.log(this.props);
     const menu = (
       <Menu onClick={e => this.onClick(e)}>
         <Menu.Item key="1">个人中心</Menu.Item>

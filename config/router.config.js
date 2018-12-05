@@ -6,6 +6,7 @@ export default [
     name: '建设单位',
     routes: [
       { path: '/jsdw', redirect: '/jsdw/dlql' },
+      { path: '/jsdw_home', name: '主页', component: './JSDWHome/JSDWHome' },
       { path: '/jsdw/dlql', name: '道路、桥梁命名申请', component: './JSDW/DLQL/DLQL' },
       { path: '/jsdw/xqly', name: '小区、楼宇命名申请', component: './JSDW/XQLY/XQLY' },
       { path: '/jsdw/mph', name: '门牌号申请', component: './JSDW/MPH/MPH' },
@@ -33,10 +34,11 @@ export default [
     name: '区民政局',
     routes: [
       { path: '/qmzj', redirect: '/qmzj/dlql' },
-      { path: '/qmzj/dlql', name: '道路、桥梁命名审核', component: './QMZJ/DLQL/DLQL' },
-      { path: '/qmzj/mph', name: '门牌号审核', component: './QMZJ/MPH/MPH' },
+      { path: '/home', name: '主页', component: './Home/Home' },
+      { path: '/qmzj/dlql', name: '道路、桥梁命名审批', component: './QMZJ/DLQL/DLQL' },
+      { path: '/qmzj/xqly', name: '小区、楼宇命名审批', component: './QMZJ/XQLY/XQLY' },
+      { path: '/qmzj/mph', name: '门牌号审批', component: './QMZJ/MPH/MPH' },
       { path: '/qmzj/mpbz', name: '门牌号编制', component: './QMZJ/MPBZ/MPBZ' },
-      { path: '/qmzj/xqly', name: '小区、楼宇命名审核', component: './QMZJ/XQLY/XQLY' },
     ],
   },
   // test
