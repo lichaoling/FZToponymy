@@ -57,7 +57,10 @@ class JSDW extends Component {
         <div className={st.header}>
           <div className={st.logo} />
           <div className={st.jz} />
-          <div className={st.user}>你好，开发商</div>
+          <div className={st.user}>
+            <Icon type="user" style={{ fontSize: 18 }}/>
+            &nbsp;你好，开发商
+          </div>
         </div>
         <div ref={e => (this.nave = e)} className={st.nave}>
           <div className={st.nave_ct}>{this.getNavs()}</div>

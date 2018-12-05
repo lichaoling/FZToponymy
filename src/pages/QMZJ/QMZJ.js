@@ -65,16 +65,19 @@ class QMZJ extends Component {
       <div className={st.QMZJ}>
         <div className={st.header}>
           <div className={st.logo} />
-          <div ref={e => (this.nave = e)} className={st.nave}>
-            {this.getNavs()}
-          </div>
+          <div className={st.jz} />
+
           <div className={st.user}>
             <Dropdown overlay={menu}>
               <a className="ant-dropdown-link" href="#">
-                你好, 经办人(区民政局)
+                <Icon type="user" style={{ fontSize: 18 }} />
+                &nbsp;你好, 经办人
               </a>
             </Dropdown>
           </div>
+        </div>
+        <div ref={e => (this.nave = e)} className={st.nave}>
+          <div className={st.nave_ct}>{this.getNavs()}</div>
         </div>
         <div className={st.body}>{this.getRoutes()}</div>
       </div>

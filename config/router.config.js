@@ -11,6 +11,21 @@ export default [
       { path: '/jsdw/mph', name: '门牌号申请', component: './JSDW/MPH/MPH' },
     ],
   },
+  //登录
+  {
+    path: '/login',
+    component: './Login/Login',
+    name: '用户登录',
+    // routes: [
+    //   { path: '/', redirect: '/login' },
+    // ]
+  },
+   //主页
+   {
+    path: '/home',
+    component: './Home/Home',
+    name: '用户主页',
+  },
   //区民政局
   {
     path: '/qmzj',
@@ -22,25 +37,7 @@ export default [
       { path: '/qmzj/mph', name: '门牌号审核', component: './QMZJ/MPH/MPH' },
       { path: '/qmzj/mpbz', name: '门牌号编制', component: './QMZJ/MPBZ/MPBZ' },
       { path: '/qmzj/xqly', name: '小区、楼宇命名审核', component: './QMZJ/XQLY/XQLY' },
-
     ],
-  },
-  //市民政局
-  {
-    path: '/smzj',
-    component: './SMZJ/SMZJ',
-    name: '市民政局',
-    routes: [
-      { path: '/smzj', redirect: '/smzj/dlql' },
-      { path: '/smzj/dlql', name: '道路、桥梁审核', component: './SMZJ/DLQL/DLQL' },
-      { path: '/smzj/xqly', name: '小区、楼宇命名审核', component: './SMZJ/XQLY/XQLY' },
-    ],
-  },
-  //市政府
-  {
-    path: '/szf',
-    component: './SZF/SZF',
-    name: '市政府',
   },
   // test
   {
