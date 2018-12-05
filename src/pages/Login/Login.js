@@ -1,10 +1,15 @@
 import { Component } from 'react';
 import { Icon, Input, Button, Checkbox } from 'antd';
 import st from './Login.less';
+import { url_Login } from '../../common/urls.js';
+import { Post } from '../../utils/request.js';
+import { rtHandle } from '../../utils/errorHandle.js';
 
 class Login extends Component {
-  login() {
-    this.props.history.push('/home');
+  async login() {
+    let rt = await Post(url_Login, { userName: this.userName, password: md5(this.password) }, e => {
+      this.props.history.push('/home');
+    });
   }
 
   componentDidMount() {
@@ -23,19 +28,26 @@ class Login extends Component {
           <div className={st.bg} />
           <div className={st.loginpanel}>
             <div className={st.righttitle}>
-              <Icon type="desktop" theme="outlined" />&ensp;用户登录
+              <Icon type="desktop" theme="outlined" />
+              &ensp;用户登录
             </div>
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
               size="large"
               type="text"
               placeholder="用户名"
+              onChange={e => {
+                this.userName = e.target.value;
+              }}
             />
             <Input
               prefix={<Icon type="key" style={{ color: 'rgba(0,0,0,.25)' }} />}
               size="large"
               type="password"
               placeholder="密码"
+              onChange={e => {
+                this.password = e.target.value;
+              }}
             />
             <div className={st.btns}>
               <Checkbox>记住密码</Checkbox>
@@ -52,10 +64,12 @@ class Login extends Component {
           </div>
           <div className={st.rightfooter}>
             <a href="http://jx.zjzwfw.gov.cn/" target="_blank">
-              <Icon type="global" theme="outlined" />&ensp;嘉兴市政务服务网
+              <Icon type="global" theme="outlined" />
+              &ensp;嘉兴市政务服务网
             </a>
             <a href="http://www.jxsmz.gov.cn" target="_blank">
-              <Icon type="link" theme="outlined" />&ensp;嘉兴市民政局
+              <Icon type="link" theme="outlined" />
+              &ensp;嘉兴市民政局
             </a>
           </div>
         </div>
