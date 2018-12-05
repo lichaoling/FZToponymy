@@ -25,7 +25,7 @@ import {
 import { Post } from '../../../utils/request.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
 import st from './DLQLQueryForm.less';
-import { getDistricts } from '../../../utils/utils.js';
+import { getUserDistricts } from '../../../utils/utils.js';
 class DLQLQueryForm extends Component {
     constructor(props) {
         super(props);
@@ -51,7 +51,7 @@ class DLQLQueryForm extends Component {
         let rt = await Post(url_GetDistrictTreeByUID);
         rtHandle(rt, d => {
             debugger
-        let districts = getDistricts(d);
+        let districts = getUserDistricts(d);
         this.setState({ districts: districts });
         });
         this.hideLoading();

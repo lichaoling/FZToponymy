@@ -197,6 +197,23 @@ export function getDistricts(data) {
 
   return data.length ? data[0].SubDistrict.map(getSub) : [];
 }
+
+export function getUserDistricts(data) {
+  let getSub = p => {
+    let obj = {
+      label: p.Name,
+      value: p.ID,
+      userIn:p.UserIn
+    };
+    if (p.SubDistrict) {
+      obj.children = p.SubDistrict.map(getSub);
+    }
+    return obj;
+  };
+
+  return data.length ? data[0].SubDistrict.map(getSub) : [];
+}
+
 export function getDistrictsWithJX(data) {
   let getSub = p => {
     let obj = {
