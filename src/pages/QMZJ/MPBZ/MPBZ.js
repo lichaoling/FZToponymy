@@ -200,13 +200,13 @@ class MPBZ extends Component {
   }
   render() {
     return (
-      <div className={st.DLQL}>
+      <div className={st.MPBZ}>
         <div className={st.content} >
           {/* <div className={st.ct_header}>
             <div className={st.ct_title}>道路审批</div>
           </div> */}
           <div className={st.ct_form}>
-            <DLQLQueryForm />
+            <MPHBzQueryForm />
           </div>
           <div className={st.ct_form}>
             <Table
