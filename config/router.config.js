@@ -1,28 +1,44 @@
 export default [
   //建设单位
   {
-    path: '/jsdw',
-    component: './JSDW/JSDW',
+    path: '/developer',
+    component: './Developer/Developer',
     name: '建设单位',
     routes: [
-      { path: '/jsdw', redirect: '/jsdw/dlql' },
-      { path: '/jsdw_home', name: '主页', component: './JSDWHome/JSDWHome' },
-      { path: '/jsdw/dlql', name: '道路、桥梁命名申请', component: './JSDW/DLQL/DLQL' },
-      { path: '/jsdw/xqly', name: '小区、楼宇命名申请', component: './JSDW/XQLY/XQLY' },
-      { path: '/jsdw/mph', name: '门牌号申请', component: './JSDW/MPH/MPH' },
+      { path: '/developer', redirect: '/developer/home' },
+      {
+        path: '/developer/home',
+        component: './DeveloperHome/DeveloperHome',
+        name: '建设单位主页',
+      },
+      {
+        path: '/developer/dlql',
+        name: '道路、桥梁命名申请',
+        component: './Developer/DLQL/DLQL',
+      },
+      {
+        path: '/developer/xqly',
+        name: '小区、楼宇命名申请',
+        component: './Developer/XQLY/XQLY',
+      },
+      { path: '/developer/mph', name: '门牌号申请', component: './Developer/MPH/MPH' },
     ],
   },
+  //建设单位主页
+
   //登录
+  {
+    path: '/',
+    name: '用户登录',
+    component: './Login/Login',
+  },
   {
     path: '/login',
     component: './Login/Login',
     name: '用户登录',
-    // routes: [
-    //   { path: '/', redirect: '/login' },
-    // ]
   },
-   //主页
-   {
+  //经办人主页
+  {
     path: '/home',
     component: './Home/Home',
     name: '用户主页',
@@ -71,7 +87,7 @@ export default [
     authority: ['admin', 'user'],
     routes: [
       // dashboard
-      { path: '/', redirect: '/dashboard/analysis' },
+      // { path: '/', redirect: '/dashboard/analysis' },
       {
         path: '/dashboard',
         name: 'dashboard',

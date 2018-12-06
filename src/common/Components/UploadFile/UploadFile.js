@@ -1,4 +1,4 @@
-import { Upload, Icon, Spin, Button } from 'antd';
+import { Upload, Icon, Spin, Button, Modal } from 'antd';
 import { Post } from '../../../utils/request.js';
 import st from './UploadFile.less';
 

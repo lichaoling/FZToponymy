@@ -194,8 +194,8 @@ export function getDistricts(data) {
     }
     return obj;
   };
-
-  return data.length ? data[0].SubDistrict.map(getSub) : [];
+  return data.length ? [getSub(data[0])] : [];
+  // return data.length ? data[0].SubDistrict.map(getSub) : [];
 }
 
 export function getUserDistricts(data) {
@@ -210,8 +210,8 @@ export function getUserDistricts(data) {
     }
     return obj;
   };
-
-  return data.length ? data[0].SubDistrict.map(getSub) : [];
+  return data.length ? [getSub(data[0])] : [];
+  // return data.length ? data[0].SubDistrict.map(getSub) : [];
 }
 
 export function getDistrictsWithJX(data) {

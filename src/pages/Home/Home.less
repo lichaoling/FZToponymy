@@ -15,9 +15,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: url(../../common/Img/登录/福州西湖夜景灯光.png);
-        background-size: cover;
-        filter: grayscale(80%) brightness(200%) opacity(0.4);
+        background-image: url(../../common/Img/主页/bg5.jpg);
+        background-size: 100% 100%; // filter: grayscale(50%) brightness(100%) opacity(0.5);
     }
     .content {
         position: relative;
@@ -63,17 +62,20 @@
         }
         .panel {
             position: absolute;
-            height: 80%;
-            margin: 10% 5%; 
-            width: 90%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             :global {
                 #cardArea {
-                    position: relative;
-                    width: 100%;
-                    margin: 0 !important;
-                    padding-top: 40px !important;
+                    width: 80%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                     .card-item {
-                        width: 340px;
+                        position: relative;
+                        width: 20%;
                         .card {
                             .card-title {
                                 background-color: rgb(22, 115, 224) !important;
@@ -86,9 +88,12 @@
                                 }
                             }
                         }
+                        .contentNew {
+                            display: none
+                        }
                     }
                     .card-item.active {
-                        width: 650px;
+                        width: 40%;
                         .card {
                             .card-content.content-second {
                                 .main-info {
@@ -104,7 +109,7 @@
                                 .other-info {
                                     padding: 25px 0 0 0 !important;
                                     >li {
-                                        width: 120px !important;
+                                        width: 100px !important;
                                         height: 40px !important;
                                         padding: 0;
                                         >a {
@@ -115,38 +120,51 @@
                                             justify-content: center;
                                             align-items: center;
                                             >span {
-                                                margin: 0 // font-size:15px;
+                                                margin: 0;
+                                                font-size: 11px;
                                             }
                                         }
                                     }
                                 }
                             }
+                            .contentNew {
+                                display: block;
+                                z-index: 10;
+                                font-size: 30px;
+                                font-weight: 500px;
+                                letter-spacing: 2px;
+                                color:white;
+                                font-family: '幼圆';
+                                text-shadow:rgb(105, 104, 104) 1px 0 0,rgb(130, 130, 136) 0 1px 0,rgb(105, 104, 104) -1px 0 0,rgb(105, 104, 104) 0 -1px 0;
+                                background-color:rgba(255, 255, 255, 0.3);
+                                border-radius: 3px;
+                                width:60%;
+                                text-align: center;
+                                box-shadow: @box-shadow;
+                                margin: 50px auto;
+                                padding: 16px;
+                            }
                             .card-title-sp {
-                                background-image: url(../../common/Img/主页/ghywsp.png);
+                                background-image: url(../../common/Img/主页/1ghywsp.png);
                                 .content {
                                     display: none
                                 }
+                               
                             }
                             .card-title-xt {
-                                background-image: url(../../common/Img/主页/ywxtgx.png);
+                                background-image: url(../../common/Img/主页/2ywxtgx.png);
                                 .content {
                                     display: none
                                 }
                             }
                             .card-title-sj {
-                                background-image: url(../../common/Img/主页/sjkgl.png);
-                                .content {
-                                    display: none
-                                }
-                            }
-                            .card-title-lc {
-                                background-image: url(../../common/Img/主页/qlcjg.png);
+                                background-image: url(../../common/Img/主页/3sjkgl.png);
                                 .content {
                                     display: none
                                 }
                             }
                             .card-title-yyff {
-                                background-image: url(../../common/Img/主页/yyff.png);
+                                background-image: url(../../common/Img/主页/4yyfw.png);
                                 .content {
                                     display: none
                                 }

@@ -24,6 +24,7 @@ import {
   url_CheckRoadName,
   url_SearchRoadByID,
   url_RoadAndBridgeApplicant,
+  url_GetNewGuid,
 } from '../../../common/urls.js';
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
@@ -43,6 +44,7 @@ class DLQLForm extends Component {
     showLocateMap: false,
     showLoading: false,
     showCheckIcon: 'empty',
+    reload: false,
   };
 
   // 存储修改后的数据
@@ -84,19 +86,25 @@ class DLQLForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchRoadByID, { id: id });
       rtHandle(rt, d => {
-        let dIDs = d.DistrictIDs.length > 0 ? d.DistrictIDs.pop() : null;
-        d.Districts = dIDs ? dIDs.reverse() : null;
-
-        d.BZTIME = d.BZTIME ? moment(d.BZTIME) : null;
-        d.JCSJ = d.JCSJ ? moment(d.JCSJ) : null;
-        this.setState({ entity: d });
+        let data = d.Data;
+        let dIDs = data.DistrictIDs;
+        data.Districts = dIDs ? dIDs.reverse() : null;
+        data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
+        data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
+        this.setState({ entity: data });
         this.hideLoading();
       });
+    } else {
+      // 获取一个新的guid
+      let rt = await Post(url_GetNewGuid);
+      rtHandle(rt, d => {
+        // let { entity } = this.state;
+        let entity = {
+          ID: d,
+        };
+        this.setState({ entity: entity });
+      });
     }
-    //  else {
-    //   let d = { BZTIME: moment() };
-    //   this.setState({ entity: d });
-    // }
   }
 
   validate(errs, bName) {
@@ -310,6 +318,15 @@ class DLQLForm extends Component {
       this.props.onCancel && this.props.onCancel();
     }
   }
+
+  onAdd() {
+    this.mObj = {};
+    this.getFormData();
+    this.setState({ reload: true }, e => {
+      this.setState({ reload: false });
+    });
+  }
+
   onEmpty() {
     if (!this.isSaved()) {
       Modal.confirm({
@@ -332,7 +349,7 @@ class DLQLForm extends Component {
     this.getFormData();
   }
   render() {
-    let { districts, entity, showLocateMap, showLoading, showCheckIcon } = this.state;
+    let { districts, entity, showLocateMap, showLoading, showCheckIcon, reload } = this.state;
     const { getFieldDecorator } = this.props.form;
     let shapeOptions = {
       stroke: true,
@@ -342,7 +359,6 @@ class DLQLForm extends Component {
       fill: false,
       clickable: true,
     };
-    console.log(entity.BZTIME ? entity.BZTIME : '没有');
     return (
       <div className={st.DLQLForm}>
         <Spin
@@ -351,399 +367,17 @@ class DLQLForm extends Component {
           size="large"
           tip="数据加载中..."
         />
+
         <div className={st.content} style={showLoading ? { filter: 'blur(2px)' } : null}>
           <div className={st.ct_header}>
             <h1>道路、桥梁名称核准、命名（更名）申请单</h1>
           </div>
           <div className={st.ct_form}>
-            <Form>
-              <div className={st.group}>
-                <div className={st.grouptitle}>
-                  基本信息<span>说明：“ * ”号标识的为必填项</span>
-                </div>
-                <div className={st.groupcontent}>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>所在（跨）行政区
-                          </span>
-                        }
-                      >
-                        <Cascader
-                          initalValue={entity.Districts ? entity.Districts : undefined}
-                          expandTrigger="hover"
-                          options={districts}
-                          placeholder="所在（跨）行政区"
-                          onChange={(a, b) => {
-                            this.mObj.districts = a;
-                            this.setState({ showCheckIcon: 'empty' });
-                            // let { entity } = this.state;
-                            // entity.Districts = a;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>标准名称
-                          </span>
-                        }
-                      >
-                        <Input
-                          initalValue={entity.NAME ? entity.NAME : undefined}
-                          onChange={e => {
-                            // let { entity } = this.state;
-                            this.mObj.NAME = e.target.value;
-                            this.setState({
-                              // entity: entity,
-                              showCheckIcon: 'empty',
-                              // isSaved: false,
-                            });
-                          }}
-                          placeholder="标准名称"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={1}>
-                      <FormItem>
-                        {this.getCheckIcon()}
-                        <Button
-                          onClick={this.checkName.bind(this)}
-                          style={{ marginLeft: '20px', display: 'flex' }}
-                          type="primary"
-                        >
-                          命名检查
-                        </Button>
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="原规划名称">
-                        <Input
-                          initalValue={entity.PLANNAME ? entity.PLANNAME : undefined}
-                          onChange={e => {
-                            // let { entity } = this.state;
-                            // entity.PLANNAME = e.target.value;
-                            this.mObj.PLANNAME = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="原规划名称"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label="起点（东/南）起"
-                      >
-                        <Input
-                          initalValue={entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined}
-                          onChange={e => {
-                            this.mObj.STARTDIRECTION = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.STARTDIRECTION = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="起点（东/南）起"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label="止点（西/北）至"
-                      >
-                        <Input
-                          initalValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
-                          onChange={e => {
-                            this.mObj.ENDDIRECTION = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.ENDDIRECTION = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="止点（西/北）至"
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="走向">
-                        <Input
-                          initalValue={entity.ZX ? entity.ZX : undefined}
-                          onChange={e => {
-                            this.mObj.ZX = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.ZX = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="走向"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="长度（米）">
-                        <InputNumber
-                          initalValue={entity.LENGTH ? entity.LENGTH : undefined}
-                          style={{ width: '100%' }}
-                          onChange={e => {
-                            this.mObj.LENGTH = e;
-                            // let { entity } = this.state;
-                            // entity.LENGTH = e;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="宽度（米）">
-                        <InputNumber
-                          initalValue={entity.WIDTH ? entity.WIDTH : undefined}
-                          style={{ width: '100%' }}
-                          onChange={e => {
-                            this.mObj.WIDTH = e;
-                            // let { entity } = this.state;
-                            // entity.WIDTH = e;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="建成时间">
-                        <DatePicker
-                          initalValue={entity.JCSJ ? entity.JCSJ : undefined}
-                          style={{ width: '100%' }}
-                          onChange={e => {
-                            this.mObj.JCSJ = e;
-                            // let { entity } = this.state;
-                            // entity.JCSJ = e;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="路面结构">
-                        <Input
-                          initalValue={entity.LMJG ? entity.LMJG : undefined}
-                          onChange={e => {
-                            this.mObj.LMJG = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.LMJG = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="路面结构"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="性质">
-                        <Select
-                          initalValue={entity.NATURE ? entity.NATURE : undefined}
-                          allowClear
-                          onChange={e => {
-                            this.mObj.NATURE = e;
-                            // let { entity } = this.state;
-                            // entity.NATURE = e;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="性质"
-                        >
-                          {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
-                            <Select.Option key={d} value={d}>
-                              {d}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="门牌号范围">
-                        <Input
-                          initalValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
-                          onChange={e => {
-                            this.mObj.MPNUMRANGE = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.MPNUMRANGE = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="门牌号范围"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>命名时间
-                          </span>
-                        }
-                      >
-                        <DatePicker
-                          initalValue={entity.BZTIME ? entity.BZTIME : undefined}
-                          style={{ width: '100%' }}
-                          onChange={e => {
-                            this.mObj.BZTIME = e;
-                            // let { entity } = this.state;
-                            // entity.BZTIME = e;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={2}>
-                      <FormItem>
-                        <Tooltip placement="right" title="定位">
-                          <Button
-                            style={{ marginLeft: '20px' }}
-                            type="primary"
-                            shape="circle"
-                            icon="environment"
-                            size="small"
-                            onClick={this.showLocateMap.bind(this)}
-                          />
-                        </Tooltip>
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={16}>
-                      <FormItem
-                        labelCol={{ span: 5 }}
-                        wrapperCol={{ span: 19 }}
-                        label="名称含义或理由"
-                      >
-                        <TextArea
-                          initalValue={entity.MCHY ? entity.MCHY : undefined}
-                          onChange={e => {
-                            this.mObj.MCHY = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.MCHY = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="名称含义或理由"
-                          autosize={{ minRows: 2 }}
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                </div>
-              </div>
-              <div className={st.group}>
-                <div className={st.grouptitle}>
-                  申办人信息<span>说明：“ * ”号标识的为必填项</span>
-                </div>
-                <div className={st.groupcontent}>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>联系人
-                          </span>
-                        }
-                      >
-                        <Input
-                          initalValue={entity.LXR ? entity.LXR : undefined}
-                          onChange={e => {
-                            this.mObj.LXR = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.LXR = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="联系人"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>联系电话
-                          </span>
-                        }
-                      >
-                        <Input
-                          initalValue={entity.LXDH ? entity.LXDH : undefined}
-                          onChange={e => {
-                            this.mObj.LXDH = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.LXDH = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="联系电话"
-                        />
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>
-                            <span className={st.ired}>*</span>申报单位
-                          </span>
-                        }
-                      >
-                        <Input
-                          initalValue={entity.SBDW ? entity.SBDW : undefined}
-                          onChange={e => {
-                            this.mObj.SBDW = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.SBDW = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="申报单位"
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={16}>
-                      <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
-                        <TextArea
-                          initalValue={entity.BZ ? entity.BZ : undefined}
-                          onChange={e => {
-                            this.mObj.BZ = e.target.value;
-                            // let { entity } = this.state;
-                            // entity.BZ = e.target.value;
-                            // this.setState({ entity: entity, isSaved: false });
-                          }}
-                          placeholder="备注"
-                          autosize={{ minRows: 2 }}
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                </div>
-              </div>
-              {this.props.isApproval ? (
+            {reload ? null : (
+              <Form>
                 <div className={st.group}>
                   <div className={st.grouptitle}>
-                    审批信息<span>说明：“ * ”号标识的为必填项</span>
+                    基本信息<span>说明：“ * ”号标识的为必填项</span>
                   </div>
                   <div className={st.groupcontent}>
                     <Row>
@@ -751,24 +385,299 @@ class DLQLForm extends Component {
                         <FormItem
                           labelCol={{ span: 8 }}
                           wrapperCol={{ span: 16 }}
-                          label={<span>审批结果</span>}
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>所在（跨）行政区
+                            </span>
+                          }
                         >
-                          <RadioGroup>
-                            <Radio value="1">通过</Radio>
-                            <Radio value="0">不通过</Radio>
-                          </RadioGroup>
+                          <Cascader
+                            initalValue={entity.Districts ? entity.Districts : undefined}
+                            expandTrigger="hover"
+                            changeOnSelect
+                            options={districts}
+                            placeholder="所在（跨）行政区"
+                            onChange={(a, b) => {
+                              this.mObj.districts = a;
+                              this.setState({ showCheckIcon: 'empty' });
+                              // let { entity } = this.state;
+                              // entity.Districts = a;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>标准名称
+                            </span>
+                          }
+                        >
+                          <Input
+                            initalValue={entity.NAME ? entity.NAME : undefined}
+                            onChange={e => {
+                              // let { entity } = this.state;
+                              this.mObj.NAME = e.target.value;
+                              this.setState({
+                                // entity: entity,
+                                showCheckIcon: 'empty',
+                                // isSaved: false,
+                              });
+                            }}
+                            placeholder="标准名称"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={1}>
+                        <FormItem>
+                          {this.getCheckIcon()}
+                          <Button
+                            onClick={this.checkName.bind(this)}
+                            style={{ marginLeft: '20px', display: 'flex' }}
+                            type="primary"
+                          >
+                            命名检查
+                          </Button>
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label="原规划名称"
+                        >
+                          <Input
+                            initalValue={entity.PLANNAME ? entity.PLANNAME : undefined}
+                            onChange={e => {
+                              // let { entity } = this.state;
+                              // entity.PLANNAME = e.target.value;
+                              this.mObj.PLANNAME = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="原规划名称"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label="起点（东/南）起"
+                        >
+                          <Input
+                            initalValue={entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined}
+                            onChange={e => {
+                              this.mObj.STARTDIRECTION = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.STARTDIRECTION = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="起点（东/南）起"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label="止点（西/北）至"
+                        >
+                          <Input
+                            initalValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
+                            onChange={e => {
+                              this.mObj.ENDDIRECTION = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.ENDDIRECTION = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="止点（西/北）至"
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="走向">
+                          <Input
+                            initalValue={entity.ZX ? entity.ZX : undefined}
+                            onChange={e => {
+                              this.mObj.ZX = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.ZX = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="走向"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label="长度（米）"
+                        >
+                          <InputNumber
+                            initalValue={entity.LENGTH ? entity.LENGTH : undefined}
+                            style={{ width: '100%' }}
+                            placeholder="长度（米）"
+                            onChange={e => {
+                              this.mObj.LENGTH = e;
+                              // let { entity } = this.state;
+                              // entity.LENGTH = e;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label="宽度（米）"
+                        >
+                          <InputNumber
+                            initalValue={entity.WIDTH ? entity.WIDTH : undefined}
+                            style={{ width: '100%' }}
+                            placeholder="宽度（米）"
+                            onChange={e => {
+                              this.mObj.WIDTH = e;
+                              // let { entity } = this.state;
+                              // entity.WIDTH = e;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="建成时间">
+                          <DatePicker
+                            initalValue={entity.JCSJ ? entity.JCSJ : undefined}
+                            style={{ width: '100%' }}
+                            onChange={e => {
+                              this.mObj.JCSJ = e;
+                              // let { entity } = this.state;
+                              // entity.JCSJ = e;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="路面结构">
+                          <Input
+                            initalValue={entity.LMJG ? entity.LMJG : undefined}
+                            onChange={e => {
+                              this.mObj.LMJG = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.LMJG = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="路面结构"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="性质">
+                          <Select
+                            initalValue={entity.NATURE ? entity.NATURE : undefined}
+                            allowClear
+                            onChange={e => {
+                              this.mObj.NATURE = e;
+                              // let { entity } = this.state;
+                              // entity.NATURE = e;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="性质"
+                          >
+                            {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
+                              <Select.Option key={d} value={d}>
+                                {d}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label="门牌号范围"
+                        >
+                          <Input
+                            initalValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
+                            onChange={e => {
+                              this.mObj.MPNUMRANGE = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.MPNUMRANGE = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="门牌号范围"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>命名时间
+                            </span>
+                          }
+                        >
+                          <DatePicker
+                            initalValue={entity.BZTIME ? entity.BZTIME : undefined}
+                            style={{ width: '100%' }}
+                            onChange={e => {
+                              this.mObj.BZTIME = e;
+                              // let { entity } = this.state;
+                              // entity.BZTIME = e;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={2}>
+                        <FormItem>
+                          <Tooltip placement="right" title="定位">
+                            <Button
+                              style={{ marginLeft: '20px' }}
+                              type="primary"
+                              shape="circle"
+                              icon="environment"
+                              size="small"
+                              onClick={this.showLocateMap.bind(this)}
+                            />
+                          </Tooltip>
                         </FormItem>
                       </Col>
                     </Row>
                     <Row>
                       <Col span={16}>
-                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
+                        <FormItem
+                          labelCol={{ span: 5 }}
+                          wrapperCol={{ span: 19 }}
+                          label="名称含义或理由"
+                        >
                           <TextArea
-                            initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                            initalValue={entity.MCHY ? entity.MCHY : undefined}
                             onChange={e => {
-                              this.mObj.SPYJ = e.target.value;
+                              this.mObj.MCHY = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.MCHY = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
                             }}
-                            placeholder="审批意见"
+                            placeholder="名称含义或理由"
                             autosize={{ minRows: 2 }}
                           />
                         </FormItem>
@@ -776,8 +685,141 @@ class DLQLForm extends Component {
                     </Row>
                   </div>
                 </div>
-              ) : null}
-            </Form>
+                <div className={st.group}>
+                  <div className={st.grouptitle}>
+                    申办人信息<span>说明：“ * ”号标识的为必填项</span>
+                  </div>
+                  <div className={st.groupcontent}>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>联系人
+                            </span>
+                          }
+                        >
+                          <Input
+                            initalValue={entity.LXR ? entity.LXR : undefined}
+                            onChange={e => {
+                              this.mObj.LXR = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.LXR = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="联系人"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>联系电话
+                            </span>
+                          }
+                        >
+                          <Input
+                            initalValue={entity.LXDH ? entity.LXDH : undefined}
+                            onChange={e => {
+                              this.mObj.LXDH = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.LXDH = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="联系电话"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>申报单位
+                            </span>
+                          }
+                        >
+                          <Input
+                            initalValue={entity.SBDW ? entity.SBDW : undefined}
+                            onChange={e => {
+                              this.mObj.SBDW = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.SBDW = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="申报单位"
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={16}>
+                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
+                          <TextArea
+                            initalValue={entity.BZ ? entity.BZ : undefined}
+                            onChange={e => {
+                              this.mObj.BZ = e.target.value;
+                              // let { entity } = this.state;
+                              // entity.BZ = e.target.value;
+                              // this.setState({ entity: entity, isSaved: false });
+                            }}
+                            placeholder="备注"
+                            autosize={{ minRows: 2 }}
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                  </div>
+                </div>
+                {this.props.isApproval ? (
+                  <div className={st.group}>
+                    <div className={st.grouptitle}>
+                      审批信息<span>说明：“ * ”号标识的为必填项</span>
+                    </div>
+                    <div className={st.groupcontent}>
+                      <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={<span>审批结果</span>}
+                          >
+                            <RadioGroup>
+                              <Radio value="1">通过</Radio>
+                              <Radio value="0">不通过</Radio>
+                            </RadioGroup>
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={16}>
+                          <FormItem
+                            labelCol={{ span: 4 }}
+                            wrapperCol={{ span: 20 }}
+                            label="审批意见"
+                          >
+                            <TextArea
+                              initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                              onChange={e => {
+                                this.mObj.SPYJ = e.target.value;
+                              }}
+                              placeholder="审批意见"
+                              autosize={{ minRows: 2 }}
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                    </div>
+                  </div>
+                ) : null}
+              </Form>
+            )}
           </div>
           <div className={st.ct_footer}>
             <div style={{ float: 'right' }}>
@@ -785,13 +827,17 @@ class DLQLForm extends Component {
                 保存
               </Button>
               &emsp;
-              <Button type="default" onClick={this.onCancel.bind(this)}>
-                取消
-              </Button>
-              {/* &emsp;
-              <Button type="default" onClick={this.onEmpty.bind(this)}>
-                清空
-              </Button> */}
+              {this.props.isApproval ? (
+                <Button type="default" onClick={this.onCancel.bind(this)}>
+                  取消
+                </Button>
+              ) : null}
+              &emsp;
+              {!this.props.isApproval ? (
+                <Button type="default" onClick={this.onAdd.bind(this)}>
+                  追加
+                </Button>
+              ) : null}
             </div>
           </div>
         </div>

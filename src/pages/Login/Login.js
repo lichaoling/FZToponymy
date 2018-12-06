@@ -71,7 +71,7 @@ class Login extends Component {
               className={st.loginbtn}
               type="primary"
               onClick={this.login.bind(this)}
-              style={showLoading ? { filter: 'blur(2px)' } : null}
+              style={showLoading ? { filter: 'blur(1px)' } : null}
             >
               {showLoading ? <Icon type="loading" /> : null}
               登录

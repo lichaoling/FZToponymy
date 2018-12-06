@@ -121,10 +121,10 @@ class Home extends Component {
               </span>
             </div>
           </div>
-          <div className={st.tel}>
+          {/* <div className={st.tel}>
             <span>技术支持：福州市勘测院</span>
             <span>服务热线：0573-12345678</span>
-          </div>
+          </div> */}
           <div className={st.panel}>
             <ul id="cardArea" className="card-area clearfix">
               <li className="card-item animated fadeIn">
@@ -137,6 +137,7 @@ class Home extends Component {
                       <h1>地名地址审批管理系统</h1>
                       <p className="short-info">高效规范 标准清晰</p>
                     </div>
+                    <div className="contentNew">地名地址审批管理系统</div>
                   </div>
                   <div className="card-content content-first bg-e8e8e8">
                     <ul className="content-first-list">
@@ -204,6 +205,7 @@ class Home extends Component {
                       <h1>业务协同更新系统</h1>
                       <p className="short-info">连接互通 简便开放</p>
                     </div>
+                    <div className="contentNew">业务协同更新系统</div>
                   </div>
                   <div className="card-content content-first bg-e1e1e1">
                     <ul className="content-first-list">
@@ -254,6 +256,7 @@ class Home extends Component {
                       <h1>数据库管理系统</h1>
                       <p className="short-info">海量数据 轻松管理</p>
                     </div>
+                    <div className="contentNew">数据库管理系统</div>
                   </div>
                   <div className="card-content content-first bg-e8e8e8">
                     <ul className="content-first-list">
@@ -311,6 +314,7 @@ class Home extends Component {
                       <h1>地名地址服务应用</h1>
                       <p className="short-info">标准服务 信息共享</p>
                     </div>
+                    <div className="contentNew">地名地址服务应用</div>
                   </div>
                   <div className="card-content content-first bg-e8e8e8">
                     <ul className="content-first-list">

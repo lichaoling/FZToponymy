@@ -51,7 +51,10 @@ class Approval extends Component {
           .removeClass(ac);
       });
   }
-  onClick(e) {}
+  onClick(e) {
+    if(e.key==='3')
+    this.props.history.push('/login');
+  }
   render() {
     const menu = (
       <Menu onClick={e => this.onClick(e)}>
@@ -60,6 +63,7 @@ class Approval extends Component {
         <Menu.Item key="3">退出</Menu.Item>
       </Menu>
     );
+    let { children } = this.props;
     return (
       <div className={st.QMZJ}>
         <div className={st.header}>
@@ -78,7 +82,7 @@ class Approval extends Component {
         <div ref={e => (this.nave = e)} className={st.nave}>
           <div className={st.nave_ct}>{this.getNavs()}</div>
         </div>
-        <div className={st.body}>{this.getRoutes()}</div>
+        <div className={st.body}>{children}</div>
       </div>
     );
   }
