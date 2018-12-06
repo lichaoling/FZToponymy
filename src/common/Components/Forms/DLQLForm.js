@@ -310,7 +310,22 @@ class DLQLForm extends Component {
       this.props.onCancel && this.props.onCancel();
     }
   }
-  onEmpty() {}
+  onEmpty() {
+    if (!this.isSaved()) {
+      Modal.confirm({
+        title: '提醒',
+        content: '是否放弃所做的修改？',
+        okText: '确定',
+        cancelText: '取消',
+        onOk: async () => {
+          this.props.onCancel && this.props.onCancel();
+        },
+        onCancel() {},
+      });
+    } else {
+      this.props.onCancel && this.props.onCancel();
+    }
+  }
 
   componentDidMount() {
     this.getDistricts();
@@ -327,6 +342,7 @@ class DLQLForm extends Component {
       fill: false,
       clickable: true,
     };
+    console.log(entity.BZTIME ? entity.BZTIME : '没有');
     return (
       <div className={st.DLQLForm}>
         <Spin
@@ -724,43 +740,43 @@ class DLQLForm extends Component {
                   </Row>
                 </div>
               </div>
-              <div className={st.group}>
-                <div className={st.grouptitle}>
-                  审批信息<span>说明：“ * ”号标识的为必填项</span>
+              {this.props.isApproval ? (
+                <div className={st.group}>
+                  <div className={st.grouptitle}>
+                    审批信息<span>说明：“ * ”号标识的为必填项</span>
+                  </div>
+                  <div className={st.groupcontent}>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={<span>审批结果</span>}
+                        >
+                          <RadioGroup>
+                            <Radio value="1">通过</Radio>
+                            <Radio value="0">不通过</Radio>
+                          </RadioGroup>
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={16}>
+                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
+                          <TextArea
+                            initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                            onChange={e => {
+                              this.mObj.SPYJ = e.target.value;
+                            }}
+                            placeholder="审批意见"
+                            autosize={{ minRows: 2 }}
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                  </div>
                 </div>
-                <div className={st.groupcontent}>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>审批结果</span>
-                        }
-                      >
-                        <RadioGroup>
-                          <Radio value="1">通过</Radio>
-                          <Radio value="0">不通过</Radio>
-                        </RadioGroup>
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={16}>
-                      <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
-                        <TextArea
-                          initalValue={entity.SPYJ ? entity.SPYJ : undefined}
-                          onChange={e => {
-                            this.mObj.SPYJ = e.target.value;
-                          }}
-                          placeholder="审批意见"
-                          autosize={{ minRows: 2 }}
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                </div>
-              </div>
+              ) : null}
             </Form>
           </div>
           <div className={st.ct_footer}>
@@ -772,10 +788,10 @@ class DLQLForm extends Component {
               <Button type="default" onClick={this.onCancel.bind(this)}>
                 取消
               </Button>
-              &emsp;
+              {/* &emsp;
               <Button type="default" onClick={this.onEmpty.bind(this)}>
                 清空
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>

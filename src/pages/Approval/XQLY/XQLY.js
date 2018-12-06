@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import st from './DLQL.less';
+import st from './XQLY.less';
 import {
   Modal,
   Row,
@@ -11,11 +11,11 @@ import {
 } from 'antd';
 
 import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
-import DLQLForm from '../../../common/Components/Forms/DLQLForm';
-class DLQL extends Component {
+import XQLYForm from '../../../common/Components/Forms/XQLYForm';
+class XQLY extends Component {
   constructor(ps) {
     super(ps);
-    this.qlPg = {
+    this.xqlyPg = {
       pageSize: 10,
       size: 'small',
       showQuickJumper: true,
@@ -23,7 +23,7 @@ class DLQL extends Component {
     };
     this.state = {
       showModal: false,
-      qlCol: [{
+      xqlyCol: [{
         title: '序号',
         dataIndex: 'XH',
         key: 'XH',
@@ -39,18 +39,14 @@ class DLQL extends Component {
         dataIndex: 'BZMC',
         key: 'BZMC',
       }, {
-        title: '性质',
-        dataIndex: 'ZX',
-        key: 'ZX',
+        title: '所属道路',
+        dataIndex: 'SSDL',
+        key: 'SSDL',
       }, {
-        title: '长度',
-        dataIndex: 'CD',
-        key: 'CD',
+        title: '建筑面积',
+        dataIndex: 'JZMJ',
+        key: 'JZMJ',
       }, {
-        title: '宽度',
-        dataIndex: 'KD',
-        key: 'KD',
-      },{
         title: '审批时间',
         dataIndex: 'SPSJ',
         key: 'SPSJ',
@@ -66,125 +62,102 @@ class DLQL extends Component {
         ),
       }
       ],
-      qlData: [{
+      xqlyData: [{
         key: 1,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 2,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 3,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 4,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 5,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 6,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 7,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 8,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 9,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 10,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 11,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }, {
         key: 12,
         XH: '01',
         XZQH: '鼓楼区',
         BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
+        SSDL: '一级',
+        SPSJ: '2018-12-01 05:00',
+        JZMJ: '50米',
       }],
     };
   }
@@ -200,10 +173,10 @@ class DLQL extends Component {
   }
   render() {
     return (
-      <div className={st.DLQL}>
+      <div className={st.XQLY}>
         <div className={st.content} >
           {/* <div className={st.ct_header}>
-            <div className={st.ct_title}>道路审批</div>
+            <div className={st.ct_title}>小区楼宇审批</div>
           </div> */}
           <div className={st.ct_form}>
             <DLQLQueryForm />
@@ -211,9 +184,9 @@ class DLQL extends Component {
           <div className={st.ct_form}>
             <Table
               className={st.ct_table}
-              columns={this.state.qlCol}
-              dataSource={this.state.qlData}
-              pagination={this.qlPg}
+              columns={this.state.xqlyCol}
+              dataSource={this.state.xqlyData}
+              pagination={this.xqlyPg}
               size="small"
               bordered>
             </Table>
@@ -230,7 +203,7 @@ class DLQL extends Component {
                 className={st.ct_modalCon}
                 width={"80%"}
               >
-                <DLQLForm />
+                <XQLYForm isApproval={true}/>
               </Modal>
             ) : null
         }
@@ -239,4 +212,4 @@ class DLQL extends Component {
   }
 }
 
-export default DLQL;
+export default XQLY;

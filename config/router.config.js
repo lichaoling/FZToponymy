@@ -27,18 +27,18 @@ export default [
     component: './Home/Home',
     name: '用户主页',
   },
-  //区民政局
+  //地名地址审批管理系统
   {
-    path: '/qmzj',
-    component: './QMZJ/QMZJ',
-    name: '区民政局',
+    path: '/approval',
+    component: './Approval/Approval',
+    name: '地名地址审批管理系统',
     routes: [
-      { path: '/qmzj', redirect: '/qmzj/dlql' },
+      { path: '/approval', redirect: '/approval/dlql' },
       { path: '/home', name: '主页', component: './Home/Home' },
-      { path: '/qmzj/dlql', name: '道路、桥梁命名审批', component: './QMZJ/DLQL/DLQL' },
-      { path: '/qmzj/xqly', name: '小区、楼宇命名审批', component: './QMZJ/XQLY/XQLY' },
-      { path: '/qmzj/mph', name: '门牌号审批', component: './QMZJ/MPH/MPH' },
-      { path: '/qmzj/mpbz', name: '门牌号编制', component: './QMZJ/MPBZ/MPBZ' },
+      { path: '/approval/dlql', name: '道路、桥梁命名审批', component: './Approval/DLQL/DLQL' },
+      { path: '/approval/xqly', name: '小区、楼宇命名审批', component: './Approval/XQLY/XQLY' },
+      { path: '/approval/mph', name: '门牌号审批', component: './Approval/MPH/MPH' },
+      { path: '/approval/mpbz', name: '门牌号编制', component: './Approval/MPBZ/MPBZ' },
     ],
   },
   // test

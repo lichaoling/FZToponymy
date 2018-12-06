@@ -230,7 +230,7 @@ class MPBZ extends Component {
                 className={st.ct_modalCon}
                 width={"80%"}
               >
-                <DLQLForm />
+                <DLQLForm isApproval={true}/>
               </Modal>
             ) : null
         }

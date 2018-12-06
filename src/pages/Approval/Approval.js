@@ -5,9 +5,9 @@ import Link from 'umi/link';
 import DLQL from './DLQL/DLQL';
 import MPBZ from './MPBZ/MPBZ';
 import MPH from './MPH/MPH';
-import st from './QMZJ.less';
+import st from './Approval.less';
 
-class QMZJ extends Component {
+class Approval extends Component {
   getRoutes() {
     let { routes } = this.props.route;
     let cmps = [];
@@ -84,4 +84,4 @@ class QMZJ extends Component {
   }
 }
 
-export default QMZJ;
+export default Approval;

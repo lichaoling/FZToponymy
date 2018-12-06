@@ -16,6 +16,8 @@ import {
   Spin,
   notification,
   Radio,
+  Pagination,
+  Tag,
 } from 'antd';
 import {
   baseUrl,
@@ -23,6 +25,7 @@ import {
   url_CheckHouseName,
   url_SearchHouseByID,
   url_HouseAndBuildingApplicant,
+  url_SearchRoadNames,
 } from '../../../common/urls.js';
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
@@ -43,6 +46,12 @@ class XQLYForm extends Component {
     showLocateMap: false,
     showLoading: false,
     showCheckIcon: 'empty',
+    pageNum: 1,
+    pageSize: 10,
+    roadDatas: [],
+    roadCount: 0,
+    roadName: null,
+    selectedRoads: [],
   };
 
   // 存储修改后的数据
@@ -94,10 +103,14 @@ class XQLYForm extends Component {
   }
   validate(errs, bName) {
     errs = errs || [];
-    let { entity } = this.state;
+    let { entity, selectedRoads } = this.state;
+    let roadIDs = selectedRoads.map(e => {
+      return e.ID;
+    });
     let saveObj = {
       ID: entity.ID,
       ...this.mObj,
+      ROADID: roadIDs.join(','),
     };
     if (saveObj.districts) {
       let ds = saveObj.districts;
@@ -191,6 +204,11 @@ class XQLYForm extends Component {
       if (!validateObj.SBDW) {
         errs.push('请填写申报单位');
       }
+
+      //所属道路
+      if (validateObj.ROADID === '') {
+        errs.push('请选择所属道路');
+      }
     }
     return { errs, saveObj, validateObj };
   }
@@ -229,6 +247,14 @@ class XQLYForm extends Component {
       );
     }
   }
+
+  async searchRoads(pageNum, pageSize, name) {
+    let rt = await Post(url_SearchRoadNames, { pageNum, pageSize, name });
+    rtHandle(rt, d => {
+      this.setState({ roadDatas: d.Data, roadCount: d.Count });
+    });
+  }
+
   getCheckIcon() {
     let { showCheckIcon } = this.state;
     let dom = null;
@@ -236,6 +262,7 @@ class XQLYForm extends Component {
     else if (showCheckIcon === 'no') dom = <span className="iconfont icon-cuowu" />;
     return dom;
   }
+
   closeEditForm() {}
 
   onSaveClick = e => {
@@ -310,7 +337,19 @@ class XQLYForm extends Component {
     this.getFormData();
   }
   render() {
-    let { districts, entity, showLocateMap, showLoading, showCheckIcon } = this.state;
+    let {
+      districts,
+      entity,
+      showLocateMap,
+      showLoading,
+      showCheckIcon,
+      pageNum,
+      pageSize,
+      roadDatas,
+      roadCount,
+      roadName,
+      selectedRoads,
+    } = this.state;
     const { getFieldDecorator } = this.props.form;
     let shapeOptions = {
       stroke: true,
@@ -558,6 +597,7 @@ class XQLYForm extends Component {
                   <Row>
                     <Col span={22}>
                       <FormItem
+                        className={'road_ct'}
                         labelCol={{ span: 3 }}
                         wrapperCol={{ span: 21 }}
                         label={
@@ -570,24 +610,77 @@ class XQLYForm extends Component {
                           <div className={st.road}>
                             <div className={st.roadSelect}>
                               <div className={st.search}>
-                                <Search placeholder="道路名称" onSearch={value => {}} />
+                                <Search
+                                  placeholder="道路名称"
+                                  onSearch={value => {
+                                    this.setState({ roadName: value });
+                                    this.searchRoads(pageNum, pageSize, value);
+                                  }}
+                                />
                               </div>
                               <div className={st.content}>
-                                <span>
-                                  AAAAA路{' '}
-                                  <Tooltip placement="right" title="添加">
-                                    <Icon type="plus" />
-                                  </Tooltip>
-                                </span>
-                                <span>
-                                  BBBB路{' '}
-                                  <Tooltip placement="right" title="添加">
-                                    <Icon type="plus" />
-                                  </Tooltip>
-                                </span>
+                                {roadDatas.map(e => {
+                                  return (
+                                    <Tooltip
+                                      placement="right"
+                                      title="添加"
+                                      className={st.tip}
+                                      onClick={s => {
+                                        let r = e;
+                                        let isRepeat = false;
+                                        selectedRoads.map(t => {
+                                          if (r.ID == t.ID) isRepeat = true;
+                                        });
+                                        if (!isRepeat) {
+                                          selectedRoads.push(r);
+                                          this.setState({ selectedRoads });
+                                        }
+                                      }}
+                                    >
+                                      <span className={st.roadName}>{e.NAME}</span>
+                                      <span className={st.distName}>{e.DistrictName.join('')}</span>
+                                    </Tooltip>
+                                  );
+                                })}
+                              </div>
+                              <div className={st.pagenation}>
+                                <Pagination
+                                  size="small"
+                                  total={roadCount}
+                                  showSizeChanger
+                                  showQuickJumper
+                                  onChange={(pageNum, pageSize) => {
+                                    this.searchRoads(pageNum, pageSize, roadName);
+                                  }}
+                                  onShowSizeChange={(pageNum, pageSize) => {
+                                    this.searchRoads(pageNum, pageSize, roadName);
+                                  }}
+                                />
                               </div>
                             </div>
-                            <div className={st.roadConetnt} />
+                            <div className={st.roadConetnt}>
+                              {selectedRoads.map(e => {
+                                return (
+                                  <Tooltip
+                                    placement="right"
+                                    title="删除"
+                                    className={st.tip}
+                                    onClick={s => {
+                                      let r = e;
+                                      let roads = selectedRoads.filter(t => {
+                                        return t.ID != r.ID;
+                                      });
+                                      this.setState({ selectedRoads: roads });
+                                    }}
+                                  >
+                                    <Tag color="#2db7f5" className={st.tag}>
+                                      <span className={st.roadName}>{e.NAME}</span>
+                                      <span className={st.distName}>{e.DistrictName.join('')}</span>
+                                    </Tag>
+                                  </Tooltip>
+                                );
+                              })}
+                            </div>
                           </div>
                         }
                       </FormItem>
@@ -689,43 +782,43 @@ class XQLYForm extends Component {
                   </Row>
                 </div>
               </div>
-              <div className={st.group}>
-                <div className={st.grouptitle}>
-                  审批信息<span>说明：“ * ”号标识的为必填项</span>
+              {this.props.isApproval ? (
+                <div className={st.group}>
+                  <div className={st.grouptitle}>
+                    审批信息<span>说明：“ * ”号标识的为必填项</span>
+                  </div>
+                  <div className={st.groupcontent}>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={<span>审批结果</span>}
+                        >
+                          <RadioGroup>
+                            <Radio value="1">通过</Radio>
+                            <Radio value="0">不通过</Radio>
+                          </RadioGroup>
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={16}>
+                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
+                          <TextArea
+                            initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                            onChange={e => {
+                              this.mObj.SPYJ = e.target.value;
+                            }}
+                            placeholder="审批意见"
+                            autosize={{ minRows: 2 }}
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                  </div>
                 </div>
-                <div className={st.groupcontent}>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>审批结果</span>
-                        }
-                      >
-                        <RadioGroup>
-                          <Radio value="1">通过</Radio>
-                          <Radio value="0">不通过</Radio>
-                        </RadioGroup>
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={16}>
-                      <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
-                        <TextArea
-                          initalValue={entity.SPYJ ? entity.SPYJ : undefined}
-                          onChange={e => {
-                            this.mObj.SPYJ = e.target.value;
-                          }}
-                          placeholder="审批意见"
-                          autosize={{ minRows: 2 }}
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                </div>
-              </div>
+              ) : null}
             </Form>
           </div>
           <div className={st.ct_footer}>
