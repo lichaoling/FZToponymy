@@ -9,7 +9,7 @@ export default [
       {
         path: '/developer/home',
         component: './DeveloperHome/DeveloperHome',
-        name: '建设单位主页',
+        name: '主页',
       },
       {
         path: '/developer/dlql',
@@ -24,13 +24,11 @@ export default [
       { path: '/developer/mph', name: '门牌号申请', component: './Developer/MPH/MPH' },
     ],
   },
-  //建设单位主页
 
   //登录
   {
     path: '/',
-    name: '用户登录',
-    component: './Login/Login',
+    redirect: '/login',
   },
   {
     path: '/login',
