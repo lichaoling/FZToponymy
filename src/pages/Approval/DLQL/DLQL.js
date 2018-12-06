@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import st from './MPBZ.less';
+import st from './DLQL.less';
 import {
   Modal,
   Row,
@@ -12,7 +12,7 @@ import {
 
 import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
 import DLQLForm from '../../../common/Components/Forms/DLQLForm';
-class MPBZ extends Component {
+class DLQL extends Component {
   constructor(ps) {
     super(ps);
     this.qlPg = {
@@ -230,7 +230,7 @@ class MPBZ extends Component {
                 className={st.ct_modalCon}
                 width={"80%"}
               >
-                <DLQLForm />
+                <DLQLForm isApproval={true}/>
               </Modal>
             ) : null
         }
@@ -239,4 +239,4 @@ class MPBZ extends Component {
   }
 }
 
-export default MPBZ;
+export default DLQL;

@@ -16,6 +16,7 @@ let //**************** *行政区划*******************
   url_SearchHouseByID = `${baseUrl}/House/SearchHouseByID`, //查询一条小区楼宇(string id)
   url_SearchHouses = `${baseUrl}/House/SearchHouseByID`, //查询已审批或者待审批的小区楼宇数据(int pageNum, int pageSize, string districtID, int approvalState, DateTime? start, DateTime? end)
   url_HouseApprove = `${baseUrl}/House/HouseApprove`, //小区楼宇审批(string mObj, string result, string suggestion, string workFlowID = "2")
+  url_SearchRoadNames=`${baseUrl}/House/SearchRoadNames`,//查询正式道路名称(int pageNum, int pageSize, string name)
   //**************** *住宅门牌编制申请*******************
   url_GetHousesByDistFromMP = `${baseUrl}/HouseBZ/GetHousesByDistFromMP`, //从门牌表中根据行政区划获取小区名称(string districtID)
   url_SearchHouseBZByID = `${baseUrl}/HouseBZ/SearchHouseBZByID`, //查询一条住宅门牌编制申请数据进行审批(string id)
@@ -48,6 +49,7 @@ export {
   url_SearchHouseByID,
   url_SearchHouses,
   url_HouseApprove,
+  url_SearchRoadNames,
 
   url_GetHousesByDistFromMP,
   url_SearchHouseBZByID,

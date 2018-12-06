@@ -37,7 +37,6 @@ class DLQLQueryForm extends Component {
             secFormItem: "",
             districts: [],
         };
-
     }
     showLoading() {
         this.setState({ showLoading: true });

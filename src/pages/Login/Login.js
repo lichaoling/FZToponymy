@@ -6,10 +6,22 @@ import { Post } from '../../utils/request.js';
 import { rtHandle } from '../../utils/errorHandle.js';
 
 class Login extends Component {
+  state = {
+    showLoading: false,
+  };
   async login() {
+    this.showLoading();
     let rt = await Post(url_Login, { userName: this.userName, password: md5(this.password) }, e => {
       this.props.history.push('/home');
+      this.hideLoading();
     });
+  }
+  showLoading() {
+    this.setState({ showLoading: true });
+  }
+
+  hideLoading() {
+    this.setState({ showLoading: false });
   }
 
   componentDidMount() {
@@ -17,6 +29,7 @@ class Login extends Component {
   }
 
   render() {
+    let { showLoading } = this.state;
     return (
       <div className={st.login}>
         <canvas id="canvas" />
@@ -58,11 +71,13 @@ class Login extends Component {
               className={st.loginbtn}
               type="primary"
               onClick={this.login.bind(this)}
+              style={showLoading ? { filter: 'blur(2px)' } : null}
             >
+              {showLoading ? <Icon type="loading" /> : null}
               登录
             </Button>
           </div>
-          <div className={st.rightfooter}>
+          {/* <div className={st.rightfooter}>
             <a href="http://jx.zjzwfw.gov.cn/" target="_blank">
               <Icon type="global" theme="outlined" />
               &ensp;嘉兴市政务服务网
@@ -71,7 +86,7 @@ class Login extends Component {
               <Icon type="link" theme="outlined" />
               &ensp;嘉兴市民政局
             </a>
-          </div>
+          </div> */}
         </div>
         <div className={st.footer}>
           <span>福州市地名地址管理服务平台</span>

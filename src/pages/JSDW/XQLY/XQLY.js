@@ -9,7 +9,7 @@ class XQLY extends Component {
     return (
       <div className={st.XQLY}>
         <div className={st.Content}>
-          <XQLYForm />
+          <XQLYForm isApproval={false} />
         </div>
       </div>
     );

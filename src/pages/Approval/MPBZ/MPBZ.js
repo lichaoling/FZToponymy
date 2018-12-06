@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import st from './MPH.less';
+import st from './MPBZ.less';
 import {
   Modal,
   Row,
@@ -11,11 +11,11 @@ import {
 } from 'antd';
 
 import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
-import MPHForm from '../../../common/Components/Forms/MPHForm';
-class MPH extends Component {
+import DLQLForm from '../../../common/Components/Forms/DLQLForm';
+class MPBZ extends Component {
   constructor(ps) {
     super(ps);
-    this.MPHPg = {
+    this.qlPg = {
       pageSize: 10,
       size: 'small',
       showQuickJumper: true,
@@ -23,7 +23,7 @@ class MPH extends Component {
     };
     this.state = {
       showModal: false,
-      MPHCol: [{
+      qlCol: [{
         title: '序号',
         dataIndex: 'XH',
         key: 'XH',
@@ -35,13 +35,13 @@ class MPH extends Component {
         dataIndex: 'XZQH',
         key: 'XZQH',
       }, {
-        title: '街道',
-        dataIndex: 'JD',
-        key: 'JD',
+        title: '名称',
+        dataIndex: 'BZMC',
+        key: 'BZMC',
       }, {
-        title: '道路',
-        dataIndex: 'DL',
-        key: 'DL',
+        title: '性质',
+        dataIndex: 'ZX',
+        key: 'ZX',
       }, {
         title: '长度',
         dataIndex: 'CD',
@@ -51,6 +51,10 @@ class MPH extends Component {
         dataIndex: 'KD',
         key: 'KD',
       },{
+        title: '审批时间',
+        dataIndex: 'SPSJ',
+        key: 'SPSJ',
+      }, {
         title: '操作',
         dataIndex: 'cz',
         key: 'cz',
@@ -62,103 +66,125 @@ class MPH extends Component {
         ),
       }
       ],
-      MPHData: [{
+      qlData: [{
         key: 1,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
-        
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
       }, {
         key: 2,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 3,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 4,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 5,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 6,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 7,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 8,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 9,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 10,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 11,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }, {
         key: 12,
         XH: '01',
         XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
+        BZMC: '解放大桥',
+        ZX: '一级',
         CD: '100米',
-        KD: '20米',
+        KD: '50米',
+        SPSJ:'2018-12-01 11:00',
+
       }],
     };
   }
@@ -174,10 +200,10 @@ class MPH extends Component {
   }
   render() {
     return (
-      <div className={st.MPH}>
+      <div className={st.DLQL}>
         <div className={st.content} >
           {/* <div className={st.ct_header}>
-            <div className={st.ct_title}>门牌号审批</div>
+            <div className={st.ct_title}>道路审批</div>
           </div> */}
           <div className={st.ct_form}>
             <DLQLQueryForm />
@@ -185,9 +211,9 @@ class MPH extends Component {
           <div className={st.ct_form}>
             <Table
               className={st.ct_table}
-              columns={this.state.MPHCol}
-              dataSource={this.state.MPHData}
-              pagination={this.MPHPg}
+              columns={this.state.qlCol}
+              dataSource={this.state.qlData}
+              pagination={this.qlPg}
               size="small"
               bordered>
             </Table>
@@ -204,7 +230,7 @@ class MPH extends Component {
                 className={st.ct_modalCon}
                 width={"80%"}
               >
-                <MPHForm />
+                <DLQLForm isApproval={true}/>
               </Modal>
             ) : null
         }
@@ -213,4 +239,4 @@ class MPH extends Component {
   }
 }
 
-export default MPH;
+export default MPBZ;

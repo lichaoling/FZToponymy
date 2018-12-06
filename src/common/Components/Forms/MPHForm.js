@@ -445,43 +445,43 @@ class MPHForm extends Component {
                   </Row>
                 </div>
               </div>
-              <div className={st.group}>
-                <div className={st.grouptitle}>
-                  审批信息<span>说明：“ * ”号标识的为必填项</span>
+              {this.props.isApproval ? (
+                <div className={st.group}>
+                  <div className={st.grouptitle}>
+                    审批信息<span>说明：“ * ”号标识的为必填项</span>
+                  </div>
+                  <div className={st.groupcontent}>
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                          label={<span>审批结果</span>}
+                        >
+                          <RadioGroup>
+                            <Radio value="1">通过</Radio>
+                            <Radio value="0">不通过</Radio>
+                          </RadioGroup>
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={16}>
+                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
+                          <TextArea
+                            initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                            onChange={e => {
+                              this.mObj.SPYJ = e.target.value;
+                            }}
+                            placeholder="审批意见"
+                            autosize={{ minRows: 2 }}
+                          />
+                        </FormItem>
+                      </Col>
+                    </Row>
+                  </div>
                 </div>
-                <div className={st.groupcontent}>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        label={
-                          <span>审批结果</span>
-                        }
-                      >
-                        <RadioGroup>
-                          <Radio value="1">通过</Radio>
-                          <Radio value="0">不通过</Radio>
-                        </RadioGroup>
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={16}>
-                      <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="审批意见">
-                        <TextArea
-                          initalValue={entity.SPYJ ? entity.SPYJ : undefined}
-                          onChange={e => {
-                            this.mObj.SPYJ = e.target.value;
-                          }}
-                          placeholder="审批意见"
-                          autosize={{ minRows: 2 }}
-                        />
-                      </FormItem>
-                    </Col>
-                  </Row>
-                </div>
-              </div>
+              ) : null}
             </Form>
           </div>
           <div className={st.ct_footer}>

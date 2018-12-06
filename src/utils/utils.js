@@ -203,7 +203,7 @@ export function getUserDistricts(data) {
     let obj = {
       label: p.Name,
       value: p.ID,
-      disabled:p.UserIn
+      disabled:!p.UserIn
     };
     if (p.SubDistrict) {
       obj.children = p.SubDistrict.map(getSub);
