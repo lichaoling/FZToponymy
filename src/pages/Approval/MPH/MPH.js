@@ -9,18 +9,17 @@ import {
   Icon,
   Table,
 } from 'antd';
-
-import SPQueryForm from '../../../common/Components/Forms/SPQueryForm';
+import {
+  url_SearchHousesBZToProve
+} from '../../../common/urls.js';
+import { Post } from '../../../utils/request.js';
+import { rtHandle } from '../../../utils/errorHandle.js';
+import SPQueryForm from '../../../common/Components/Forms/SPQueryForm'; //查询表
 import MPHForm from '../../../common/Components/Forms/MPHForm';
 class MPH extends Component {
   constructor(ps) {
     super(ps);
-    this.MPHPg = {
-      pageSize: 10,
-      size: 'small',
-      showQuickJumper: true,
-      showSizeChanger: true
-    };
+
     this.state = {
       showModal: false,
       MPHCol: [{
@@ -32,24 +31,20 @@ class MPH extends Component {
         ),
       }, {
         title: '行政区划',
-        dataIndex: 'XZQH',
-        key: 'XZQH',
-      }, {
-        title: '街道',
-        dataIndex: 'JD',
-        key: 'JD',
+        dataIndex: 'DistrictName',
+        key: 'DistrictName',
       }, {
         title: '道路',
-        dataIndex: 'DL',
-        key: 'DL',
+        dataIndex: 'RoadName',
+        key: 'RoadName',
       }, {
         title: '长度',
-        dataIndex: 'CD',
-        key: 'CD',
+        dataIndex: 'LENGTH',
+        key: 'LENGTH',
       }, {
         title: '宽度',
-        dataIndex: 'KD',
-        key: 'KD',
+        dataIndex: 'WIDTH',
+        key: 'WIDTH',
       },{
         title: '操作',
         dataIndex: 'cz',
@@ -62,105 +57,46 @@ class MPH extends Component {
         ),
       }
       ],
-      MPHData: [{
-        key: 1,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-        
-      }, {
-        key: 2,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 3,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 4,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 5,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 6,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 7,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 8,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 9,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 10,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 11,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }, {
-        key: 12,
-        XH: '01',
-        XZQH: '鼓楼区',
-        JD: '解放大桥',
-        DL: '一级',
-        CD: '100米',
-        KD: '20米',
-      }],
+      MPHData: [],
     };
+
+    //pagination参数
+    this.MPHPg = {
+      current: 1, //当前页码
+      pageSize: 10,
+      size: 'small',
+      showQuickJumper: true,
+      showSizeChanger: true
+    };
+  }
+  showLoading() {
+    this.setState({ showLoading: true });
+  }
+  hideLoading() {
+    this.setState({ showLoading: false });
+  }
+  //获取子组件SPQueryForm的查询条件
+  searchMPH = (districtID, approvalState, start, end) => {
+    this.setState({ districtID: districtID, approvalState: approvalState, start: start, end: end });
+    this.getMPHTableData(districtID, approvalState, start, end);
+  }
+  // 获取道路桥梁查询内容-接口url_SearchHousesBZToProve(pageNum, pageSize, districtID, approvalState, start, end)
+  async getMPHTableData(districtID, approvalState, start, end) {
+    this.showLoading();
+    var pageNum = this.MPHPg.current;
+    var pageSize = this.MPHPg.pageSize;
+    let rt = await Post(url_SearchHousesBZToProve, { pageNum, pageSize, districtID, approvalState, start, end });
+    rtHandle(rt, d => {
+      debugger
+      this.MPHPg.total = d.Count;
+      this.setState({ MPHData: d.Data });
+    });
+    this.hideLoading();
+  }
+  //切换页码
+  handleTableChange = (pagination, filters, sorter) => {
+    this.MPHPg = pagination;
+    this.getMPHTableData(this.state.districtID, this.state.approvalState, this.state.start, this.state.end);
   }
   handleOk = (e) => {
     this.setState({
@@ -176,18 +112,17 @@ class MPH extends Component {
     return (
       <div className={st.MPH}>
         <div className={st.content} >
-          {/* <div className={st.ct_header}>
-            <div className={st.ct_title}>门牌号审批</div>
-          </div> */}
           <div className={st.ct_form}>
-            <SPQueryForm />
+            <SPQueryForm name={"MPH"} searchMPH={this.searchMPH} />
           </div>
           <div className={st.ct_form}>
             <Table
+              rowKey={record => record.ID}
               className={st.ct_table}
               columns={this.state.MPHCol}
               dataSource={this.state.MPHData}
               pagination={this.MPHPg}
+              onChange={this.handleTableChange}
               size="small"
               bordered>
             </Table>

@@ -76,6 +76,9 @@ class SPQueryForm extends Component {
                     case 'XQLY':
                         cthis.props.searchXQLY(districtID, approvalState, start, end);
                         break;
+                    case 'MPH':
+                        cthis.props.searchMPH(districtID, approvalState, start, end);
+                        break;
                     default:
                         break;
                 }
