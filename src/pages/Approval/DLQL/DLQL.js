@@ -9,14 +9,14 @@ import {
   Icon,
   Table,
 } from 'antd';
-import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
-import DLQLForm from '../../../common/Components/Forms/DLQLForm';
 import {
   url_SearchRoads
 } from '../../../common/urls.js';
 import { Post } from '../../../utils/request.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
-import { getUserDistricts } from '../../../utils/utils.js';
+import SPQueryForm from '../../../common/Components/Forms/SPQueryForm';
+import DLQLForm from '../../../common/Components/Forms/DLQLForm';
+
 class DLQL extends Component {
   constructor(ps) {
     super(ps);
@@ -83,7 +83,7 @@ class DLQL extends Component {
   hideLoading() {
       this.setState({ showLoading: false });
   }
-  //获取子组件DLQLQueryForm的查询条件
+  //获取子组件SPQueryForm的查询条件
   searchDLQL = (districtID, approvalState, start, end) => {
     this.setState({districtID: districtID, approvalState: approvalState, start: start, end: end});
     this.getDLQLTableData(districtID, approvalState, start, end);
@@ -121,7 +121,7 @@ class DLQL extends Component {
       <div className={st.DLQL}>
         <div className={st.content} >
           <div className={st.ct_form}>
-            <DLQLQueryForm name={"DLQL"} searchDLQL={this.searchDLQL} />
+            <SPQueryForm name={"DLQL"} searchDLQL={this.searchDLQL} />
           </div>
           <div className={st.ct_form}>
             <Table

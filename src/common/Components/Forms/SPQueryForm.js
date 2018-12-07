@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import {
-    Form, Select, Button,  Icon, DatePicker,
+    Form, Select, Button, Icon, DatePicker,
     Cascader, Row, Input, notification,
     Spin,
 } from 'antd';
@@ -14,12 +14,12 @@ function hasErrors(fieldsError) {
 }
 import {
     url_GetDistrictTreeByUID,
-  } from '../../../common/urls.js';
+} from '../../../common/urls.js';
 import { Post } from '../../../utils/request.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
 import { getUserDistricts } from '../../../utils/utils.js';
-import st from './DLQLQueryForm.less';
-class DLQLQueryForm extends Component {
+import st from './SPQueryForm.less';
+class SPQueryForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -33,7 +33,7 @@ class DLQLQueryForm extends Component {
     }
     showLoading() {
         this.setState({ showLoading: true });
-      }
+    }
     hideLoading() {
         this.setState({ showLoading: false });
     }
@@ -42,8 +42,8 @@ class DLQLQueryForm extends Component {
         this.showLoading();
         let rt = await Post(url_GetDistrictTreeByUID);
         rtHandle(rt, d => {
-        let districts = getUserDistricts(d);
-        this.setState({ districts: districts });
+            let districts = getUserDistricts(d);
+            this.setState({ districts: districts });
         });
         this.hideLoading();
     }
@@ -53,21 +53,28 @@ class DLQLQueryForm extends Component {
         this.getDistricts();
     }
 
- 
+
 
     handleSubmit = (e) => {
         e.preventDefault();
-        let cthis=this;
+        let cthis = this;
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // values['zjd'] = values['zjd'] == undefined ? "" : values['zjd'];
-                switch(cthis.props.name){
+                if (values['spsj'] == undefined) {
+                    var start = null;
+                    var end = null;
+                } else {
+                    var start = values["spsj"][0].toISOString();
+                    var end = values["spsj"][1].toISOString();
+                }
+                var districtID = values["xzqh"][values["xzqh"].length - 1];
+                var approvalState = parseInt(values["spzt"]);
+                switch (cthis.props.name) {
                     case 'DLQL':
-                        var districtID = values["xzqh"][values["xzqh"].length-1];
-                        var approvalState = parseInt(values["spzt"]);
-                        var start = values["spsj"][0].toISOString();
-                        var end = values["spsj"][1].toISOString();
                         cthis.props.searchDLQL(districtID, approvalState, start, end);
+                        break;
+                    case 'XQLY':
+                        cthis.props.searchXQLY(districtID, approvalState, start, end);
                         break;
                     default:
                         break;
@@ -92,12 +99,12 @@ class DLQLQueryForm extends Component {
             wrapperCol: { span: 18 },
         };
         return (
-            <div className={st.DLQLQueryForm}>
-            <Spin
-                className={showLoading ? 'active' : ''}
-                spinning={showLoading}
-                size="large"
-                tip="数据加载中..."
+            <div className={st.SPQueryForm}>
+                <Spin
+                    className={showLoading ? 'active' : ''}
+                    spinning={showLoading}
+                    size="large"
+                    tip="数据加载中..."
                 />
                 <Form onSubmit={this.handleSubmit} layout="inline" style={{ fontSize: "14px" }} >
                     <Row className={st.up_row}>
@@ -115,11 +122,7 @@ class DLQLQueryForm extends Component {
                                     placeholder="所在（跨）行政区"
                                     style={{ width: 300 }}
                                     changeOnSelect
-                                    // onChange={(a, b) => {
-                                    //     districts = a;
-                                    //     this.setState({ showCheckIcon: 'empty' });
-                                    // }}
-                                    />
+                                />
                             )}
                         </FormItem>
                         <FormItem label={`审批状态：`} className={st.edit_row}>
@@ -127,6 +130,7 @@ class DLQLQueryForm extends Component {
                                 rules: [
                                     { required: false, message: '请选择' },
                                 ],
+                                initialValue: "0"
                             })(
                                 <Select placeholder="请选择" name="spzt" style={{ width: 130 }}>
                                     <Option value="0">未审批</Option>
@@ -182,5 +186,5 @@ class DLQLQueryForm extends Component {
     }
 }
 
-DLQLQueryForm = Form.create()(DLQLQueryForm);
-export default DLQLQueryForm;
+SPQueryForm = Form.create()(SPQueryForm);
+export default SPQueryForm;

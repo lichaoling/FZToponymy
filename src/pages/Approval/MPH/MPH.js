@@ -10,7 +10,7 @@ import {
   Table,
 } from 'antd';
 
-import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
+import SPQueryForm from '../../../common/Components/Forms/SPQueryForm';
 import MPHForm from '../../../common/Components/Forms/MPHForm';
 class MPH extends Component {
   constructor(ps) {
@@ -180,7 +180,7 @@ class MPH extends Component {
             <div className={st.ct_title}>门牌号审批</div>
           </div> */}
           <div className={st.ct_form}>
-            <DLQLQueryForm />
+            <SPQueryForm />
           </div>
           <div className={st.ct_form}>
             <Table

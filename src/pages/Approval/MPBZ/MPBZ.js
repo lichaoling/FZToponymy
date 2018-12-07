@@ -10,7 +10,7 @@ import {
   Table,
 } from 'antd';
 
-import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
+import SPQueryForm from '../../../common/Components/Forms/SPQueryForm';
 import DLQLForm from '../../../common/Components/Forms/DLQLForm';
 class MPBZ extends Component {
   constructor(ps) {
