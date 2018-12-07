@@ -1,0 +1,154 @@
+@keyframes mymove {
+  0% {
+    top: 0px;
+  }
+  25% {
+    top: -5px;
+  }
+  50% {
+    top: -10px;
+  }
+  75% {
+    top: -5px;
+  }
+  100% {
+    top: 0px;
+  }
+}
+.MPBZ {
+  height: 100%;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin: 0 auto;
+}
+.MPBZ .content {
+  width: 100%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  background-color: #fff;
+  margin: 10px;
+}
+.MPBZ .content :global .ant-table-body {
+  margin: 0;
+}
+.MPBZ .content .ct_title {
+  font-weight: bold;
+  color: #118eea;
+  padding: 10px;
+  font-size: 15px;
+}
+.MPBZ .content .ct_table {
+  margin: 10px;
+}
+.MPBZ .content .ct_header {
+  border-bottom: 1px solid rgba(105, 105, 105, 0.06);
+  display: flex;
+  align-items: center;
+}
+.MPBZ .content .ct_header > h1 {
+  margin: 0;
+}
+.MPBZ .ct_form .group {
+  margin: 20px;
+  padding: 10px 0;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02);
+}
+.MPBZ .ct_form .group:first-child {
+  margin-top: 15px;
+}
+.MPBZ .ct_form .group .grouptitle {
+  position: relative;
+  padding: 5px 10px;
+  background: rgba(158, 158, 158, 0.06);
+}
+.MPBZ .ct_form .group .grouptitle::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+  height: 100%;
+  width: 4px;
+  background-color: #1890ff;
+}
+.MPBZ .ct_form .group .grouptitle > span {
+  margin-right: 20px;
+  float: right;
+  color: red;
+}
+.MPBZ .ct_form .group .groupcontent {
+  width: 100%;
+  margin: 0;
+  padding: 0 30px;
+}
+.MPBZ .ct_form .group .groupcontent :global .ant-row {
+  margin: 10px 0;
+}
+.MPBZ .ct_form .group .groupcontent :global .ant-form-item-children {
+  display: flex;
+}
+.MPBZ .ct_form .group .groupcontent :global .ant-form-item-children .iconfont {
+  margin-left: 5px;
+  font-size: 20px;
+}
+.MPBZ .ct_form .group .groupcontent :global .ant-form-item-children .iconfont.icon-iconcorrect {
+  color: green;
+}
+.MPBZ .ct_form .group .groupcontent :global .ant-form-item-children .iconfont.icon-cuowu {
+  color: red;
+}
+.MPBZ .ct_form .group .groupcontent .ired {
+  color: red;
+  display: inline-block;
+  margin-right: 5px;
+}
+.MPBZ .ct_form :global .ant-divider {
+  margin: 5px 0;
+}
+.MPBZ .ct_form :global .ant-form-item {
+  margin: 5px 0;
+}
+.MPBZ .ct_footer {
+  padding: 10px;
+  border-top: 1px solid #eee;
+  height: 50px;
+}
+:global .ant-spin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+:global .ant-spin.active {
+  z-index: 9;
+}
+.locatemap :global .ant-modal,
+.locatemap :global .ant-modal-content {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  width: auto !important;
+}
+.locatemap :global .ant-modal-body {
+  padding: 10px;
+  height: calc(100% - 45px);
+  background-color: #fafafa;
+}
+.locatemap :global .ant-modal-body {
+  padding: 0;
+}
+.ct_modalCon {
+  margin: 20px 100px;
+  margin: 0 auto;
+}

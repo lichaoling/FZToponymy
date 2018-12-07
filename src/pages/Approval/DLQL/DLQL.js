@@ -9,18 +9,17 @@ import {
   Icon,
   Table,
 } from 'antd';
-
 import DLQLQueryForm from '../../../common/Components/Forms/DLQLQueryForm';
 import DLQLForm from '../../../common/Components/Forms/DLQLForm';
+import {
+  url_SearchRoads
+} from '../../../common/urls.js';
+import { Post } from '../../../utils/request.js';
+import { rtHandle } from '../../../utils/errorHandle.js';
+import { getUserDistricts } from '../../../utils/utils.js';
 class DLQL extends Component {
   constructor(ps) {
     super(ps);
-    this.qlPg = {
-      pageSize: 10,
-      size: 'small',
-      showQuickJumper: true,
-      showSizeChanger: true
-    };
     this.state = {
       showModal: false,
       qlCol: [{
@@ -32,28 +31,29 @@ class DLQL extends Component {
         ),
       }, {
         title: '行政区划',
-        dataIndex: 'XZQH',
-        key: 'XZQH',
+        dataIndex: 'DistrictName',
+        key: 'DistrictName',
+        width: 300,
       }, {
         title: '名称',
-        dataIndex: 'BZMC',
-        key: 'BZMC',
+        dataIndex: 'NAME',
+        key: 'NAME',
       }, {
         title: '性质',
-        dataIndex: 'ZX',
-        key: 'ZX',
+        dataIndex: 'PLANNAME',
+        key: 'PLANNAME',
       }, {
         title: '长度',
-        dataIndex: 'CD',
-        key: 'CD',
+        dataIndex: 'LENGTH',
+        key: 'LENGTH',
       }, {
         title: '宽度',
-        dataIndex: 'KD',
-        key: 'KD',
+        dataIndex: 'WIDTH',
+        key: 'WIDTH',
       },{
         title: '审批时间',
-        dataIndex: 'SPSJ',
-        key: 'SPSJ',
+        dataIndex: 'ApprovalTime',
+        key: 'ApprovalTime',
       }, {
         title: '操作',
         dataIndex: 'cz',
@@ -62,131 +62,49 @@ class DLQL extends Component {
           <span>
             <a onClick={() => this.setState({ showModal: true })} >审批</a>
           </span>
-
         ),
       }
       ],
-      qlData: [{
-        key: 1,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-      }, {
-        key: 2,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 3,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 4,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 5,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 6,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 7,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 8,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 9,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 10,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 11,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 12,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }],
+      qlData: [],
     };
+
+    //pagination参数
+    this.qlPg= {
+      current: 1, //当前页码
+      pageSize: 10, //每页几条
+      size: 'small',
+      showQuickJumper: true,
+      showSizeChanger: true
+    };
+  }
+  showLoading() {
+    this.setState({ showLoading: true });
+  }
+  hideLoading() {
+      this.setState({ showLoading: false });
+  }
+  //获取子组件DLQLQueryForm的查询条件
+  searchDLQL = (districtID, approvalState, start, end) => {
+    this.setState({districtID: districtID, approvalState: approvalState, start: start, end: end});
+    this.getDLQLTableData(districtID, approvalState, start, end);
+  }
+  // 获取道路桥梁查询内容-接口url_SearchRoads(pageNum, pageSize, districtID, approvalState, start, end)
+  async getDLQLTableData(districtID, approvalState, start, end) {
+    this.showLoading();
+    var pageNum = this.qlPg.current;
+    var pageSize = this.qlPg.pageSize;
+    let rt = await Post(url_SearchRoads,{pageNum, pageSize, districtID, approvalState, start, end});
+    rtHandle(rt, d => {
+      this.qlPg.total = d.Count;
+      debugger
+      this.setState({ qlData: d.Data });
+    });
+    this.hideLoading();
+  }
+  //切换页码
+  handleTableChange = (pagination, filters, sorter) => {
+    this.qlPg = pagination;
+    this.getDLQLTableData(this.state.districtID, this.state.approvalState, this.state.start, this.state.end);
   }
   handleOk = (e) => {
     this.setState({
@@ -202,18 +120,17 @@ class DLQL extends Component {
     return (
       <div className={st.DLQL}>
         <div className={st.content} >
-          {/* <div className={st.ct_header}>
-            <div className={st.ct_title}>道路审批</div>
-          </div> */}
           <div className={st.ct_form}>
-            <DLQLQueryForm />
+            <DLQLQueryForm name={"DLQL"} searchDLQL={this.searchDLQL} />
           </div>
           <div className={st.ct_form}>
             <Table
+              rowKey={record => record.ID}
               className={st.ct_table}
               columns={this.state.qlCol}
               dataSource={this.state.qlData}
               pagination={this.qlPg}
+              onChange={this.handleTableChange}
               size="small"
               bordered>
             </Table>

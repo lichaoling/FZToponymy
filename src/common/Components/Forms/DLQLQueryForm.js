@@ -1,31 +1,24 @@
 import { Component } from 'react';
 import {
-    Form, Select, InputNumber, Switch, Radio,
-    Slider, Button, Upload, Icon, DatePicker,
-    TreeSelect, Cascader, Row, Input, notification,
+    Form, Select, Button,  Icon, DatePicker,
+    Cascader, Row, Input, notification,
     Spin,
 } from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const OptGroup = Select.OptGroup;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
+const { RangePicker } = DatePicker;
 
 function hasErrors(fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
 import {
-    // baseUrl,
     url_GetDistrictTreeByUID,
-    // url_CheckRoadName,
-    // url_SearchRoadByID,
-    // url_RoadAndBridgeApplicant,
   } from '../../../common/urls.js';
 import { Post } from '../../../utils/request.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
-import st from './DLQLQueryForm.less';
 import { getUserDistricts } from '../../../utils/utils.js';
+import st from './DLQLQueryForm.less';
 class DLQLQueryForm extends Component {
     constructor(props) {
         super(props);
@@ -60,66 +53,24 @@ class DLQLQueryForm extends Component {
         this.getDistricts();
     }
 
-    XianSelectChange(e) {
-        $.post(
-            _URL_.SA + "GetListByParentId",
-            { id: e },
-            function (e) {
-                this.setState({ zjd: e });
-            }.bind(this)).
-            error(function () {
-                notification['warning']({
-                    message: '提示',
-                    description: '网络故障，请稍后再试',
-                });
-            });
-    }
+ 
 
     handleSubmit = (e) => {
         e.preventDefault();
+        let cthis=this;
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                values['xian'] = values['xian'] == undefined ? "" : values['xian'];
-                values['zjd'] = values['zjd'] == undefined ? "" : values['zjd'];
-                if (this.props.url == "GetOverTimeProjects") {
-                    $.post(
-                        _URL_.PM + "GetOverTimeProjects",
-                        {
-                            pageindex: 1,
-                            listnum: 1000,
-                            xian: values['xian'],
-                            zhen: values['zjd'],
-                        },
-                        function (e) {
-                            this.props.getQueryData(e);
-                        }.bind(this))
-                        .error(function () {
-                            notification['warning']({
-                                message: '提示',
-                                description: '网络故障，请稍后再试',
-                            });
-                        });
-                }
-                if (this.props.url == "GetInitCatelogs") {
-                    this.props.openLoad();
-                    var zjd = values['xian'];
-                    if (values['zjd'] != "") {
-                        zjd = values['zjd'];
-                    }
-                    $.post(
-                        _URL_.FR + "GetInitCatelogs",
-                        {
-                            zjd: zjd
-                        },
-                        function (e) {
-                            this.props.getQueryData(e, zjd);
-                        }.bind(this)).
-                        error(function () {
-                            notification['warning']({
-                                message: '提示',
-                                description: '网络故障，请稍后再试',
-                            });
-                        });
+                // values['zjd'] = values['zjd'] == undefined ? "" : values['zjd'];
+                switch(cthis.props.name){
+                    case 'DLQL':
+                        var districtID = values["xzqh"][values["xzqh"].length-1];
+                        var approvalState = parseInt(values["spzt"]);
+                        var start = values["spsj"][0].toISOString();
+                        var end = values["spsj"][1].toISOString();
+                        cthis.props.searchDLQL(districtID, approvalState, start, end);
+                        break;
+                    default:
+                        break;
                 }
             }
         });
@@ -135,89 +86,11 @@ class DLQLQueryForm extends Component {
     render() {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         let { districts, showLoading, } = this.state;
-        var xianOptions = this.state.xian.map(xian => <Select.Option value={xian.Id}>{xian.Name}</Select.Option>);
-        var zjdOptions = this.state.zjd != [] ? this.state.zjd.map(zjd => <Select.Option value={zjd.Id}>{zjd.Name}</Select.Option>) : "";
         var s = this.state;
         const formItemLayout = {
             labelCol: { span: 6 },
             wrapperCol: { span: 18 },
         };
-        var areaSrc = [
-            {
-                value: '350102',
-                label: '鼓楼区',
-                children: [
-                    {
-                        value: '350102001',
-                        label: '鼓东街道',
-                    }, {
-                        value: '350102002',
-                        label: '鼓西街道',
-                    }, {
-                        value: '350102003',
-                        label: '温泉街道',
-                    }, {
-                        value: '350102004',
-                        label: '东街街道',
-                    }, {
-                        value: '350102005',
-                        label: '南街街道',
-                    }, {
-                        value: '350102006',
-                        label: '安泰街道',
-                    }, {
-                        value: '350102007',
-                        label: '华大街道',
-                    }, {
-                        value: '350102008',
-                        label: '水部街道',
-                    }, {
-                        value: '350102009',
-                        label: '五凤街道',
-                    }, {
-                        value: '350102100',
-                        label: '洪山镇',
-                    }
-
-                ],
-            }, {
-                value: '350103',
-                label: '台江区',
-                children: [
-                    {
-                        value: '350103001',
-                        label: '瀛洲街道',
-                    }, {
-                        value: '350103002',
-                        label: '后洲街道',
-                    }, {
-                        value: '350103003',
-                        label: '义洲街道',
-                    }, {
-                        value: '350103004',
-                        label: '新港街道',
-                    }, {
-                        value: '350103005',
-                        label: '上海街道',
-                    }, {
-                        value: '350103006',
-                        label: '苍霞街道',
-                    }, {
-                        value: '350103007',
-                        label: '茶亭街道',
-                    }, {
-                        value: '350103008',
-                        label: '洋中街道',
-                    }, {
-                        value: '350103009',
-                        label: '鳌峰街道',
-                    }, {
-                        value: '3501030010',
-                        label: '宁化街道',
-                    }
-
-                ],
-            },];
         return (
             <div className={st.DLQLQueryForm}>
             <Spin
@@ -228,19 +101,20 @@ class DLQLQueryForm extends Component {
                 />
                 <Form onSubmit={this.handleSubmit} layout="inline" style={{ fontSize: "14px" }} >
                     <Row className={st.up_row}>
-                        <FormItem label={`行政区划：`} /*{...formItemLayout}*/ className={st.edit_row}>
-                            {getFieldDecorator('xian', {
+                        <FormItem label={`行政区划：`} className={st.edit_row}>
+                            {getFieldDecorator('xzqh', {
                                 rules: [
                                     { required: false, message: '请选择' },
                                 ],
                             })(
-                                // <Cascader placeholder={"请选择"} options={areaSrc} />
                                 <Cascader
+                                    name="xzqh"
                                     initalValue={districts ? districts : undefined}
                                     expandTrigger="hover"
                                     options={districts}
                                     placeholder="所在（跨）行政区"
                                     style={{ width: 300 }}
+                                    changeOnSelect
                                     // onChange={(a, b) => {
                                     //     districts = a;
                                     //     this.setState({ showCheckIcon: 'empty' });
@@ -248,25 +122,43 @@ class DLQLQueryForm extends Component {
                                     />
                             )}
                         </FormItem>
-                        <FormItem label={`审批状态：`} /*{...formItemLayout}*/ className={st.edit_row}>
+                        <FormItem label={`审批状态：`} className={st.edit_row}>
                             {getFieldDecorator('spzt', {
                                 rules: [
                                     { required: false, message: '请选择' },
                                 ],
                             })(
-                                <Select placeholder="请选择" name="xian" style={{ width: 130 }}>
-                                    <Option value="1">未审批</Option>
-                                    <Option value="2">已审批</Option>
+                                <Select placeholder="请选择" name="spzt" style={{ width: 130 }}>
+                                    <Option value="0">未审批</Option>
+                                    <Option value="1">已审批</Option>
                                 </Select>
                             )}
                         </FormItem>
-                        <FormItem label={`审批时间：`} /*{...formItemLayout}*/  >
+                        {/* <FormItem label={`审批时间：`}  >
+                            {getFieldDecorator('spsj', {
+                                rules: [
+                                    { required: false, message: '请输入' },
+                                ],
+                            })(
+                                <DateRange name="spsj" />
+                            )}
+                        </FormItem> */}
+                        <FormItem label={`审批时间：`}  >
+                            {getFieldDecorator('spsj', {
+                                rules: [
+                                    { required: false, message: '请输入' },
+                                ],
+                            })(
+                                <RangePicker name="spsj" />
+                            )}
+                        </FormItem>
+                        {/* <FormItem label={`审批时间：`}  >
                             {getFieldDecorator('spkssj', {
                                 rules: [
                                     { required: false, message: '请输入' },
                                 ],
                             })(
-                                <DatePicker />
+                                <DatePicker name="spkssj"  />
                             )}
                         </FormItem>
                         <span className={st.spanSpr}>~</span>
@@ -276,9 +168,9 @@ class DLQLQueryForm extends Component {
                                     { required: false, message: '请输入' },
                                 ],
                             })(
-                                <DatePicker />
+                                <DatePicker name="spjssj"  />
                             )}
-                        </FormItem>
+                        </FormItem> */}
                         <FormItem style={{ marginLeft: 15 }}>
                             <Button type="primary" htmlType="submit" loading={this.state.loading} icon="search"></Button>
                             <Button style={{ marginLeft: 5 }} onClick={this.handleReset} icon="delete"></Button>
