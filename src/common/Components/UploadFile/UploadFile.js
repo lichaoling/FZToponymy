@@ -112,7 +112,9 @@ class UploadFile extends React.Component {
           onRemove={this.onRemove.bind(this)}
         >
           <Button>
-            <Icon type="upload" /> 上传
+            <Icon type="plus" />
+            <div className="ant-upload-text">上传</div>
+            {/* <Icon type="upload" /> 上传 */}
           </Button>
         </Upload>
       </div>

@@ -96,19 +96,21 @@ class XQLYForm extends Component {
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs ? dIDs.reverse() : null;
 
-        d.BZTIME = d.BZTIME ? moment(d.BZTIME) : null;
-        d.SJSJ = d.SJSJ ? moment(d.SJSJ) : null;
-        d.JCSJ = d.JCSJ ? moment(d.JCSJ) : null;
-        this.setState({ entity: d });
+        data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
+        data.SJSJ = data.SJSJ ? moment(data.SJSJ) : null;
+        data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
+        this.setState({ entity: data });
         this.hideLoading();
       });
     } else {
+      this.showLoading();
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
         let { entity } = this.state;
         entity.ID = d;
         this.setState({ entity: entity });
+        this.hideLoading();
       });
     }
   }
@@ -139,6 +141,7 @@ class XQLYForm extends Component {
     }
 
     let validateObj = {
+      ...entity,
       ...saveObj,
     };
     // 行政区必填
