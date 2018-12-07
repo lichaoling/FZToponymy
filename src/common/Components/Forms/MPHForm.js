@@ -94,8 +94,8 @@ class MPHForm extends Component {
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs ? dIDs.reverse() : null;
 
-        d.BZTIME = d.BZTIME ? moment(d.BZTIME) : null;
-        this.setState({ entity: d });
+        data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
+        this.setState({ entity: data });
         this.hideLoading();
       });
     } else {
