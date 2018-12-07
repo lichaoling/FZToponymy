@@ -103,12 +103,14 @@ class XQLYForm extends Component {
         this.hideLoading();
       });
     } else {
+      this.showLoading();
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
         let { entity } = this.state;
         entity.ID = d;
         this.setState({ entity: entity });
+        this.hideLoading();
       });
     }
   }
@@ -139,6 +141,7 @@ class XQLYForm extends Component {
     }
 
     let validateObj = {
+      ...entity,
       ...saveObj,
     };
     // 行政区必填

@@ -7,7 +7,9 @@ let //**************** *行政区划*******************
   //**************** *道路桥梁*******************
   url_CheckRoadName = `${baseUrl}/Road/CheckRoadName`, //检查道路、桥梁命名检查(string DISTRICTID, string NAME)
   url_RoadAndBridgeApplicant = `${baseUrl}/Road/RoadAndBridgeApplicant`, //道路、桥梁命名申请(string mObj, string workFlowID = "1")
-  url_SearchRoadByID = `${baseUrl}/Road/SearchRoadByID`, //查询一条道路、桥梁数据进行审批(string id)
+  url_SearchRoadByID = `${baseUrl}/Road/SearchRoadByID`, //查询一条道路、桥梁数据进行审批(string id) 
+  //返回结果：{Data，State}  如果State=first说明是审批的第一个节点，则可以修改全部内容;如果State=notFirst说明是审批的中间节点，只可以修改名称;如果State=complete则已经审批完，不需要显示审批的那几个控件
+
   url_SearchRoads = `${baseUrl}/Road/SearchRoads`, //查询已审批或者待审批的道路、桥梁数据(int pageNum, int pageSize, string districtID, int approvalState, DateTime? start, DateTime? end
   url_RoadApprove = `${baseUrl}/Road/RoadApprove`, //道路、桥梁审批(string mObj, string result, string suggestion, string workFlowID = "1")
   //**************** *小区楼宇*******************

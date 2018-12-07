@@ -134,6 +134,7 @@ class MPHForm extends Component {
       saveObj.BZTIME = saveObj.BZTIME.toISOString();
     }
     let validateObj = {
+      ...entity,
       ...saveObj,
     };
     // 行政区必填
