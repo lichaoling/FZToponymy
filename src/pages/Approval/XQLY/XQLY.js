@@ -42,12 +42,12 @@ class XQLY extends Component {
         key: 'NAME',
       }, {
         title: '所属道路',
-        dataIndex: 'ADDRESS',
-        key: 'ADDRESS',
+        dataIndex: 'RoadNames',
+        key: 'RoadNames',
       }, {
         title: '建筑面积',
-        dataIndex: 'ZDMJ',
-        key: 'ZDMJ',
+        dataIndex: 'JZMJ',
+        key: 'JZMJ',
       }, {
         title: '审批时间',
         dataIndex: 'ApprovalTime',
@@ -139,14 +139,15 @@ class XQLY extends Component {
           this.state.showModal ?
             (
               <Modal
-                title="审批"
+                  destroyOnClose
                 visible={true}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
                 className={st.ct_modalCon}
-                width={"80%"}
+                width={"90%"}
+                footer={null}
+                style={{top:10}}
+                bodyStyle={{padding:0}}
               >
-                <XQLYForm isApproval={true} />
+                <XQLYForm isApproval={true} title={"住宅小区、楼宇名称命名（更名）申报表"}/>
               </Modal>
             ) : null
         }

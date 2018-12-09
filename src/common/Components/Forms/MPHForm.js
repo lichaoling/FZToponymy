@@ -251,7 +251,7 @@ class MPHForm extends Component {
         />
         <div className={st.content}>
           <div className={st.ct_header}>
-            <h1>新建住宅小区（楼宇）门牌号申请单</h1>
+            <h1>{this.props.title}</h1>
           </div>
           <div className={st.ct_form}>
             {reload ? null : (

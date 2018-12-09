@@ -28,7 +28,7 @@ class DLQL extends Component {
     return (
       <div className={st.DLQL}>
         <div className={st.Content}>
-          <DLQLForm isApproval={false} />
+          <DLQLForm isApproval={false} title={"道路、桥梁名称核准、命名（更名）申请单"}/>
         </div>
       </div>
     );

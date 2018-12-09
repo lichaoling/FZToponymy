@@ -29,7 +29,7 @@ class MPH extends Component {
     return (
       <div className={st.MPH}>
       <div className={st.Content}>
-        <MPHForm isApproval={false} />
+        <MPHForm isApproval={false} title={"新建住宅小区（楼宇）门牌号申请单"}/>
         </div>
       </div>
     );

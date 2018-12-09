@@ -25,6 +25,7 @@ import {
   url_SearchRoadByID,
   url_RoadAndBridgeApplicant,
   url_GetNewGuid,
+  url_RoadApprove,
 } from '../../../common/urls.js';
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
@@ -45,6 +46,9 @@ class DLQLForm extends Component {
     showLoading: false,
     showCheckIcon: 'empty',
     reload: false,
+    approveState: null,
+    result: null,
+    suggestion: null,
   };
 
   // 存储修改后的数据
@@ -86,12 +90,15 @@ class DLQLForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchRoadByID, { id: id });
       rtHandle(rt, d => {
+        debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs ? dIDs.reverse() : null;
         data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
         data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
-        this.setState({ entity: data });
+        this.setState({ reload: true }, e => {
+          this.setState({ entity: data, approveState: d.State, reload: false });
+        });
         this.hideLoading();
       });
     } else {
@@ -201,6 +208,12 @@ class DLQLForm extends Component {
       if (!validateObj.SBDW) {
         errs.push('请填写申报单位');
       }
+
+      //如果是审批
+      if (this.props.isApproval) {
+        if (!this.state.result) errs.push('请选择审批结果');
+        if (!this.state.suggestion || this.state.suggestion === '') errs.push('请填写审批意见');
+      }
     }
 
     return { errs, saveObj, validateObj };
@@ -219,10 +232,11 @@ class DLQLForm extends Component {
         )),
       });
     } else {
-      let { DISTRICTID, NAME } = validateObj;
+      let { ID, DISTRICTID, NAME } = validateObj;
       await Post(
         url_CheckRoadName,
         {
+          ID,
           DISTRICTID,
           NAME,
         },
@@ -279,11 +293,23 @@ class DLQLForm extends Component {
             )),
           });
         } else {
-          this.save(saveObj);
+          this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
         }
       }.bind(this)
     );
   };
+  async approve(obj) {
+    let { result, suggestion } = this.state;
+    await Post(url_RoadApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
+      notification.success({ description: '审批成功！', message: '成功' });
+      this.mObj = {};
+      if (this.props.onSaveSuccess) {
+        this.props.onSaveSuccess();
+      }
+      this.setState({ showCheckIcon: 'empty' });
+      this.getFormData(this.state.entity.ID);
+    });
+  }
 
   async save(obj) {
     await Post(url_RoadAndBridgeApplicant, { mObj: JSON.stringify(obj) }, e => {
@@ -352,7 +378,17 @@ class DLQLForm extends Component {
     this.getFormData();
   }
   render() {
-    let { districts, entity, showLocateMap, showLoading, showCheckIcon, reload } = this.state;
+    let {
+      districts,
+      entity,
+      showLocateMap,
+      showLoading,
+      showCheckIcon,
+      reload,
+      approveState,
+      result,
+      suggestion,
+    } = this.state;
     const { getFieldDecorator } = this.props.form;
     let shapeOptions = {
       stroke: true,
@@ -362,6 +398,7 @@ class DLQLForm extends Component {
       fill: false,
       clickable: true,
     };
+    console.log(approveState);
     return (
       <div className={st.DLQLForm}>
         <Spin
@@ -373,7 +410,7 @@ class DLQLForm extends Component {
 
         <div className={st.content} style={showLoading ? { filter: 'blur(2px)' } : null}>
           <div className={st.ct_header}>
-            <h1>道路、桥梁名称核准、命名（更名）申请单</h1>
+            <h1>{this.props.title}</h1>
           </div>
           <div className={st.ct_form}>
             {reload ? null : (
@@ -395,7 +432,7 @@ class DLQLForm extends Component {
                           }
                         >
                           <Cascader
-                            initalValue={entity.Districts ? entity.Districts : undefined}
+                            defaultValue={entity.Districts ? entity.Districts : undefined}
                             expandTrigger="hover"
                             changeOnSelect
                             options={districts}
@@ -403,10 +440,8 @@ class DLQLForm extends Component {
                             onChange={(a, b) => {
                               this.mObj.districts = a;
                               this.setState({ showCheckIcon: 'empty' });
-                              // let { entity } = this.state;
-                              // entity.Districts = a;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -421,7 +456,7 @@ class DLQLForm extends Component {
                           }
                         >
                           <Input
-                            initalValue={entity.NAME ? entity.NAME : undefined}
+                            defaultValue={entity.NAME ? entity.NAME : undefined}
                             onChange={e => {
                               // let { entity } = this.state;
                               this.mObj.NAME = e.target.value;
@@ -456,14 +491,12 @@ class DLQLForm extends Component {
                           label="原规划名称"
                         >
                           <Input
-                            initalValue={entity.PLANNAME ? entity.PLANNAME : undefined}
+                            defaultValue={entity.PLANNAME ? entity.PLANNAME : undefined}
                             onChange={e => {
-                              // let { entity } = this.state;
-                              // entity.PLANNAME = e.target.value;
                               this.mObj.PLANNAME = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="原规划名称"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -474,14 +507,12 @@ class DLQLForm extends Component {
                           label="起点（东/南）起"
                         >
                           <Input
-                            initalValue={entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined}
+                            defaultValue={entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined}
                             onChange={e => {
                               this.mObj.STARTDIRECTION = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.STARTDIRECTION = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="起点（东/南）起"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -492,14 +523,12 @@ class DLQLForm extends Component {
                           label="止点（西/北）至"
                         >
                           <Input
-                            initalValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
+                            defaultValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
                             onChange={e => {
                               this.mObj.ENDDIRECTION = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.ENDDIRECTION = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="止点（西/北）至"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -508,14 +537,12 @@ class DLQLForm extends Component {
                       <Col span={8}>
                         <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="走向">
                           <Input
-                            initalValue={entity.ZX ? entity.ZX : undefined}
+                            defaultValue={entity.ZX ? entity.ZX : undefined}
                             onChange={e => {
                               this.mObj.ZX = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.ZX = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="走向"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -526,15 +553,13 @@ class DLQLForm extends Component {
                           label="长度（米）"
                         >
                           <InputNumber
-                            initalValue={entity.LENGTH ? entity.LENGTH : undefined}
+                            defaultValue={entity.LENGTH ? entity.LENGTH : undefined}
                             style={{ width: '100%' }}
                             placeholder="长度（米）"
                             onChange={e => {
                               this.mObj.LENGTH = e;
-                              // let { entity } = this.state;
-                              // entity.LENGTH = e;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -545,15 +570,13 @@ class DLQLForm extends Component {
                           label="宽度（米）"
                         >
                           <InputNumber
-                            initalValue={entity.WIDTH ? entity.WIDTH : undefined}
+                            defaultValue={entity.WIDTH ? entity.WIDTH : undefined}
                             style={{ width: '100%' }}
                             placeholder="宽度（米）"
                             onChange={e => {
                               this.mObj.WIDTH = e;
-                              // let { entity } = this.state;
-                              // entity.WIDTH = e;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -562,43 +585,37 @@ class DLQLForm extends Component {
                       <Col span={8}>
                         <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="建成时间">
                           <DatePicker
-                            initalValue={entity.JCSJ ? entity.JCSJ : undefined}
+                            defaultValue={entity.JCSJ ? entity.JCSJ : undefined}
                             style={{ width: '100%' }}
                             onChange={e => {
                               this.mObj.JCSJ = e;
-                              // let { entity } = this.state;
-                              // entity.JCSJ = e;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
                       <Col span={8}>
                         <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="路面结构">
                           <Input
-                            initalValue={entity.LMJG ? entity.LMJG : undefined}
+                            defaultValue={entity.LMJG ? entity.LMJG : undefined}
                             onChange={e => {
                               this.mObj.LMJG = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.LMJG = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="路面结构"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
                       <Col span={8}>
                         <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="性质">
                           <Select
-                            initalValue={entity.NATURE ? entity.NATURE : undefined}
+                            defaultValue={entity.NATURE ? entity.NATURE : undefined}
                             allowClear
                             onChange={e => {
                               this.mObj.NATURE = e;
-                              // let { entity } = this.state;
-                              // entity.NATURE = e;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="性质"
+                            disabled={approveState === 'notFirst' ? true : false}
                           >
                             {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
                               <Select.Option key={d} value={d}>
@@ -617,14 +634,12 @@ class DLQLForm extends Component {
                           label="门牌号范围"
                         >
                           <Input
-                            initalValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
+                            defaultValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
                             onChange={e => {
                               this.mObj.MPNUMRANGE = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.MPNUMRANGE = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="门牌号范围"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -639,14 +654,12 @@ class DLQLForm extends Component {
                           }
                         >
                           <DatePicker
-                            initalValue={entity.BZTIME ? entity.BZTIME : undefined}
+                            defaultValue={entity.BZTIME ? entity.BZTIME : undefined}
                             style={{ width: '100%' }}
                             onChange={e => {
                               this.mObj.BZTIME = e;
-                              // let { entity } = this.state;
-                              // entity.BZTIME = e;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -660,6 +673,7 @@ class DLQLForm extends Component {
                               icon="environment"
                               size="small"
                               onClick={this.showLocateMap.bind(this)}
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </Tooltip>
                         </FormItem>
@@ -673,15 +687,13 @@ class DLQLForm extends Component {
                           label="名称含义或理由"
                         >
                           <TextArea
-                            initalValue={entity.MCHY ? entity.MCHY : undefined}
+                            defaultValue={entity.MCHY ? entity.MCHY : undefined}
                             onChange={e => {
                               this.mObj.MCHY = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.MCHY = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="名称含义或理由"
                             autosize={{ minRows: 2 }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -705,14 +717,12 @@ class DLQLForm extends Component {
                           }
                         >
                           <Input
-                            initalValue={entity.LXR ? entity.LXR : undefined}
+                            defaultValue={entity.LXR ? entity.LXR : undefined}
                             onChange={e => {
                               this.mObj.LXR = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.LXR = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="联系人"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -727,14 +737,12 @@ class DLQLForm extends Component {
                           }
                         >
                           <Input
-                            initalValue={entity.LXDH ? entity.LXDH : undefined}
+                            defaultValue={entity.LXDH ? entity.LXDH : undefined}
                             onChange={e => {
                               this.mObj.LXDH = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.LXDH = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="联系电话"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -749,14 +757,12 @@ class DLQLForm extends Component {
                           }
                         >
                           <Input
-                            initalValue={entity.SBDW ? entity.SBDW : undefined}
+                            defaultValue={entity.SBDW ? entity.SBDW : undefined}
                             onChange={e => {
                               this.mObj.SBDW = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.SBDW = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="申报单位"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -765,22 +771,20 @@ class DLQLForm extends Component {
                       <Col span={16}>
                         <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
                           <TextArea
-                            initalValue={entity.BZ ? entity.BZ : undefined}
+                            defaultValue={entity.BZ ? entity.BZ : undefined}
                             onChange={e => {
                               this.mObj.BZ = e.target.value;
-                              // let { entity } = this.state;
-                              // entity.BZ = e.target.value;
-                              // this.setState({ entity: entity, isSaved: false });
                             }}
                             placeholder="备注"
                             autosize={{ minRows: 2 }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
                     </Row>
                   </div>
                 </div>
-                {this.props.isApproval ? (
+                {this.props.isApproval && approveState != 'complete' ? (
                   <div className={st.group}>
                     <div className={st.grouptitle}>
                       审批信息<span>说明：“ * ”号标识的为必填项</span>
@@ -793,9 +797,13 @@ class DLQLForm extends Component {
                             wrapperCol={{ span: 16 }}
                             label={<span>审批结果</span>}
                           >
-                            <RadioGroup>
-                              <Radio value="1">通过</Radio>
-                              <Radio value="0">不通过</Radio>
+                            <RadioGroup
+                              onChange={e => {
+                                this.setState({ result: e.target.value });
+                              }}
+                            >
+                              <Radio value="同意">同意</Radio>
+                              <Radio value="不同意">不同意</Radio>
                             </RadioGroup>
                           </FormItem>
                         </Col>
@@ -810,7 +818,7 @@ class DLQLForm extends Component {
                             <TextArea
                               initalValue={entity.SPYJ ? entity.SPYJ : undefined}
                               onChange={e => {
-                                this.mObj.SPYJ = e.target.value;
+                                this.setState({ suggestion: e.target.value });
                               }}
                               placeholder="审批意见"
                               autosize={{ minRows: 2 }}

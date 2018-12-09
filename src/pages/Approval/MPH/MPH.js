@@ -132,14 +132,15 @@ class MPH extends Component {
           this.state.showModal ?
             (
               <Modal
-                title="审批"
+               destroyOnClose
                 visible={true}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
                 className={st.ct_modalCon}
-                width={"80%"}
+                width={"90%"}
+                footer={null}
+                style={{top:10}}
+                bodyStyle={{padding:0}}
               >
-                <MPHForm isApproval={true}/>
+                <MPHForm isApproval={true} title={"新建住宅小区（楼宇）门牌号申请单"}/>
               </Modal>
             ) : null
         }

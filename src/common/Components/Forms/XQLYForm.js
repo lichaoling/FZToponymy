@@ -239,10 +239,11 @@ class XQLYForm extends Component {
         )),
       });
     } else {
-      let { DISTRICTID, NAME } = validateObj;
+      let { ID, DISTRICTID, NAME } = validateObj;
       await Post(
         url_CheckHouseName,
         {
+          ID,
           DISTRICTID,
           NAME,
         },
@@ -400,7 +401,7 @@ class XQLYForm extends Component {
         />
         <div className={st.content} style={showLoading ? { filter: 'blur(2px)' } : null}>
           <div className={st.ct_header}>
-            <h1>住宅小区、楼宇名称命名（更名）申报表</h1>
+            <h1>{this.props.title}</h1>
           </div>
           <div className={st.ct_form}>
             {reload ? null : (
