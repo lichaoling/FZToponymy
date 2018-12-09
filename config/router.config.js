@@ -55,6 +55,7 @@ export default [
       { path: '/approval/mpbz', name: '门牌号编制', component: './Approval/MPBZ/MPBZ' },
     ],
   },
+  /*
   // test
   {
     path: '/test',
@@ -326,5 +327,8 @@ export default [
         component: '404',
       },
     ],
+  },*/
+  {
+    component: '404',
   },
 ];

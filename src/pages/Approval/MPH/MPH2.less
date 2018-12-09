@@ -1,0 +1,161 @@
+@import '../../../common/default.less';
+.MPH {
+    height: 100%;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin: 0 auto;
+    .content {
+        width: 100%;
+        box-shadow: @box-shadow1;
+        overflow: auto;
+        background-color: #fff;
+        margin: 10px;
+        :global {
+            .ant-table-body {
+                margin: 0;
+            }
+        }
+        .ct_title {
+            font-weight: bold;
+            color: #118eea;
+            padding: 10px;
+            font-size: 15px;
+        }
+        .ct_table {
+            margin: 10px;
+           
+        }
+        .ct_header {
+            border-bottom: 1px solid rgba(105, 105, 105, 0.06);
+            display: flex;
+            align-items: center;
+            >h1 {
+                margin: 0;
+            }
+        }
+        
+    }
+    .ct_form {
+        .group {
+            margin: 20px;
+            padding: 10px 0;
+            background: white;
+            box-shadow: @box-shadow;
+            &:first-child {
+                margin-top: 15px;
+            }
+            .grouptitle {
+                position: relative;
+                padding: 5px 10px;
+                background: rgba(158, 158, 158, 0.06);
+                &::before {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    content: '';
+                    height: 100%;
+                    width: 4px;
+                    background-color: @primary-color;
+                }
+                >span {
+                    margin-right: 20px;
+                    float: right;
+                    color: red;
+                }
+            }
+            .groupcontent {
+                width: 100%;
+                margin: 0;
+                padding: 0 30px;
+                :global {
+                    .ant-row {
+                        margin: 10px 0;
+                    }
+                    .ant-form-item-children {
+                        display: flex;
+                        .iconfont {
+                            margin-left: 5px;
+                            font-size: 20px;
+                        }
+                        .iconfont.icon-iconcorrect {
+                            color: green
+                        }
+                        .iconfont.icon-cuowu {
+                            color: red
+                        }
+                    }
+                }
+                .ired {
+                    color: red;
+                    display: inline-block;
+                    margin-right: 5px;
+                }
+            }
+        }
+        :global {
+            .ant-divider {
+                margin: 5px 0;
+            }
+            .ant-form-item {
+                margin: 5px 0;
+            }
+        }
+    }
+    .ct_footer {
+        padding: 10px;
+        border-top: 1px solid @border-color;
+        height: 50px;
+    }
+}
+
+:global {
+    .ant-spin {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .ant-spin.active {
+        z-index: 9;
+    }
+}
+
+.locatemap {
+    :global {
+        .ant-modal,
+        .ant-modal-content {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            width: auto !important;
+        }
+        .ant-modal-body {
+            padding: 10px;
+            height: calc(~'100% - 45px');
+            background-color: #fafafa;
+        }
+    }
+}
+
+.locatemap {
+    :global {
+        .ant-modal-body {
+            padding: 0;
+        }
+    }
+}
+.ct_modalCon {
+    margin: 20px 100px;
+    margin: 0 auto;
+}

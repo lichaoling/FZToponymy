@@ -1,239 +1,206 @@
 import { Component } from 'react';
-import { Route, Redirect } from 'react-router-dom';
 import st from './MPBZ.less';
-import {
-  Modal,
-  Row,
-  Col,
-  Button,
-  Icon,
-  Table,
-} from 'antd';
+import { Table, Pagination, Modal } from 'antd';
+import { warn } from '../../../utils/notification';
+import Search from '../Search';
+import { searchHousesBZToLocate } from '../../../services/MPBZ';
 
-import SPQueryForm from '../../../common/Components/Forms/SPQueryForm';
-import DLQLForm from '../../../common/Components/Forms/DLQLForm';
+let baseColumns = [
+  {
+    title: '行政区划',
+    dataIndex: 'DistrictName',
+    key: 'DistrictName',
+    width: 400,
+  },
+  {
+    title: '小区名称',
+    dataIndex: 'HouseName',
+    key: 'HouseName',
+  },
+  {
+    title: '道路名称',
+    dataIndex: 'ROADNAME',
+    key: 'ROADNAME',
+  },
+  {
+    title: '门牌号',
+    dataIndex: 'MPNUM',
+    key: 'MPNUM',
+  },
+  {
+    title: '经度',
+    dataIndex: 'X',
+    key: 'X',
+  },
+  {
+    title: '维度',
+    dataIndex: 'Y',
+    key: 'Y',
+  },
+];
+
 class MPBZ extends Component {
   constructor(ps) {
     super(ps);
-    this.qlPg = {
-      pageSize: 10,
-      size: 'small',
-      showQuickJumper: true,
-      showSizeChanger: true
-    };
-    this.state = {
-      showModal: false,
-      qlCol: [{
+    let nColumns = [
+      {
         title: '序号',
         dataIndex: 'XH',
         key: 'XH',
-        render: (text, record, index) => (
-          index + 1
-        ),
-      }, {
-        title: '行政区划',
-        dataIndex: 'XZQH',
-        key: 'XZQH',
-      }, {
-        title: '名称',
-        dataIndex: 'BZMC',
-        key: 'BZMC',
-      }, {
-        title: '性质',
-        dataIndex: 'ZX',
-        key: 'ZX',
-      }, {
-        title: '长度',
-        dataIndex: 'CD',
-        key: 'CD',
-      }, {
-        title: '宽度',
-        dataIndex: 'KD',
-        key: 'KD',
-      },{
-        title: '审批时间',
-        dataIndex: 'SPSJ',
-        key: 'SPSJ',
-      }, {
+        width: 80,
+        render: (text, record, index) => {
+          let { pageSize, pageNum } = this.state;
+          return (pageNum - 1) * pageSize + index + 1;
+        },
+      },
+    ].concat(baseColumns);
+    this.columns1 = nColumns.concat([
+      {
+        title: '编制时间',
+        dataIndex: 'BZTIME',
+        key: 'BZTIME',
+      },
+      {
         title: '操作',
         dataIndex: 'cz',
         key: 'cz',
         render: (text, record) => (
           <span>
-            <a onClick={() => this.setState({ showModal: true })} >审批</a>
+            <a onClick={e => this.approve(record)}>查看</a>
           </span>
-
         ),
+      },
+    ]);
+    this.columns0 = nColumns.concat([
+      {
+        title: '操作',
+        dataIndex: 'cz',
+        key: 'cz',
+        render: (text, record) => (
+          <span>
+            <a onClick={e => this.view(record)}>编制</a>
+          </span>
+        ),
+      },
+    ]);
+  }
+
+  state = {
+    showForm: false,
+    pageSize: 20,
+    pageNum: 1,
+    total: 0,
+    rows: [],
+    approvalState: 0,
+  };
+
+  condition = {};
+
+  showForm(id) {
+    this.rowid = id;
+    this.setState({ showForm: true });
+  }
+
+  closeForm() {
+    this.rowid = null;
+    this.setState({ showForm: false });
+  }
+
+  approve(row) {
+    this.showForm(row.ID);
+  }
+
+  view(row) {
+    this.showForm(row.ID);
+  }
+
+  search(cdn) {
+    if (!cdn.districtID || cdn.districtID.length <= 1) {
+      warn('请选择区级以下行政区');
+    } else {
+      let { pageSize, pageNum } = this.state;
+      let nCdn = {
+        ...cdn,
+
+        pageSize: pageSize,
+        pageNum: pageNum,
+      };
+      this._search(nCdn);
+    }
+  }
+
+  async _search(nCdn) {
+    this.setState({ loading: true });
+    await searchHousesBZToLocate(
+      {
+        ...nCdn,
+        locateState: nCdn.approvalState,
+        districtID: nCdn.districtID[nCdn.districtID.length - 1],
+      },
+      d => {
+        let { Data, Count } = d;
+        this.setState({
+          approvalState: nCdn.approvalState,
+          rows: Data,
+          total: Count,
+          loading: false,
+        });
+        this.condition = nCdn;
       }
-      ],
-      qlData: [{
-        key: 1,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-      }, {
-        key: 2,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 3,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 4,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 5,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 6,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 7,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 8,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 9,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 10,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 11,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }, {
-        key: 12,
-        XH: '01',
-        XZQH: '鼓楼区',
-        BZMC: '解放大桥',
-        ZX: '一级',
-        CD: '100米',
-        KD: '50米',
-        SPSJ:'2018-12-01 11:00',
-
-      }],
-    };
+    );
+    this.setState({ loading: false });
   }
-  handleOk = (e) => {
-    this.setState({
-      showModal: false,
-    });
-  }
-  handleCancel = (e) => {
-    this.setState({
-      showModal: false,
-    });
-  }
+
   render() {
+    let { pageSize, pageNum, total, rows, approvalState, loading, showForm } = this.state;
     return (
       <div className={st.MPBZ}>
-        <div className={st.content} >
-          {/* <div className={st.ct_header}>
-            <div className={st.ct_title}>道路审批</div>
-          </div> */}
-          <div className={st.ct_form}>
-            <MPHBzQueryForm />
-          </div>
-          <div className={st.ct_form}>
-            <Table
-              className={st.ct_table}
-              columns={this.state.qlCol}
-              dataSource={this.state.qlData}
-              pagination={this.qlPg}
-              size="small"
-              bordered>
-            </Table>
-          </div>
+        <div className={st.search}>
+          <Search
+            extension="编制"
+            approvalState={approvalState}
+            onClear={e => {
+              this.condition = e;
+            }}
+            onSearch={e => {
+              this.setState({ pageNum: 1 }, x => {
+                this.search(e);
+              });
+            }}
+          />
         </div>
-        {
-          this.state.showModal ?
-            (
-              <Modal
-                title="审批"
-                visible={true}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
-                className={st.ct_modalCon}
-                width={"80%"}
-              >
-                <DLQLForm isApproval={true}/>
-              </Modal>
-            ) : null
-        }
+        <div className={st.table}>
+          <Table
+            loading={loading}
+            pagination={false}
+            bordered
+            columns={approvalState == 0 ? this.columns0 : this.columns1}
+            dataSource={rows}
+          />
+        </div>
+        <div className={st.footer}>
+          <Pagination
+            showTotal={e =>
+              `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
+                rows.length}`
+            }
+            total={total}
+            current={pageNum}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            onShowSizeChange={(pn, ps) => {
+              this.setState({ pageSize: ps, pageNum: 1 }, e => {
+                this.search(this.condition);
+              });
+            }}
+            onChange={e => {
+              this.setState({ pageNum: e }, e => {
+                this.search(this.condition);
+              });
+            }}
+            showSizeChanger
+          />
+        </div>
       </div>
     );
   }

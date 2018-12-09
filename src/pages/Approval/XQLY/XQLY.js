@@ -1,156 +1,224 @@
 import { Component } from 'react';
-import { Route, Redirect } from 'react-router-dom';
 import st from './XQLY.less';
-import {
-  Modal,
-  Row,
-  Col,
-  Button,
-  Icon,
-  Table,
-} from 'antd';
-import {
-  url_SearchHouses
-} from '../../../common/urls.js';
-import { Post } from '../../../utils/request.js';
-import { rtHandle } from '../../../utils/errorHandle.js';
-import SPQueryForm from '../../../common/Components/Forms/SPQueryForm'; //查询表
-import XQLYForm from '../../../common/Components/Forms/XQLYForm'; //申请表
+import { Table, Pagination, Modal, Popover } from 'antd';
+import { warn } from '../../../utils/notification';
+import Search from '../Search';
+import { searchHouses, searchWorkFlowLines } from '../../../services/XQLY';
+import XQLYForm from '../../../common/Components/Forms/XQLYForm';
+import FlowViewer from '../FlowViewer';
+
+let baseColumns = [
+  {
+    title: '行政区划',
+    dataIndex: 'DistrictName',
+    key: 'DistrictName',
+    width: 400,
+  },
+  {
+    title: '名称',
+    dataIndex: 'NAME',
+    key: 'NAME',
+  },
+  {
+    title: '所属道路',
+    dataIndex: 'RoadNames',
+    key: 'RoadNames',
+  },
+  {
+    title: '建筑面积',
+    dataIndex: 'JZMJ',
+    key: 'JZMJ',
+  },
+];
 
 class XQLY extends Component {
-
   constructor(ps) {
     super(ps);
-
-    this.state = {
-      showModal: false,
-      xqlyCol: [{
+    let nColumns = [
+      {
         title: '序号',
         dataIndex: 'XH',
         key: 'XH',
-        render: (text, record, index) => (
-          index + 1
-        ),
-      }, {
-        title: '行政区划',
-        dataIndex: 'DistrictName',
-        key: 'DistrictName',
-        width: 300,
-      }, {
-        title: '名称',
-        dataIndex: 'NAME',
-        key: 'NAME',
-      }, {
-        title: '所属道路',
-        dataIndex: 'RoadNames',
-        key: 'RoadNames',
-      }, {
-        title: '建筑面积',
-        dataIndex: 'JZMJ',
-        key: 'JZMJ',
-      }, {
+        width: 80,
+        render: (text, record, index) => {
+          let { pageSize, pageNum } = this.state;
+          return (pageNum - 1) * pageSize + index + 1;
+        },
+      },
+    ].concat(baseColumns);
+    this.columns1 = nColumns.concat([
+      {
         title: '审批时间',
-        dataIndex: 'ApprovalTime',
-        key: 'ApprovalTime',
-      }, {
+        dataIndex: 'OPERATETIME',
+        key: 'OPERATETIME',
+      },
+      {
         title: '操作',
         dataIndex: 'cz',
         key: 'cz',
         render: (text, record) => (
           <span>
-            <a onClick={() => this.setState({ showModal: true })} >审批</a>
+            <Popover
+              placement="left"
+              trigger="click"
+              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+            >
+              <a>流程</a>
+            </Popover>
+            &ensp;
+            <a onClick={e => this.approve(record)}>查看</a>
           </span>
-
         ),
-      }
-      ],
-      xqlyData: [],
-    };
+      },
+    ]);
+    this.columns0 = nColumns.concat([
+      {
+        title: '操作',
+        dataIndex: 'cz',
+        key: 'cz',
+        render: (text, record) => (
+          <span>
+            <Popover
+              placement="left"
+              trigger="click"
+              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+            >
+              <a>流程</a>
+            </Popover>
+            &ensp;
+            <a onClick={e => this.view(record)}>审批</a>
+          </span>
+        ),
+      },
+    ]);
+  }
 
-    //pagination参数
-    this.xqlyPg = {
-      current: 1, //当前页码
-      pageSize: 10,
-      size: 'small',
-      showQuickJumper: true,
-      showSizeChanger: true
-    };
+  state = {
+    showForm: false,
+    pageSize: 20,
+    pageNum: 1,
+    total: 0,
+    rows: [],
+    approvalState: 0,
+  };
+
+  condition = {};
+
+  showForm(id) {
+    this.rowid = id;
+    this.setState({ showForm: true });
   }
-  showLoading() {
-    this.setState({ showLoading: true });
+
+  closeForm() {
+    this.rowid = null;
+    this.setState({ showForm: false });
   }
-  hideLoading() {
-    this.setState({ showLoading: false });
+
+  approve(row) {
+    this.showForm(row.ID);
   }
-  //获取子组件SPQueryForm的查询条件
-  searchXQLY = (districtID, approvalState, start, end) => {
-    this.setState({ districtID: districtID, approvalState: approvalState, start: start, end: end });
-    this.getXQLYTableData(districtID, approvalState, start, end);
+
+  view(row) {
+    this.showForm(row.ID);
   }
-  // 获取道路桥梁查询内容-接口url_SearchHouses(pageNum, pageSize, districtID, approvalState, start, end)
-  async getXQLYTableData(districtID, approvalState, start, end) {
-    this.showLoading();
-    var pageNum = this.xqlyPg.current;
-    var pageSize = this.xqlyPg.pageSize;
-    let rt = await Post(url_SearchHouses, { pageNum, pageSize, districtID, approvalState, start, end });
-    rtHandle(rt, d => {
-      debugger
-      this.xqlyPg.total = d.Count;
-      this.setState({ xqlyData: d.Data });
-    });
-    this.hideLoading();
+
+  search(cdn) {
+    if (!cdn.districtID || cdn.districtID.length <= 1) {
+      warn('请选择区级以下行政区');
+    } else {
+      let { pageSize, pageNum } = this.state;
+      let nCdn = {
+        ...cdn,
+        pageSize: pageSize,
+        pageNum: pageNum,
+      };
+      this._search(nCdn);
+    }
   }
-  //切换页码
-  handleTableChange = (pagination, filters, sorter) => {
-    this.xqlyPg = pagination;
-    this.getXQLYTableData(this.state.districtID, this.state.approvalState, this.state.start, this.state.end);
+
+  async _search(nCdn) {
+    this.setState({ loading: true });
+    await searchHouses(
+      {
+        ...nCdn,
+        districtID: nCdn.districtID[nCdn.districtID.length - 1],
+      },
+      d => {
+        let { Data, Count } = d;
+        this.setState({
+          approvalState: nCdn.approvalState,
+          rows: Data,
+          total: Count,
+          loading: false,
+        });
+        this.condition = nCdn;
+      }
+    );
+    this.setState({ loading: false });
   }
-  handleOk = (e) => {
-    this.setState({
-      showModal: false,
-    });
-  }
-  handleCancel = (e) => {
-    this.setState({
-      showModal: false,
-    });
-  }
+
   render() {
+    let { pageSize, pageNum, total, rows, approvalState, loading, showForm } = this.state;
     return (
       <div className={st.XQLY}>
-        <div className={st.content} >
-          <div className={st.ct_form}>
-            <SPQueryForm name={"XQLY"} searchXQLY={this.searchXQLY} />
-          </div>
-          <div className={st.ct_form}>
-            <Table
-              rowKey={record => record.ID}
-              className={st.ct_table}
-              columns={this.state.xqlyCol}
-              dataSource={this.state.xqlyData}
-              pagination={this.xqlyPg}
-              onChange={this.handleTableChange}
-              size="small"
-              bordered>
-            </Table>
-          </div>
+        <div className={st.search}>
+          <Search
+            approvalState={approvalState}
+            onClear={e => {
+              this.condition = e;
+            }}
+            onSearch={e => {
+              this.setState({ pageNum: 1 }, x => {
+                this.search(e);
+              });
+            }}
+          />
         </div>
-        {
-          this.state.showModal ?
-            (
-              <Modal
-                  destroyOnClose
-                visible={true}
-                className={st.ct_modalCon}
-                width={"90%"}
-                footer={null}
-                style={{top:10}}
-                bodyStyle={{padding:0}}
-              >
-                <XQLYForm isApproval={true} title={"住宅小区、楼宇名称命名（更名）申报表"}/>
-              </Modal>
-            ) : null
-        }
+        <div className={st.table}>
+          <Table
+            loading={loading}
+            pagination={false}
+            bordered
+            columns={approvalState == 0 ? this.columns0 : this.columns1}
+            dataSource={rows}
+          />
+        </div>
+        <div className={st.footer}>
+          <Pagination
+            showTotal={e =>
+              `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
+                rows.length}`
+            }
+            total={total}
+            current={pageNum}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            onShowSizeChange={(pn, ps) => {
+              this.setState({ pageSize: ps, pageNum: 1 }, e => {
+                this.search(this.condition);
+              });
+            }}
+            onChange={e => {
+              this.setState({ pageNum: e }, e => {
+                this.search(this.condition);
+              });
+            }}
+            showSizeChanger
+          />
+        </div>
+        <Modal
+          wrapClassName="ct-fullmodal"
+          visible={showForm && this.rowid}
+          destroyOnClose
+          onCancel={this.closeForm.bind(this)}
+          footer={null}
+        >
+          <XQLYForm
+            isApproval={true}
+            title="住宅小区、楼宇名称命名（更名）申报表"
+            id={this.rowid}
+          />
+        </Modal>
       </div>
     );
   }

@@ -1,11 +1,34 @@
-@import '../../../common/default.less';
+@import '~@/default.less';
 .MPBZ {
-  height: 100%;
-  width: 100%;
-  padding: 5px 10px;
-  background-color: #fff;
-  box-shadow: @box-shadow;
-  .content {
+    background: white;
+    @media screen and (max-width: 1400px) {
+        width: calc(~'100% - 100px');
+    }
+    @media screen and (min-width:1400px) {
+        width: 1400px;
+    }
     height: 100%;
-  }
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .search {
+        padding: 10px;
+        padding-top: 0;
+        border-bottom: 1px solid @border-color;
+        >div>* {
+            margin-top: 10px;
+        }
+    }
+    .table {
+        flex: 1;
+        overflow: auto;
+    }
+    .footer {
+        border-top: 1px solid @border-color;
+        padding: 10px;
+        >* {
+            text-align: right;
+        }
+    }
 }

@@ -1,181 +1,229 @@
 import { Component } from 'react';
-import { Route, Redirect } from 'react-router-dom';
 import st from './DLQL.less';
-import { Modal, Row, Col, Button, Icon, Table } from 'antd';
-import { url_SearchRoads } from '../../../common/urls.js';
-import { Post } from '../../../utils/request.js';
-import { rtHandle } from '../../../utils/errorHandle.js';
-import SPQueryForm from '../../../common/Components/Forms/SPQueryForm';
+import { Table, Pagination, Modal, Popover } from 'antd';
+import { warn } from '../../../utils/notification';
+import Search from '../Search';
+import { searchRoads, searchWorkFlowLines } from '../../../services/DLQL';
 import DLQLForm from '../../../common/Components/Forms/DLQLForm';
+import FlowViewer from '../FlowViewer';
+
+let baseColumns = [
+  {
+    title: '行政区划',
+    dataIndex: 'DistrictName',
+    key: 'DistrictName',
+    width: 400,
+  },
+  {
+    title: '名称',
+    dataIndex: 'NAME',
+    key: 'NAME',
+  },
+  {
+    title: '性质',
+    dataIndex: 'NATURE',
+    key: 'NATURE',
+  },
+  {
+    title: '长度',
+    dataIndex: 'LENGTH',
+    key: 'LENGTH',
+  },
+  {
+    title: '宽度',
+    dataIndex: 'WIDTH',
+    key: 'WIDTH',
+  },
+];
 
 class DLQL extends Component {
   constructor(ps) {
     super(ps);
-    this.state = {
-      showModal: false,
-      qlCol: [
-        {
-          title: '序号',
-          dataIndex: 'XH',
-          key: 'XH',
-          render: (text, record, index) => index + 1,
+    let nColumns = [
+      {
+        title: '序号',
+        dataIndex: 'XH',
+        key: 'XH',
+        width: 80,
+        render: (text, record, index) => {
+          let { pageSize, pageNum } = this.state;
+          return (pageNum - 1) * pageSize + index + 1;
         },
-        {
-          title: '行政区划',
-          dataIndex: 'DistrictName',
-          key: 'DistrictName',
-          width: 300,
-        },
-        {
-          title: '名称',
-          dataIndex: 'NAME',
-          key: 'NAME',
-        },
-        {
-          title: '性质',
-          dataIndex: 'NATURE',
-          key: 'NATURE',
-        },
-        {
-          title: '长度',
-          dataIndex: 'LENGTH',
-          key: 'LENGTH',
-        },
-        {
-          title: '宽度',
-          dataIndex: 'WIDTH',
-          key: 'WIDTH',
-        },
-        {
-          title: '审批时间',
-          dataIndex: 'ApprovalTime',
-          key: 'ApprovalTime',
-        },
-        {
-          title: '操作',
-          dataIndex: 'cz',
-          key: 'cz',
-          render: (text, record) => (
-            <span>
-              <a onClick={e => this.approve(text, record)}>审批</a>
-            </span>
-          ),
-        },
-      ],
-      qlData: [],
-      selecedRecord: {},
-      districtID: null,
-      approvalState: null,
-      start: null,
-      end: null,
-    };
+      },
+    ].concat(baseColumns);
+    this.columns1 = nColumns.concat([
+      {
+        title: '审批时间',
+        dataIndex: 'OPERATETIME',
+        key: 'OPERATETIME',
+      },
+      {
+        title: '操作',
+        dataIndex: 'cz',
+        key: 'cz',
+        render: (text, record) => (
+          <span>
+            <Popover
+              placement="left"
+              trigger="click"
+              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+            >
+              <a>流程</a>
+            </Popover>
+            &ensp;
+            <a onClick={e => this.approve(record)}>查看</a>
+          </span>
+        ),
+      },
+    ]);
+    this.columns0 = nColumns.concat([
+      {
+        title: '操作',
+        dataIndex: 'cz',
+        key: 'cz',
+        render: (text, record) => (
+          <span>
+            <Popover
+              placement="left"
+              trigger="click"
+              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+            >
+              <a>流程</a>
+            </Popover>
+            &ensp;
+            <a onClick={e => this.view(record)}>审批</a>
+          </span>
+        ),
+      },
+    ]);
+  }
 
-    //pagination参数
-    this.qlPg = {
-      current: 1, //当前页码
-      pageSize: 10, //每页几条
-      size: 'small',
-      showQuickJumper: true,
-      showSizeChanger: true,
-    };
-  }
-  showLoading() {
-    this.setState({ showLoading: true });
-  }
-  hideLoading() {
-    this.setState({ showLoading: false });
-  }
-  //获取子组件SPQueryForm的查询条件
-  searchDLQL = (districtID, approvalState, start, end) => {
-    this.setState({ districtID: districtID, approvalState: approvalState, start: start, end: end });
-    this.getDLQLTableData(districtID, approvalState, start, end);
+  state = {
+    showForm: false,
+    pageSize: 20,
+    pageNum: 1,
+    total: 0,
+    rows: [],
+    approvalState: 0,
   };
-  // 获取道路桥梁查询内容-接口url_SearchRoads(pageNum, pageSize, districtID, approvalState, start, end)
-  async getDLQLTableData(districtID, approvalState, start, end) {
-    this.showLoading();
-    var pageNum = this.qlPg.current;
-    var pageSize = this.qlPg.pageSize;
-    let rt = await Post(url_SearchRoads, {
-      pageNum,
-      pageSize,
-      districtID,
-      approvalState,
-      start,
-      end,
-    });
-    rtHandle(rt, d => {
-      this.qlPg.total = d.Count;
-      this.setState({ qlData: d.Data });
-    });
-    this.hideLoading();
+
+  condition = {};
+
+  showForm(id) {
+    this.rowid = id;
+    this.setState({ showForm: true });
   }
-  //切换页码
-  handleTableChange = (pagination, filters, sorter) => {
-    this.qlPg = pagination;
-    this.getDLQLTableData(
-      this.state.districtID,
-      this.state.approvalState,
-      this.state.start,
-      this.state.end
+
+  closeForm() {
+    this.rowid = null;
+    this.setState({ showForm: false });
+  }
+
+  approve(row) {
+    this.showForm(row.ID);
+  }
+
+  view(row) {
+    this.showForm(row.ID);
+  }
+
+  search(cdn) {
+    if (!cdn.districtID || cdn.districtID.length <= 1) {
+      warn('请选择区级以下行政区');
+    } else {
+      let { pageSize, pageNum } = this.state;
+      let nCdn = {
+        ...cdn,
+        pageSize: pageSize,
+        pageNum: pageNum,
+      };
+      this._search(nCdn);
+    }
+  }
+
+  async _search(nCdn) {
+    this.setState({ loading: true });
+    await searchRoads(
+      {
+        ...nCdn,
+        districtID: nCdn.districtID[nCdn.districtID.length - 1],
+      },
+      d => {
+        let { Data, Count } = d;
+        this.setState({
+          approvalState: nCdn.approvalState,
+          rows: Data,
+          total: Count,
+          loading: false,
+        });
+        this.condition = nCdn;
+      }
     );
-  };
-  approve(text, recorde) {
-    let { selecedRecord } = this.state;
-    selecedRecord = recorde;
-    this.setState({ selecedRecord, showModal: true });
+    this.setState({ loading: false });
   }
+
   render() {
-    let {
-      showModal,
-      qlCol,
-      qlData,
-      selecedRecord,
-      districtID,
-      approvalState,
-      start,
-      end,
-    } = this.state;
+    let { pageSize, pageNum, total, rows, approvalState, loading, showForm } = this.state;
     return (
       <div className={st.DLQL}>
-        <div className={st.content}>
-          <div className={st.ct_form}>
-            <SPQueryForm name={'DLQL'} searchDLQL={this.searchDLQL} />
-          </div>
-          <div className={st.ct_form}>
-            <Table
-              rowKey={record => record.ID}
-              className={st.ct_table}
-              columns={qlCol}
-              dataSource={qlData}
-              pagination={this.qlPg}
-              onChange={this.handleTableChange}
-              size="small"
-              bordered
-            />
-          </div>
+        <div className={st.search}>
+          <Search
+            approvalState={approvalState}
+            onClear={e => {
+              this.condition = e;
+            }}
+            onSearch={e => {
+              this.setState({ pageNum: 1 }, x => {
+                this.search(e);
+              });
+            }}
+          />
         </div>
-        {this.state.showModal ? (
-          <Modal
-            destroyOnClose
-            onCancel={() => this.setState({ showModal: false })}
-            visible={true}
-            className={st.ct_modalCon}
-            width={'90%'}
-            footer={null}
-            style={{ top: 10 }}
-            bodyStyle={{ padding: 0 }}
-          >
-            <DLQLForm
-              isApproval={true}
-              title={'道路、桥梁名称核准、命名（更名）审批单'}
-              id={selecedRecord.ID}
-              onSaveSuccess={() => {
-                this.setState({ showModal: false });
-                this.searchDLQL(districtID, approvalState, start, end);
-              }}
-            />
-          </Modal>
-        ) : null}
+        <div className={st.table}>
+          <Table
+            loading={loading}
+            pagination={false}
+            bordered
+            columns={approvalState == 0 ? this.columns0 : this.columns1}
+            dataSource={rows}
+          />
+        </div>
+        <div className={st.footer}>
+          <Pagination
+            showTotal={e =>
+              `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
+                rows.length}`
+            }
+            total={total}
+            current={pageNum}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            onShowSizeChange={(pn, ps) => {
+              this.setState({ pageSize: ps, pageNum: 1 }, e => {
+                this.search(this.condition);
+              });
+            }}
+            onChange={e => {
+              this.setState({ pageNum: e }, e => {
+                this.search(this.condition);
+              });
+            }}
+            showSizeChanger
+          />
+        </div>
+        <Modal
+          wrapClassName="ct-fullmodal"
+          visible={showForm && this.rowid}
+          destroyOnClose
+          onCancel={this.closeForm.bind(this)}
+          footer={null}
+        >
+          <DLQLForm
+            isApproval={true}
+            title="道路、桥梁名称核准、命名（更名）审批单"
+            id={this.rowid}
+          />
+        </Modal>
       </div>
     );
   }

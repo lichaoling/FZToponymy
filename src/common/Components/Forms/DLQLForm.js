@@ -93,7 +93,7 @@ class DLQLForm extends Component {
         debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
-        data.Districts = dIDs ? dIDs.reverse() : null;
+        // data.Districts = dIDs ? dIDs.reverse() : null;
         data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
         data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
         this.setState({ reload: true }, e => {
@@ -413,381 +413,12 @@ class DLQLForm extends Component {
             <h1>{this.props.title}</h1>
           </div>
           <div className={st.ct_form}>
-            {reload ? null : (
-              <Form>
-                <div className={st.group}>
-                  <div className={st.grouptitle}>
-                    基本信息<span>说明：“ * ”号标识的为必填项</span>
-                  </div>
-                  <div className={st.groupcontent}>
-                    <Row>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>所在（跨）行政区
-                            </span>
-                          }
-                        >
-                          <Cascader
-                            defaultValue={entity.Districts ? entity.Districts : undefined}
-                            expandTrigger="hover"
-                            changeOnSelect
-                            options={districts}
-                            placeholder="所在（跨）行政区"
-                            onChange={(a, b) => {
-                              this.mObj.districts = a;
-                              this.setState({ showCheckIcon: 'empty' });
-                            }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>标准名称
-                            </span>
-                          }
-                        >
-                          <Input
-                            defaultValue={entity.NAME ? entity.NAME : undefined}
-                            onChange={e => {
-                              // let { entity } = this.state;
-                              this.mObj.NAME = e.target.value;
-                              this.setState({
-                                // entity: entity,
-                                showCheckIcon: 'empty',
-                                // isSaved: false,
-                              });
-                            }}
-                            placeholder="标准名称"
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={1}>
-                        <FormItem>
-                          {this.getCheckIcon()}
-                          <Button
-                            onClick={this.checkName.bind(this)}
-                            style={{ marginLeft: '20px', display: 'flex' }}
-                            type="primary"
-                          >
-                            命名检查
-                          </Button>
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label="原规划名称"
-                        >
-                          <Input
-                            defaultValue={entity.PLANNAME ? entity.PLANNAME : undefined}
-                            onChange={e => {
-                              this.mObj.PLANNAME = e.target.value;
-                            }}
-                            placeholder="原规划名称"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label="起点（东/南）起"
-                        >
-                          <Input
-                            defaultValue={entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined}
-                            onChange={e => {
-                              this.mObj.STARTDIRECTION = e.target.value;
-                            }}
-                            placeholder="起点（东/南）起"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label="止点（西/北）至"
-                        >
-                          <Input
-                            defaultValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
-                            onChange={e => {
-                              this.mObj.ENDDIRECTION = e.target.value;
-                            }}
-                            placeholder="止点（西/北）至"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={8}>
-                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="走向">
-                          <Input
-                            defaultValue={entity.ZX ? entity.ZX : undefined}
-                            onChange={e => {
-                              this.mObj.ZX = e.target.value;
-                            }}
-                            placeholder="走向"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label="长度（米）"
-                        >
-                          <InputNumber
-                            defaultValue={entity.LENGTH ? entity.LENGTH : undefined}
-                            style={{ width: '100%' }}
-                            placeholder="长度（米）"
-                            onChange={e => {
-                              this.mObj.LENGTH = e;
-                            }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label="宽度（米）"
-                        >
-                          <InputNumber
-                            defaultValue={entity.WIDTH ? entity.WIDTH : undefined}
-                            style={{ width: '100%' }}
-                            placeholder="宽度（米）"
-                            onChange={e => {
-                              this.mObj.WIDTH = e;
-                            }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={8}>
-                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="建成时间">
-                          <DatePicker
-                            defaultValue={entity.JCSJ ? entity.JCSJ : undefined}
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              this.mObj.JCSJ = e;
-                            }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="路面结构">
-                          <Input
-                            defaultValue={entity.LMJG ? entity.LMJG : undefined}
-                            onChange={e => {
-                              this.mObj.LMJG = e.target.value;
-                            }}
-                            placeholder="路面结构"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="性质">
-                          <Select
-                            defaultValue={entity.NATURE ? entity.NATURE : undefined}
-                            allowClear
-                            onChange={e => {
-                              this.mObj.NATURE = e;
-                            }}
-                            placeholder="性质"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          >
-                            {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
-                              <Select.Option key={d} value={d}>
-                                {d}
-                              </Select.Option>
-                            ))}
-                          </Select>
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label="门牌号范围"
-                        >
-                          <Input
-                            defaultValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
-                            onChange={e => {
-                              this.mObj.MPNUMRANGE = e.target.value;
-                            }}
-                            placeholder="门牌号范围"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>命名时间
-                            </span>
-                          }
-                        >
-                          <DatePicker
-                            defaultValue={entity.BZTIME ? entity.BZTIME : undefined}
-                            style={{ width: '100%' }}
-                            onChange={e => {
-                              this.mObj.BZTIME = e;
-                            }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={2}>
-                        <FormItem>
-                          <Tooltip placement="right" title="定位">
-                            <Button
-                              style={{ marginLeft: '20px' }}
-                              type="primary"
-                              shape="circle"
-                              icon="environment"
-                              size="small"
-                              onClick={this.showLocateMap.bind(this)}
-                              disabled={approveState === 'notFirst' ? true : false}
-                            />
-                          </Tooltip>
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={16}>
-                        <FormItem
-                          labelCol={{ span: 5 }}
-                          wrapperCol={{ span: 19 }}
-                          label="名称含义或理由"
-                        >
-                          <TextArea
-                            defaultValue={entity.MCHY ? entity.MCHY : undefined}
-                            onChange={e => {
-                              this.mObj.MCHY = e.target.value;
-                            }}
-                            placeholder="名称含义或理由"
-                            autosize={{ minRows: 2 }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
-                <div className={st.group}>
-                  <div className={st.grouptitle}>
-                    申办人信息<span>说明：“ * ”号标识的为必填项</span>
-                  </div>
-                  <div className={st.groupcontent}>
-                    <Row>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>联系人
-                            </span>
-                          }
-                        >
-                          <Input
-                            defaultValue={entity.LXR ? entity.LXR : undefined}
-                            onChange={e => {
-                              this.mObj.LXR = e.target.value;
-                            }}
-                            placeholder="联系人"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>联系电话
-                            </span>
-                          }
-                        >
-                          <Input
-                            defaultValue={entity.LXDH ? entity.LXDH : undefined}
-                            onChange={e => {
-                              this.mObj.LXDH = e.target.value;
-                            }}
-                            placeholder="联系电话"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>申报单位
-                            </span>
-                          }
-                        >
-                          <Input
-                            defaultValue={entity.SBDW ? entity.SBDW : undefined}
-                            onChange={e => {
-                              this.mObj.SBDW = e.target.value;
-                            }}
-                            placeholder="申报单位"
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={16}>
-                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
-                          <TextArea
-                            defaultValue={entity.BZ ? entity.BZ : undefined}
-                            onChange={e => {
-                              this.mObj.BZ = e.target.value;
-                            }}
-                            placeholder="备注"
-                            autosize={{ minRows: 2 }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
-                {this.props.isApproval && approveState != 'complete' ? (
+            <div>
+              {reload ? null : (
+                <Form>
                   <div className={st.group}>
                     <div className={st.grouptitle}>
-                      审批信息<span>说明：“ * ”号标识的为必填项</span>
+                      基本信息<span>说明：“ * ”号标识的为必填项</span>
                     </div>
                     <div className={st.groupcontent}>
                       <Row>
@@ -795,42 +426,423 @@ class DLQLForm extends Component {
                           <FormItem
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 16 }}
-                            label={<span>审批结果</span>}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>所在（跨）行政区
+                              </span>
+                            }
                           >
-                            <RadioGroup
-                              onChange={e => {
-                                this.setState({ result: e.target.value });
+                            <Cascader
+                              defaultValue={entity.Districts ? entity.Districts : undefined}
+                              expandTrigger="hover"
+                              changeOnSelect
+                              options={districts}
+                              placeholder="所在（跨）行政区"
+                              onChange={(a, b) => {
+                                this.mObj.districts = a;
+                                this.setState({ showCheckIcon: 'empty' });
                               }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>标准名称
+                              </span>
+                            }
+                          >
+                            <Input
+                              defaultValue={entity.NAME ? entity.NAME : undefined}
+                              onChange={e => {
+                                // let { entity } = this.state;
+                                this.mObj.NAME = e.target.value;
+                                this.setState({
+                                  // entity: entity,
+                                  showCheckIcon: 'empty',
+                                  // isSaved: false,
+                                });
+                              }}
+                              placeholder="标准名称"
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={1}>
+                          <FormItem>
+                            {this.getCheckIcon()}
+                            <Button
+                              onClick={this.checkName.bind(this)}
+                              style={{ marginLeft: '20px', display: 'flex' }}
+                              type="primary"
                             >
-                              <Radio value="同意">同意</Radio>
-                              <Radio value="不同意">不同意</Radio>
-                            </RadioGroup>
+                              命名检查
+                            </Button>
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="原规划名称"
+                          >
+                            <Input
+                              defaultValue={entity.PLANNAME ? entity.PLANNAME : undefined}
+                              onChange={e => {
+                                this.mObj.PLANNAME = e.target.value;
+                              }}
+                              placeholder="原规划名称"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="起点（东/南）起"
+                          >
+                            <Input
+                              defaultValue={
+                                entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined
+                              }
+                              onChange={e => {
+                                this.mObj.STARTDIRECTION = e.target.value;
+                              }}
+                              placeholder="起点（东/南）起"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="止点（西/北）至"
+                          >
+                            <Input
+                              defaultValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
+                              onChange={e => {
+                                this.mObj.ENDDIRECTION = e.target.value;
+                              }}
+                              placeholder="止点（西/北）至"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={8}>
+                          <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="走向">
+                            <Input
+                              defaultValue={entity.ZX ? entity.ZX : undefined}
+                              onChange={e => {
+                                this.mObj.ZX = e.target.value;
+                              }}
+                              placeholder="走向"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="长度（米）"
+                          >
+                            <InputNumber
+                              defaultValue={entity.LENGTH ? entity.LENGTH : undefined}
+                              style={{ width: '100%' }}
+                              placeholder="长度（米）"
+                              onChange={e => {
+                                this.mObj.LENGTH = e;
+                              }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="宽度（米）"
+                          >
+                            <InputNumber
+                              defaultValue={entity.WIDTH ? entity.WIDTH : undefined}
+                              style={{ width: '100%' }}
+                              placeholder="宽度（米）"
+                              onChange={e => {
+                                this.mObj.WIDTH = e;
+                              }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="建成时间"
+                          >
+                            <DatePicker
+                              defaultValue={entity.JCSJ ? entity.JCSJ : undefined}
+                              style={{ width: '100%' }}
+                              onChange={e => {
+                                this.mObj.JCSJ = e;
+                              }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="路面结构"
+                          >
+                            <Input
+                              defaultValue={entity.LMJG ? entity.LMJG : undefined}
+                              onChange={e => {
+                                this.mObj.LMJG = e.target.value;
+                              }}
+                              placeholder="路面结构"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="性质">
+                            <Select
+                              defaultValue={entity.NATURE ? entity.NATURE : undefined}
+                              allowClear
+                              onChange={e => {
+                                this.mObj.NATURE = e;
+                              }}
+                              placeholder="性质"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            >
+                              {['快速路', '主干道', '次干道', '大桥', '内河桥梁'].map(d => (
+                                <Select.Option key={d} value={d}>
+                                  {d}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="门牌号范围"
+                          >
+                            <Input
+                              defaultValue={entity.MPNUMRANGE ? entity.MPNUMRANGE : undefined}
+                              onChange={e => {
+                                this.mObj.MPNUMRANGE = e.target.value;
+                              }}
+                              placeholder="门牌号范围"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>命名时间
+                              </span>
+                            }
+                          >
+                            <DatePicker
+                              defaultValue={entity.BZTIME ? entity.BZTIME : undefined}
+                              style={{ width: '100%' }}
+                              onChange={e => {
+                                this.mObj.BZTIME = e;
+                              }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={2}>
+                          <FormItem>
+                            <Tooltip placement="right" title="定位">
+                              <Button
+                                style={{ marginLeft: '20px' }}
+                                type="primary"
+                                shape="circle"
+                                icon="environment"
+                                size="small"
+                                onClick={this.showLocateMap.bind(this)}
+                                disabled={approveState === 'notFirst' ? true : false}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </Col>
                       </Row>
                       <Row>
                         <Col span={16}>
                           <FormItem
-                            labelCol={{ span: 4 }}
-                            wrapperCol={{ span: 20 }}
-                            label="审批意见"
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 19 }}
+                            label="名称含义或理由"
                           >
                             <TextArea
-                              initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                              defaultValue={entity.MCHY ? entity.MCHY : undefined}
                               onChange={e => {
-                                this.setState({ suggestion: e.target.value });
+                                this.mObj.MCHY = e.target.value;
                               }}
-                              placeholder="审批意见"
+                              placeholder="名称含义或理由"
                               autosize={{ minRows: 2 }}
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
                         </Col>
                       </Row>
                     </div>
                   </div>
-                ) : null}
-              </Form>
-            )}
+                  <div className={st.group}>
+                    <div className={st.grouptitle}>
+                      申办人信息<span>说明：“ * ”号标识的为必填项</span>
+                    </div>
+                    <div className={st.groupcontent}>
+                      <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>联系人
+                              </span>
+                            }
+                          >
+                            <Input
+                              defaultValue={entity.LXR ? entity.LXR : undefined}
+                              onChange={e => {
+                                this.mObj.LXR = e.target.value;
+                              }}
+                              placeholder="联系人"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>联系电话
+                              </span>
+                            }
+                          >
+                            <Input
+                              defaultValue={entity.LXDH ? entity.LXDH : undefined}
+                              onChange={e => {
+                                this.mObj.LXDH = e.target.value;
+                              }}
+                              placeholder="联系电话"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>申报单位
+                              </span>
+                            }
+                          >
+                            <Input
+                              defaultValue={entity.SBDW ? entity.SBDW : undefined}
+                              onChange={e => {
+                                this.mObj.SBDW = e.target.value;
+                              }}
+                              placeholder="申报单位"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={16}>
+                          <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
+                            <TextArea
+                              defaultValue={entity.BZ ? entity.BZ : undefined}
+                              onChange={e => {
+                                this.mObj.BZ = e.target.value;
+                              }}
+                              placeholder="备注"
+                              autosize={{ minRows: 2 }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                    </div>
+                  </div>
+                  {this.props.isApproval && approveState != 'complete' ? (
+                    <div className={st.group}>
+                      <div className={st.grouptitle}>
+                        审批信息<span>说明：“ * ”号标识的为必填项</span>
+                      </div>
+                      <div className={st.groupcontent}>
+                        <Row>
+                          <Col span={8}>
+                            <FormItem
+                              labelCol={{ span: 8 }}
+                              wrapperCol={{ span: 16 }}
+                              label={<span>审批结果</span>}
+                            >
+                              <RadioGroup
+                                onChange={e => {
+                                  this.setState({ result: e.target.value });
+                                }}
+                              >
+                                <Radio value="同意">同意</Radio>
+                                <Radio value="不同意">不同意</Radio>
+                              </RadioGroup>
+                            </FormItem>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col span={16}>
+                            <FormItem
+                              labelCol={{ span: 4 }}
+                              wrapperCol={{ span: 20 }}
+                              label="审批意见"
+                            >
+                              <TextArea
+                                initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                                onChange={e => {
+                                  this.setState({ suggestion: e.target.value });
+                                }}
+                                placeholder="审批意见"
+                                autosize={{ minRows: 2 }}
+                              />
+                            </FormItem>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  ) : null}
+                </Form>
+              )}
+            </div>
           </div>
           <div className={st.ct_footer}>
             <div style={{ float: 'right' }}>
