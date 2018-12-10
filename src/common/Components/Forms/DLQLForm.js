@@ -426,7 +426,7 @@ class DLQLForm extends Component {
                             wrapperCol={{ span: 16 }}
                             label={
                               <span>
-                                <span className={st.ired}>*</span>所在（跨）行政区
+                                <span className={st.ired}>*</span>所在行政区
                               </span>
                             }
                           >
@@ -503,7 +503,7 @@ class DLQLForm extends Component {
                           <FormItem
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 16 }}
-                            label="起点（东/南）起"
+                            label="起点"
                           >
                             <Input
                               defaultValue={
@@ -521,14 +521,14 @@ class DLQLForm extends Component {
                           <FormItem
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 16 }}
-                            label="止点（西/北）至"
+                            label="止点"
                           >
                             <Input
                               defaultValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
                               onChange={e => {
                                 this.mObj.ENDDIRECTION = e.target.value;
                               }}
-                              placeholder="止点（西/北）至"
+                              placeholder="止点"
                               disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
@@ -842,7 +842,6 @@ class DLQLForm extends Component {
                               label="审批意见"
                             >
                               <TextArea
-                                initalValue={entity.SPYJ ? entity.SPYJ : undefined}
                                 onChange={e => {
                                   this.setState({ suggestion: e.target.value });
                                 }}

@@ -105,11 +105,11 @@ class UploadFile extends React.Component {
     return (
       <div className={`${st.uploadfile} clearfix`}>
         <Upload
-          disabled={showLoading}
+          disabled={showLoading || this.props.disabled}
           listType="text"
           fileList={fileList}
           beforeUpload={this.beforeUpload}
-          onRemove={this.onRemove.bind(this)}
+          onRemove={this.props.disabled ? false : this.onRemove.bind(this)}
         >
           <Button>
             <Icon type="plus" />

@@ -371,7 +371,7 @@ class MPHForm extends Component {
                     <div className={st.groupcontent}>
                       <Row>
                         <Col span={12}>
-                          <FormItem label="立项批文">
+                          <FormItem label="立项批文（上传类型：图片）">
                             <UploadPicture
                               fileList={entity.LXPW}
                               id={entity.ID}
@@ -383,11 +383,12 @@ class MPHForm extends Component {
                               uploadAction={url_UploadPicture}
                               removeAction={url_RemovePicture}
                               getAction={url_GetPictureUrls}
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
                         </Col>
                         <Col span={12}>
-                          <FormItem label="营业执照">
+                          <FormItem label="营业执照（上传类型：图片）">
                             <UploadPicture
                               fileList={entity.YYZZ}
                               id={entity.ID}
@@ -399,13 +400,14 @@ class MPHForm extends Component {
                               uploadAction={url_UploadPicture}
                               removeAction={url_RemovePicture}
                               getAction={url_GetPictureUrls}
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
                         </Col>
                       </Row>
                       <Row>
                         <Col span={12}>
-                          <FormItem label="土地出让合同">
+                          <FormItem label="土地出让合同（上传类型：图片）">
                             <UploadPicture
                               fileList={entity.TDCRHT}
                               id={entity.ID}
@@ -417,11 +419,12 @@ class MPHForm extends Component {
                               uploadAction={url_UploadPicture}
                               removeAction={url_RemovePicture}
                               getAction={url_GetPictureUrls}
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
                         </Col>
                         <Col span={12}>
-                          <FormItem label="申请报告">
+                          <FormItem label="申请报告（上传类型：文件）">
                             <UploadFile
                               fileList={entity.SQBG}
                               id={entity.ID}
@@ -434,13 +437,14 @@ class MPHForm extends Component {
                               removeAction={url_RemovePicture}
                               getAction={url_GetPictureUrls}
                               listType="text"
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
                         </Col>
                       </Row>
                       <Row>
                         <Col span={12}>
-                          <FormItem label="总平面图">
+                          <FormItem label="总平面图（上传类型：图片）">
                             <UploadPicture
                               fileList={entity.ZPMT}
                               id={entity.ID}
@@ -452,11 +456,12 @@ class MPHForm extends Component {
                               uploadAction={url_UploadPicture}
                               removeAction={url_RemovePicture}
                               getAction={url_GetPictureUrls}
+                              disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
                         </Col>
                         <Col span={12}>
-                          <FormItem label="红线图">
+                          <FormItem label="红线图（上传类型：图片）">
                             <UploadPicture
                               fileList={entity.HXT}
                               id={entity.ID}
@@ -508,7 +513,7 @@ class MPHForm extends Component {
                             }
                           >
                             <Input
-                              initalValue={entity.LXR ? entity.LXR : undefined}
+                              defaultValue={entity.LXR ? entity.LXR : undefined}
                               onChange={e => {
                                 this.mObj.LXR = e.target.value;
                               }}
@@ -527,7 +532,7 @@ class MPHForm extends Component {
                             }
                           >
                             <Input
-                              initalValue={entity.LXDH ? entity.LXDH : undefined}
+                              defaultValue={entity.LXDH ? entity.LXDH : undefined}
                               onChange={e => {
                                 this.mObj.LXDH = e.target.value;
                               }}
@@ -546,7 +551,7 @@ class MPHForm extends Component {
                             }
                           >
                             <Input
-                              initalValue={entity.SBDW ? entity.SBDW : undefined}
+                              defaultValue={entity.SBDW ? entity.SBDW : undefined}
                               onChange={e => {
                                 this.mObj.SBDW = e.target.value;
                               }}
@@ -559,7 +564,7 @@ class MPHForm extends Component {
                         <Col span={16}>
                           <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
                             <TextArea
-                              initalValue={entity.BZ ? entity.BZ : undefined}
+                              defaultValue={entity.BZ ? entity.BZ : undefined}
                               onChange={e => {
                                 this.mObj.BZ = e.target.value;
                               }}
@@ -577,6 +582,23 @@ class MPHForm extends Component {
                         审批信息<span>说明：“ * ”号标识的为必填项</span>
                       </div>
                       <div className={st.groupcontent}>
+                        {entity.ROLLBACKSSUGGESTION ? (
+                          <Row>
+                            <Col span={16}>
+                              <FormItem
+                                labelCol={{ span: 4 }}
+                                wrapperCol={{ span: 20 }}
+                                label="审批退回意见"
+                              >
+                                <TextArea
+                                  value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                                  autosize={{ minRows: 2 }}
+                                  disabled
+                                />
+                              </FormItem>
+                            </Col>
+                          </Row>
+                        ) : null}
                         <Row>
                           <Col span={8}>
                             <FormItem
@@ -587,7 +609,8 @@ class MPHForm extends Component {
                               <RadioGroup
                                 onChange={e => {
                                   this.setState({ result: e.target.value });
-                                }}>
+                                }}
+                              >
                                 <Radio value="同意">同意</Radio>
                                 <Radio value="不同意">不同意</Radio>
                               </RadioGroup>
@@ -602,7 +625,6 @@ class MPHForm extends Component {
                               label="审批意见"
                             >
                               <TextArea
-                                initalValue={entity.SPYJ ? entity.SPYJ : undefined}
                                 onChange={e => {
                                   this.setState({ suggestion: e.target.value });
                                 }}

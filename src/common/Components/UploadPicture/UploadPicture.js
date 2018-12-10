@@ -108,12 +108,13 @@ class UploadPicture extends React.Component {
     return (
       <div className={`${st.uploadpicture} clearfix`}>
         <Upload
-          disabled={showLoading}
+          disabled={showLoading || this.props.disabled}
           listType="picture-card"
           fileList={fileList}
           onPreview={this.handlePreview}
           beforeUpload={this.beforeUpload}
-          onRemove={this.onRemove.bind(this)}
+          onRemove={this.props.disabled ? false : this.onRemove.bind(this)}
+          accept="image/*"
         >
           <div>
             <Spin spinning={showLoading} tip={progressContent}>

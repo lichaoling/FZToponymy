@@ -558,10 +558,9 @@ class XQLYForm extends Component {
                             wrapperCol={{ span: 16 }}
                             label={
                               <span>
-                                <span className={st.ired}>*</span>建筑面积（平方千米）
+                                <span className={st.ired}>*</span>建筑面积
                               </span>
                             }
-                            disabled={approveState === 'notFirst' ? true : false}
                           >
                             <InputNumber
                               defaultValue={entity.JZMJ ? entity.JZMJ : undefined}
@@ -569,6 +568,8 @@ class XQLYForm extends Component {
                               onChange={e => {
                                 this.mObj.JZMJ = e;
                               }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="建筑面积（平方千米）"
                             />
                           </FormItem>
                         </Col>
@@ -578,7 +579,7 @@ class XQLYForm extends Component {
                             wrapperCol={{ span: 16 }}
                             label={
                               <span>
-                                <span className={st.ired}>*</span>占地面积（平方米）
+                                <span className={st.ired}>*</span>占地面积
                               </span>
                             }
                           >
@@ -589,6 +590,7 @@ class XQLYForm extends Component {
                                 this.mObj.ZDMJ = e;
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="占地面积（平方米）"
                             />
                           </FormItem>
                         </Col>
@@ -605,6 +607,7 @@ class XQLYForm extends Component {
                                 this.mObj.DZFLBM = e;
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="地址分类"
                             />
                           </FormItem>
                         </Col>
@@ -619,6 +622,7 @@ class XQLYForm extends Component {
                                 this.mObj.LHL = e;
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="绿化率"
                             />
                           </FormItem>
                         </Col>
@@ -635,6 +639,7 @@ class XQLYForm extends Component {
                                 this.mObj.SJSJ = e;
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="始建时间"
                             />
                           </FormItem>
                         </Col>
@@ -651,6 +656,7 @@ class XQLYForm extends Component {
                                 this.mObj.JCSJ = e;
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="建成时间"
                             />
                           </FormItem>
                         </Col>
@@ -665,7 +671,7 @@ class XQLYForm extends Component {
                                 <span className={st.ired}>*</span>命名时间
                               </span>
                             }
-                            disabled={approveState === 'notFirst' ? true : false}
+                           
                           >
                             <DatePicker
                               defaultValue={entity.BZTIME ? entity.BZTIME : undefined}
@@ -673,6 +679,8 @@ class XQLYForm extends Component {
                               onChange={e => {
                                 this.mObj.BZTIME = e;
                               }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                              placeholder="命名时间"
                             />
                           </FormItem>
                         </Col>
@@ -739,7 +747,7 @@ class XQLYForm extends Component {
                                           }}
                                         >
                                           <span className={st.roadName}>{e.NAME}</span>
-                                          <span className={st.distName}>{e.DistrictName}</span>
+                                          <span className={st.distName}>{e.DistrictName.replace(/\./g,"")}</span>
                                         </Tooltip>
                                       );
                                     })}
@@ -921,7 +929,6 @@ class XQLYForm extends Component {
                               label="审批意见"
                             >
                               <TextArea
-                                initalValue={entity.SPYJ ? entity.SPYJ : undefined}
                                 onChange={e => {
                                   this.setState({ suggestion: e.target.value });
                                 }}
