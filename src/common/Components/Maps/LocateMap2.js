@@ -24,16 +24,16 @@ class LocateMap2 extends Component {
       name: '地图',
       type: 'vec',
       layer: L.layerGroup([
-        L.tileLayer.TDTJX({ type: 'vec' }),
-        L.tileLayer.TDTJX({ type: 'vec_anno' }),
+        L.tileLayer.tdtgj_veco(),
+        L.tileLayer.tdtgj_veca(),
       ]),
     },
     img: {
       type: 'img',
       name: '影像',
       layer: L.layerGroup([
-        L.tileLayer.TDTJX({ type: 'img' }),
-        L.tileLayer.TDTJX({ type: 'img_anno' }),
+        L.tileLayer.tdtgj_imgo(),
+        L.tileLayer.tdtgj_imga(),
       ]),
     },
   };
@@ -67,13 +67,13 @@ class LocateMap2 extends Component {
   getToolbar(cfg) {
     return cfg
       ? cfg.map(i => {
-          return (
-            <span key={i.id} onClick={e => i.onClick(e, i, this)}>
-              <span className={`iconfont ${i.icon}`} />
-              {i.name}
-            </span>
-          );
-        })
+        return (
+          <span key={i.id} onClick={e => i.onClick(e, i, this)}>
+            <span className={`iconfont ${i.icon}`} />
+            {i.name}
+          </span>
+        );
+      })
       : null;
   }
 
@@ -113,7 +113,7 @@ class LocateMap2 extends Component {
     let self = this;
     $(this.layerToggle)
       .find('>div')
-      .on('click', function() {
+      .on('click', function () {
         let type = $(this).data('type');
         self.changeLayer(type);
       });
