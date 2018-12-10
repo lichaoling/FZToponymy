@@ -141,6 +141,8 @@ class MPH extends Component {
     await searchHousesBZToProve(
       {
         ...nCdn,
+        start: nCdn.approvalState === 0 ? null : nCdn.start,
+        end: nCdn.approvalState === 0 ? null : nCdn.end,
         districtID: nCdn.districtID[nCdn.districtID.length - 1],
       },
       d => {
@@ -213,7 +215,7 @@ class MPH extends Component {
           onCancel={this.closeForm.bind(this)}
           footer={null}
         >
-          <MPHForm isApproval={true} title="新建住宅小区（楼宇）门牌号申请单" id={this.rowid} onSaveSuccess={this.refreshTab.bind(this)} />
+          <MPHForm isApproval={approvalState === 0} title="新建住宅小区（楼宇）门牌号申请单" id={this.rowid} onSaveSuccess={this.refreshTab.bind(this)} />
         </Modal>
       </div>
     );

@@ -17,6 +17,7 @@ class Search extends Component {
     districtLoading: false,
     reload: false,
     districts: [],
+    approvalState: 0
   };
 
   condition = {
@@ -53,6 +54,7 @@ class Search extends Component {
 
   render() {
     let { reload, districts, districtLoading } = this.state;
+    let asx = this.state.approvalState;
     let { districtID, approvalState, start, end } = this.oCondition;
     let cmp = reload ? null : (
       <div>
@@ -76,6 +78,7 @@ class Search extends Component {
           placeholder={this.ex + '状态'}
           style={{ width: 200 }}
           onChange={e => {
+            this.setState({ approvalState: e });
             this.condition.approvalState = e;
           }}
         >
@@ -84,6 +87,7 @@ class Search extends Component {
         </Select>
         &emsp;
         <DatePicker
+          disabled={asx === 0}
           defaultValue={start}
           placeholder={this.ex + '时间（起）'}
           onChange={e => {
@@ -93,6 +97,7 @@ class Search extends Component {
         />
         &ensp; ~ &ensp;
         <DatePicker
+          disabled={asx === 0}
           defautlValue={end}
           placeholder={this.ex + '时间（止）'}
           onChange={e => {

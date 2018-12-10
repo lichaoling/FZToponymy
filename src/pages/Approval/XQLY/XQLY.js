@@ -146,6 +146,8 @@ class XQLY extends Component {
     await searchHouses(
       {
         ...nCdn,
+        start: nCdn.approvalState === 0 ? null : nCdn.start,
+        end: nCdn.approvalState === 0 ? null : nCdn.end,
         districtID: nCdn.districtID[nCdn.districtID.length - 1],
       },
       d => {
@@ -219,7 +221,7 @@ class XQLY extends Component {
           footer={null}
         >
           <XQLYForm
-            isApproval={true}
+            isApproval={approvalState === 0}
             title="住宅小区、楼宇名称命名（更名）申报表"
             id={this.rowid}
             onSaveSuccess={this.refreshTab.bind(this)}
