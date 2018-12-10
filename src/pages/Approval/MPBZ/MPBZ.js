@@ -1,12 +1,10 @@
 import { Component } from 'react';
 import st from './MPBZ.less';
-import { Table, Pagination, Modal } from 'antd';
-import { warn } from '../../../utils/notification';
+import { Table, Pagination, Modal, Input, Select, Button } from 'antd';
+import { warn, success } from '../../../utils/notification';
 import Search from '../Search';
-import { searchHousesBZToLocate } from '../../../services/MPBZ';
+import { searchHousesBZToLocate, houseBZLocate } from '../../../services/MPBZ';
 import LocateMap from '../../../common/Components/Maps/LocateMap2';
-//import icons from '../../../common/Components/Maps/icons';
-//const { locateRed} = icons;
 
 let mpIcon = L.divIcon({
   className: 'div-icon-mp',
@@ -106,6 +104,13 @@ class MPBZ extends Component {
   };
 
   condition = {};
+
+  saveLocate(mObj) {
+    houseBZLocate({ mObj: JSON.stringify(mObj) }, e => {
+      success("保存成功！");
+      this.search(this.condition);
+    });
+  }
 
   showMap(row, isNew = false) {
     this.row = {
@@ -221,52 +226,64 @@ class MPBZ extends Component {
             beforeBtns={[
               {
                 id: 'mpbz',
+                icon:'icon-paizhao',
                 name: "门牌编制",
-                onClick: (e, i, cmp) => {
-                  if (!this.mpbzTool) {
-                    this.mpbzTool = new L.Draw.Marker(cmp.map, { icon: mpIcon });
+                onClick: ((e, i, cmp) => {
+                  let row = this.row;
 
-                    this.mpbzTool.on(L.Draw.Event.CREATED, e => {
-                      if (this.mpMarker) {
-                        this.mpMarker.remove();
-                        this.mpMarker = null;
-                      }
-                      var { layer } = e;
-                      this.mpMarker = layer;
+                  this.mpbzTool = new L.Draw.Marker(cmp.map, { icon: mpIcon });
 
-                      var latlngs = layer.getLatLng();
-                      let { lat, lng } = latlngs;
+                  this.mpbzTool.on(L.Draw.Event.CREATED, e => {
+                    if (this.mpMarker) {
+                      this.mpMarker.remove();
+                      this.mpMarker = null;
+                    }
+                    var { layer } = e;
+                    this.mpMarker = layer;
 
-                      this.mpMarker
-                        .bindPopup(
-                          `<div class='coordinatestooltip'><input type="text" value="[${lng.toFixed(
-                            6
-                          )},${lat.toFixed(6)}]"/></div>`
-                        )
-                        .addTo(cmp.map)
-                        .openPopup();
-                    });
-                  }
+                    var latlngs = layer.getLatLng();
+                    let { lat, lng } = latlngs;
+                    let dom = document.createElement("div");
+                    let popup = ReactDOM.render(
+                      <Popup
+                        saveLocate={e => {
+                          let obj = { ...e, X: lng.toFixed(8) - 0, Y: lat.toFixed(8) - 0, ID: this.row.ID };
+                          this.saveLocate(obj);
+                        }}
+                        MPNUM={row.MPNUM}
+                        MPNUM_NO={row.MPNUM_NO} />, dom);
+                    this.mpMarker
+                      .bindPopup(dom)
+                      .addTo(cmp.map)
+                      .openPopup();
+                  });
+
                   cmp.disableMSTools();
                   this.mpbzTool.enable();
-                }
+                }).bind(this)
               }
             ]}
             onMapReady={e => {
+              let row = this.row;
               if (!this.row.isNew) {
                 let { X, Y } = this.row;
                 if (X && Y) {
-
+                  e.map.setView([Y, X], 16);
+                  if (this.mpMarker) {
+                    this.mpMarker.remove();
+                    this.mpMarker = null;
+                  }
+                  let dom = document.createElement("div");
+                  let popup = ReactDOM.render(<Popup saveLocate={e => {
+                    let obj = { ...e, X, Y, ID: this.row.ID };
+                    this.saveLocate(obj);
+                  }} MPNUM={row.MPNUM} MPNUM_NO={row.MPNUM_NO} />, dom);
+                  this.mpMarker = L.marker([Y, X], { icon: mpIcon }).bindPopup(dom).addTo(e.map);
+                  setTimeout(e => {
+                    this.mpMarker.openPopup();
+                  }, 1000);
                 }
               }
-              if (this.mpMarker) {
-                this.mpMarker.remove();
-                this.mpMarker = null;
-              }
-              let { X, Y } = { X: 119.311231, Y: 26.077768 };
-              this.mpMarker = L.marker([Y, X], { icon: mpIcon }).addTo(e.map);
-
-              console.log(e);
             }}
           />
         </Modal>
@@ -280,7 +297,7 @@ class Popup extends Component {
     super(ps);
     this.state = ps.MPNUM ? {
       MPNUM: ps.MPNUM,
-      MPNUM_NO: MPNUM_NO.subString(MPNUM_NO.indexOf(ps.MPNUM), MPNUM_NO.length - 1)
+      MPNUM_NO: ps.MPNUM_NO.substring(ps.MPNUM_NO.indexOf(ps.MPNUM) + ps.MPNUM.length, ps.MPNUM_NO.length)
     } : {
         MPNUM_NO: '号'
       };
@@ -292,29 +309,32 @@ class Popup extends Component {
       warn("请填写门牌号后再保存！");
     } else {
       let { saveLocate } = this.props;
-      saveLocate(MPNUM, MPNUM + MPNUM_NO);
+      saveLocate({
+        MPNUM, MPNUM_NO: MPNUM + MPNUM_NO
+      });
     }
   }
 
   render() {
     let { MPNUM, MPNUM_NO } = this.state;
     return <div className={st.popup}>
-      <div>门牌号：
+      <div>
         <Input
           placeholder="请输入门牌号"
+          value={MPNUM}
           onChange={e => this.setState({ MPNUM: e.target.value })}
+          addonBefore="门牌号："
           addonAfter={
             <Select value={MPNUM_NO} onChange={e => {
               this.setState({ MPNUM_NO: e });
             }}>
-              <Select.Option>号</Select.Option>
+              <Select.Option value="号">号</Select.Option>
             </Select>
           } />
       </div>
       <div>
         <Button type="primary" onClick={e => this.save()}>保存</Button>
       </div>
-
     </div>;
   }
 }
