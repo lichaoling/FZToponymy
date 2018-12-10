@@ -1,189 +1,204 @@
 @import '../../common/default.less';
 .home {
-    position: fixed;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  > div {
+    height: 100%;
+  }
+  .bg {
+    position: absolute;
     top: 0;
-    bottom: 0;
-    right: 0;
     left: 0;
-    display: flex;
-    >div {
-        height: 100%;
+    right: 0;
+    bottom: 0;
+    background-image: url(../../common/Img/主页/bg5.jpg);
+    background-size: 100% 100%; // filter: grayscale(50%) brightness(100%) opacity(0.5);
+  }
+  .content {
+    position: relative;
+    flex: 1;
+    .logo {
+      width: 728px;
+      height: 81px;
+      position: absolute;
+      top: 30px;
+      left: 3%;
+      background-image: url(../../common/Img/登录/Title.png);
     }
-    .bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: url(../../common/Img/主页/bg5.jpg);
-        background-size: 100% 100%; // filter: grayscale(50%) brightness(100%) opacity(0.5);
-    }
-    .content {
-        position: relative;
-        flex: 1;
-        .logo {
-            width: 728px;
-            height: 81px;
-            position: absolute;
-            top: 30px;
-            left: 3%;
-            background-image: url(../../common/Img/登录/Title.png);
+    .timeuser {
+      position: absolute;
+      top: 50px;
+      right: 3%;
+      display: flex;
+      align-items: center;
+      color: @primary-color;
+      font-size: 20px;
+      .time {
+        font-weight: 700;
+        span:first-child {
+          font-size: 42px;
         }
-        .timeuser {
-            position: absolute;
-            top: 50px;
-            right:3%;
-            display: flex;
-            align-items: center;
-            color: @primary-color;
-            font-size: 20px;
-            .time {
-                font-weight: 700;
-                span:first-child {
-                    font-size: 42px;
+      }
+      .user {
+        padding: 2px 6px;
+        border-radius: 50%;
+        color: white;
+        background: @primary-color;
+      }
+    }
+    .tel {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      color: @primary-color;
+      > span {
+        display: inline-block;
+        margin: 0 20px;
+      }
+    }
+    .panel {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      :global {
+        #cardArea {
+          width: 80%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .card-item {
+            position: relative;
+            width: 20%;
+            .card {
+              .card-title {
+                background-color: rgb(22, 115, 224) !important;
+              }
+              .card-content {
+                .content-first-list {
+                  > li {
+                    margin-bottom: 20px;
+                  }
                 }
-            }
-            .user {
-                padding: 2px 6px;
-                border-radius: 50%;
+              }
+              .no-prv {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
                 color: white;
-                background: @primary-color;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9;
+                font-size: 28px;
+                letter-spacing: 4px;
+              }
             }
-        }
-        .tel {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            color: @primary-color;
-            >span {
-                display: inline-block;
-                margin: 0 20px;
+            .contentNew {
+              display: none;
             }
-        }
-        .panel {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            :global {
-                #cardArea {
-                    width: 80%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    .card-item {
-                        position: relative;
-                        width: 20%;
-                        .card {
-                            .card-title {
-                                background-color: rgb(22, 115, 224) !important;
-                            }
-                            .card-content {
-                                .content-first-list {
-                                    >li {
-                                        margin-bottom: 20px;
-                                    }
-                                }
-                            }
-                        }
-                        .contentNew {
-                            display: none
-                        }
-                    }
-                    .card-item.active {
-                        width: 40%;
-                        .card {
-                            .card-content.content-second {
-                                .main-info {
-                                    .main-head {
-                                        font-size: 20px !important;
-                                        font-weight: 800;
-                                    }
-                                    .main-tip {
-                                        font-size: 15px !important;
-                                        text-indent: 2em;
-                                    }
-                                }
-                                .other-info {
-                                    padding: 25px 0 0 0 !important;
-                                    >li {
-                                        width: 100px !important;
-                                        height: 40px !important;
-                                        padding: 0;
-                                        >a {
-                                            position: relative;
-                                            height: 100% !important;
-                                            width: 100% !important;
-                                            display: flex;
-                                            justify-content: center;
-                                            align-items: center;
-                                            >span {
-                                                margin: 0;
-                                                font-size: 11px;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            .contentNew {
-                                display: block;
-                                z-index: 10;
-                                font-size: 30px;
-                                font-weight: 1000;
-                                letter-spacing: 2px;
-                                color:white;
-                                font-family: '幼圆';
-                                text-shadow:rgb(105, 104, 104) 1px 0 0,rgb(130, 130, 136) 0 1px 0,rgb(105, 104, 104) -1px 0 0,rgb(105, 104, 104) 0 -1px 0;
-                                background-color:rgba(255, 255, 255, 0.3);
-                                border-radius: 5px;
-                                width:70%;
-                                text-align: center;
-                                box-shadow: @box-shadow;
-                                margin: 50px auto;
-                                padding: 16px;
-                            }
-                            .card-title-sp {
-                                background-image: url(../../common/Img/主页/1ghywsp.png);
-                                .content {
-                                    display: none
-                                }
-                               
-                            }
-                            .card-title-xt {
-                                background-image: url(../../common/Img/主页/2ywxtgx.png);
-                                .content {
-                                    display: none
-                                }
-                            }
-                            .card-title-sj {
-                                background-image: url(../../common/Img/主页/3sjkgl.png);
-                                .content {
-                                    display: none
-                                }
-                            }
-                            .card-title-yyff {
-                                background-image: url(../../common/Img/主页/4yyfw.png);
-                                .content {
-                                    display: none
-                                }
-                            }
-                        }
-                    }
-                    .card-area .card-item.active .card .card-title {
-                        height: 159px;
-                        top: -15px;
-                        border: none;
-                    }
-                    .card-title {
-                        background-size: 100% 100% !important;
-                    }
-                    .card-area .card-item .card .card-title .content {
-                        bottom: 15px;
-                    }
+          }
+          .card-item.active {
+            width: 40%;
+            .card {
+              .card-content.content-second {
+                .main-info {
+                  .main-head {
+                    font-size: 20px !important;
+                    font-weight: 800;
+                  }
+                  .main-tip {
+                    font-size: 15px !important;
+                    text-indent: 2em;
+                  }
                 }
+                .other-info {
+                  padding: 25px 0 0 0 !important;
+                  > li {
+                    width: 100px !important;
+                    height: 40px !important;
+                    padding: 0;
+                    > a {
+                      position: relative;
+                      height: 100% !important;
+                      width: 100% !important;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      > span {
+                        margin: 0;
+                        font-size: 11px;
+                      }
+                    }
+                  }
+                }
+              }
+              .contentNew {
+                display: block;
+                z-index: 10;
+                font-size: 30px;
+                font-weight: 1000;
+                letter-spacing: 2px;
+                color: white;
+                font-family: '幼圆';
+                text-shadow: rgb(105, 104, 104) 1px 0 0, rgb(130, 130, 136) 0 1px 0,
+                  rgb(105, 104, 104) -1px 0 0, rgb(105, 104, 104) 0 -1px 0;
+                background-color: rgba(255, 255, 255, 0.3);
+                border-radius: 5px;
+                width: 70%;
+                text-align: center;
+                box-shadow: @box-shadow;
+                margin: 50px auto;
+                padding: 16px;
+              }
+              .card-title-sp {
+                background-image: url(../../common/Img/主页/1ghywsp.png);
+                .content {
+                  display: none;
+                }
+              }
+              .card-title-xt {
+                background-image: url(../../common/Img/主页/2ywxtgx.png);
+                .content {
+                  display: none;
+                }
+              }
+              .card-title-sj {
+                background-image: url(../../common/Img/主页/3sjkgl.png);
+                .content {
+                  display: none;
+                }
+              }
+              .card-title-yyff {
+                background-image: url(../../common/Img/主页/4yyfw.png);
+                .content {
+                  display: none;
+                }
+              }
             }
+          }
+          .card-area .card-item.active .card .card-title {
+            height: 159px;
+            top: -15px;
+            border: none;
+          }
+          .card-title {
+            background-size: 100% 100% !important;
+          }
+          .card-area .card-item .card .card-title .content {
+            bottom: 15px;
+          }
         }
+      }
     }
+  }
 }
