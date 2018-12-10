@@ -86,7 +86,7 @@ class DLQL extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer key={record.ID}  id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -151,6 +151,8 @@ class DLQL extends Component {
     await searchRoads(
       {
         ...nCdn,
+        start: nCdn.approvalState === 0 ? null : nCdn.start,
+        end: nCdn.approvalState === 0 ? null : nCdn.end,
         districtID: nCdn.districtID[nCdn.districtID.length - 1],
       },
       d => {
@@ -225,8 +227,8 @@ class DLQL extends Component {
           footer={null}
         >
           <DLQLForm
-            isApproval={true}
-            title="道路、桥梁名称核准、命名（更名）审批表"
+            isApproval={approvalState === 0}
+            title="道路、桥梁名称核准、命名（更名）审批单"
             id={this.rowid}
             onSaveSuccess={this.refreshTab.bind(this)}
           />

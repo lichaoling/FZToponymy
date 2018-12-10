@@ -4,7 +4,17 @@ import { Table, Pagination, Modal } from 'antd';
 import { warn } from '../../../utils/notification';
 import Search from '../Search';
 import { searchHousesBZToLocate } from '../../../services/MPBZ';
-import LocateMap from '../../../common/Components/Maps/LocateMap2'
+import LocateMap from '../../../common/Components/Maps/LocateMap2';
+//import icons from '../../../common/Components/Maps/icons';
+//const { locateRed} = icons;
+
+let mpIcon = L.divIcon({
+  className: 'div-icon-mp',
+  iconSize: [42, 40],
+  iconAnchor: [21, 20],
+  popupAnchor: [0, -22],
+  tooltipAnchor: [0, -22],
+});
 
 let baseColumns = [
   {
@@ -130,6 +140,8 @@ class MPBZ extends Component {
     await searchHousesBZToLocate(
       {
         ...nCdn,
+        start: nCdn.approvalState === 0 ? null : nCdn.start,
+        end: nCdn.approvalState === 0 ? null : nCdn.end,
         locateState: nCdn.approvalState,
         districtID: nCdn.districtID[nCdn.districtID.length - 1],
       },
@@ -205,10 +217,105 @@ class MPBZ extends Component {
           onCancel={this.closeMap.bind(this)}
           footer={null}
         >
-          <LocateMap />
+          <LocateMap
+            beforeBtns={[
+              {
+                id: 'mpbz',
+                name: "门牌编制",
+                onClick: (e, i, cmp) => {
+                  if (!this.mpbzTool) {
+                    this.mpbzTool = new L.Draw.Marker(cmp.map, { icon: mpIcon });
+
+                    this.mpbzTool.on(L.Draw.Event.CREATED, e => {
+                      if (this.mpMarker) {
+                        this.mpMarker.remove();
+                        this.mpMarker = null;
+                      }
+                      var { layer } = e;
+                      this.mpMarker = layer;
+
+                      var latlngs = layer.getLatLng();
+                      let { lat, lng } = latlngs;
+
+                      this.mpMarker
+                        .bindPopup(
+                          `<div class='coordinatestooltip'><input type="text" value="[${lng.toFixed(
+                            6
+                          )},${lat.toFixed(6)}]"/></div>`
+                        )
+                        .addTo(cmp.map)
+                        .openPopup();
+                    });
+                  }
+                  cmp.disableMSTools();
+                  this.mpbzTool.enable();
+                }
+              }
+            ]}
+            onMapReady={e => {
+              if (!this.row.isNew) {
+                let { X, Y } = this.row;
+                if (X && Y) {
+
+                }
+              }
+              if (this.mpMarker) {
+                this.mpMarker.remove();
+                this.mpMarker = null;
+              }
+              let { X, Y } = { X: 119.311231, Y: 26.077768 };
+              this.mpMarker = L.marker([Y, X], { icon: mpIcon }).addTo(e.map);
+
+              console.log(e);
+            }}
+          />
         </Modal>
       </div>
     );
+  }
+}
+
+class Popup extends Component {
+  constructor(ps) {
+    super(ps);
+    this.state = ps.MPNUM ? {
+      MPNUM: ps.MPNUM,
+      MPNUM_NO: MPNUM_NO.subString(MPNUM_NO.indexOf(ps.MPNUM), MPNUM_NO.length - 1)
+    } : {
+        MPNUM_NO: '号'
+      };
+  }
+
+  save() {
+    let { MPNUM, MPNUM_NO } = this.state;
+    if (!MPNUM) {
+      warn("请填写门牌号后再保存！");
+    } else {
+      let { saveLocate } = this.props;
+      saveLocate(MPNUM, MPNUM + MPNUM_NO);
+    }
+  }
+
+  render() {
+    let { MPNUM, MPNUM_NO } = this.state;
+    return <div className={st.popup}>
+      <div>门牌号：
+        <Input
+          placeholder="请输入门牌号"
+          onChange={e => this.setState({ MPNUM: e.target.value })}
+          addonAfter={
+            <Select value={MPNUM_NO} onChange={e => {
+              this.setState({ MPNUM_NO: e });
+            }}>
+              <Select.Option>号</Select.Option>
+            </Select>
+          } />
+      </div>
+      <div>
+        <Button type="primary" onClick={e => this.save()}>保存</Button>
+      </div>
+
+    </div>;
   }
 }
 
