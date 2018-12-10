@@ -25,7 +25,7 @@ let baseColumns = [
     key: 'RoadNames',
   },
   {
-    title: '建筑面积',
+    title: '建筑面积（平方千米）',
     dataIndex: 'JZMJ',
     key: 'JZMJ',
   },
@@ -61,7 +61,9 @@ class XQLY extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={
+                <FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />
+              }
             >
               <a>流程</a>
             </Popover>
@@ -81,7 +83,9 @@ class XQLY extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={
+                <FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />
+              }
             >
               <a>流程</a>
             </Popover>
@@ -194,7 +198,7 @@ class XQLY extends Component {
           <Pagination
             showTotal={e =>
               `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
-              rows.length}`
+                rows.length}`
             }
             total={total}
             current={pageNum}
@@ -222,7 +226,7 @@ class XQLY extends Component {
         >
           <XQLYForm
             isApproval={approvalState === 0}
-            title="住宅小区、楼宇名称命名（更名）申报表"
+            title="住宅小区、楼宇名称命名（更名）审批表"
             id={this.rowid}
             onSaveSuccess={this.refreshTab.bind(this)}
           />

@@ -25,12 +25,12 @@ let baseColumns = [
     key: 'NATURE',
   },
   {
-    title: '长度',
+    title: '长度（米）',
     dataIndex: 'LENGTH',
     key: 'LENGTH',
   },
   {
-    title: '宽度',
+    title: '宽度（米）',
     dataIndex: 'WIDTH',
     key: 'WIDTH',
   },

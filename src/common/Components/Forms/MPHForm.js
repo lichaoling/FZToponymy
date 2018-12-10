@@ -115,6 +115,7 @@ class MPHForm extends Component {
       rtHandle(rt, d => {
         let entity = {
           ID: d,
+          BZTIME: moment(),
         };
         this.setState({ entity: entity });
       });
@@ -570,7 +571,7 @@ class MPHForm extends Component {
                       </Row>
                     </div>
                   </div>
-                  {this.props.isApproval ? (
+                  {this.props.isApproval && approveState !== 'complete' ? (
                     <div className={st.group}>
                       <div className={st.grouptitle}>
                         审批信息<span>说明：“ * ”号标识的为必填项</span>
@@ -583,9 +584,12 @@ class MPHForm extends Component {
                               wrapperCol={{ span: 16 }}
                               label={<span>审批结果</span>}
                             >
-                              <RadioGroup>
-                                <Radio value="1">通过</Radio>
-                                <Radio value="0">不通过</Radio>
+                              <RadioGroup
+                                onChange={e => {
+                                  this.setState({ result: e.target.value });
+                                }}>
+                                <Radio value="同意">同意</Radio>
+                                <Radio value="不同意">不同意</Radio>
                               </RadioGroup>
                             </FormItem>
                           </Col>
@@ -600,7 +604,7 @@ class MPHForm extends Component {
                               <TextArea
                                 initalValue={entity.SPYJ ? entity.SPYJ : undefined}
                                 onChange={e => {
-                                  this.mObj.SPYJ = e.target.value;
+                                  this.setState({ suggestion: e.target.value });
                                 }}
                                 placeholder="审批意见"
                                 autosize={{ minRows: 2 }}
