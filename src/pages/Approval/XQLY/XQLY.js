@@ -61,7 +61,7 @@ class XQLY extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -81,7 +81,7 @@ class XQLY extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -120,6 +120,11 @@ class XQLY extends Component {
 
   view(row) {
     this.showForm(row.ID);
+  }
+
+  refreshTab() {
+    this.closeForm();
+    this.search(this.condition);
   }
 
   search(cdn) {
@@ -187,7 +192,7 @@ class XQLY extends Component {
           <Pagination
             showTotal={e =>
               `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
-                rows.length}`
+              rows.length}`
             }
             total={total}
             current={pageNum}
@@ -217,6 +222,7 @@ class XQLY extends Component {
             isApproval={true}
             title="住宅小区、楼宇名称命名（更名）申报表"
             id={this.rowid}
+            onSaveSuccess={this.refreshTab.bind(this)}
           />
         </Modal>
       </div>

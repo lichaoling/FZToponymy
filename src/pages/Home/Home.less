@@ -75,6 +75,7 @@
           align-items: center;
           .card-item {
             position: relative;
+            overflow: hidden;
             width: 20%;
             .card {
               .card-title {
@@ -99,8 +100,17 @@
                 justify-content: center;
                 align-items: center;
                 z-index: 9;
-                font-size: 28px;
-                letter-spacing: 4px;
+                
+                >div{
+                  font-size: 18px;
+                  background: rgba(0, 0, 0, 0.5);
+                  padding:5px 20px;
+                  border-radius: 24px;
+                  >i{
+                    font-weight: 700;
+                    margin-right:10px;
+                  }
+                }
               }
             }
             .contentNew {
@@ -157,7 +167,7 @@
                 width: 70%;
                 text-align: center;
                 box-shadow: @box-shadow;
-                margin: 50px auto;
+                margin: 60px auto;
                 padding: 16px;
               }
               .card-title-sp {

@@ -80,17 +80,17 @@ class Home extends Component {
   componentDidMount() {
     this.startRefreshTime();
 
-    (function(t, i) {
+    (function (t, i) {
       var e = {
         id: '#cardArea',
         sid: '.card-item',
       };
-      i.fn.cardArea = function(t) {
+      i.fn.cardArea = function (t) {
         var t = i.extend({}, e, t);
-        return this.each(function() {
+        return this.each(function () {
           var e = i(t.id),
             n = e.find(t.sid);
-          n.on('mouseenter', function() {
+          n.on('mouseenter', function () {
             i(this)
               .addClass('active')
               .siblings()
@@ -100,7 +100,7 @@ class Home extends Component {
       };
     })(window, jQuery);
 
-    $(function() {
+    $(function () {
       $('#cardArea').cardArea();
     });
   }
@@ -197,6 +197,9 @@ class Home extends Component {
               </li>
               <li className="card-item animated fadeIn">
                 <div className="card">
+                <div className="no-prv">
+                    <div><Icon type="exclamation-circle" />无访问权限</div>
+                  </div>
                   <div className="card-title card-title-xt title-even">
                     <div className="content">
                       <div className="zq-product-img">
@@ -248,6 +251,9 @@ class Home extends Component {
               </li>
               <li className="card-item animated fadeIn">
                 <div className="card">
+                <div className="no-prv">
+                    <div><Icon type="exclamation-circle" />无访问权限</div>
+                  </div>
                   <div className="card-title card-title-sj title-even">
                     <div className="content">
                       <div className="zq-product-img">
@@ -307,8 +313,7 @@ class Home extends Component {
               <li className="card-item animated fadeIn">
                 <div className="card">
                   <div className="no-prv">
-                    <Icon type="exclamation-circle" />
-                    无访问权限
+                    <div><Icon type="exclamation-circle" />无访问权限</div>
                   </div>
                   <div className="card-title card-title-yyff title-even">
                     <div className="content">

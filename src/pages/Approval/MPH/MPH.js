@@ -56,7 +56,7 @@ class MPH extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer id={record.HOUSEBZID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.HOUSEBZID} id={record.HOUSEBZID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -76,7 +76,7 @@ class MPH extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer id={record.HOUSEBZID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.HOUSEBZID} id={record.HOUSEBZID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -115,6 +115,11 @@ class MPH extends Component {
 
   view(row) {
     this.showForm(row.HOUSEBZID);
+  }
+
+  refreshTab() {
+    this.closeForm();
+    this.search(this.condition);
   }
 
   search(cdn) {
@@ -182,7 +187,7 @@ class MPH extends Component {
           <Pagination
             showTotal={e =>
               `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
-                rows.length}`
+              rows.length}`
             }
             total={total}
             current={pageNum}
@@ -208,7 +213,7 @@ class MPH extends Component {
           onCancel={this.closeForm.bind(this)}
           footer={null}
         >
-          <MPHForm isApproval={true} title="新建住宅小区（楼宇）门牌号申请单" id={this.rowid} />
+          <MPHForm isApproval={true} title="新建住宅小区（楼宇）门牌号申请单" id={this.rowid} onSaveSuccess={this.refreshTab.bind(this)} />
         </Modal>
       </div>
     );
