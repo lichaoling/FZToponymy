@@ -115,7 +115,7 @@ ol {
             }
         }
     }
-    .ct-fullmodal {
+    .ct-fullmodal,.ct-fullmodal2 {
         position: fixed;
         top: 0;
         right: 0;
@@ -134,6 +134,17 @@ ol {
             padding: 10px;
             height: calc(~'100%');
             background-color: #fafafa;
+        }
+    }
+    .ct-fullmodal2{
+        .ant-modal-body {
+            height: calc(~'100% - 45px');
+        }
+    }
+
+    .ct-fullmodal2.ct-map{
+        .ant-modal-body {
+            padding: 0;
         }
     }
 

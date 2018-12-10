@@ -4,6 +4,7 @@ import { Table, Pagination, Modal } from 'antd';
 import { warn } from '../../../utils/notification';
 import Search from '../Search';
 import { searchHousesBZToLocate } from '../../../services/MPBZ';
+import LocateMap from '../../../common/Components/Maps/LocateMap2'
 
 let baseColumns = [
   {
@@ -66,7 +67,7 @@ class MPBZ extends Component {
         key: 'cz',
         render: (text, record) => (
           <span>
-            <a onClick={e => this.approve(record)}>查看</a>
+            <a onClick={e => this.showMap(record)}>查看</a>
           </span>
         ),
       },
@@ -78,7 +79,7 @@ class MPBZ extends Component {
         key: 'cz',
         render: (text, record) => (
           <span>
-            <a onClick={e => this.view(record)}>编制</a>
+            <a onClick={e => this.showMap(record, true)}>编制</a>
           </span>
         ),
       },
@@ -86,7 +87,7 @@ class MPBZ extends Component {
   }
 
   state = {
-    showForm: false,
+    showMap: false,
     pageSize: 20,
     pageNum: 1,
     total: 0,
@@ -96,22 +97,17 @@ class MPBZ extends Component {
 
   condition = {};
 
-  showForm(id) {
-    this.rowid = id;
-    this.setState({ showForm: true });
+  showMap(row, isNew = false) {
+    this.row = {
+      ...row,
+      isNew
+    };
+    this.setState({ showMap: true });
   }
 
-  closeForm() {
-    this.rowid = null;
-    this.setState({ showForm: false });
-  }
-
-  approve(row) {
-    this.showForm(row.ID);
-  }
-
-  view(row) {
-    this.showForm(row.ID);
+  closeMap() {
+    this.row = null;
+    this.setState({ showMap: false });
   }
 
   search(cdn) {
@@ -152,7 +148,7 @@ class MPBZ extends Component {
   }
 
   render() {
-    let { pageSize, pageNum, total, rows, approvalState, loading, showForm } = this.state;
+    let { pageSize, pageNum, total, rows, approvalState, loading, showMap } = this.state;
     return (
       <div className={st.MPBZ}>
         <div className={st.search}>
@@ -182,7 +178,7 @@ class MPBZ extends Component {
           <Pagination
             showTotal={e =>
               `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
-                rows.length}`
+              rows.length}`
             }
             total={total}
             current={pageNum}
@@ -201,6 +197,16 @@ class MPBZ extends Component {
             showSizeChanger
           />
         </div>
+        <Modal
+          title="门牌编制"
+          wrapClassName="ct-fullmodal2 ct-map"
+          visible={showMap && this.row}
+          destroyOnClose
+          onCancel={this.closeMap.bind(this)}
+          footer={null}
+        >
+          <LocateMap />
+        </Modal>
       </div>
     );
   }

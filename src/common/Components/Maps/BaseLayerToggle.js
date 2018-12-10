@@ -9,16 +9,16 @@ class BaseLayerToggle extends Component {
       name: '地图',
       type: 'vec',
       layer: L.layerGroup([
-        L.tileLayer.TDTJX({ type: 'vec' }),
-        L.tileLayer.TDTJX({ type: 'vec_anno' }),
+        L.tileLayer.tdtgj_veco(),
+        L.tileLayer.tdtgj_veca(),
       ]),
     },
     img: {
       type: 'img',
       name: '影像',
       layer: L.layerGroup([
-        L.tileLayer.TDTJX({ type: 'img' }),
-        L.tileLayer.TDTJX({ type: 'img_anno' }),
+        L.tileLayer.tdtgj_imgo(),
+        L.tileLayer.tdtgj_imga(),
       ]),
     },
   };
