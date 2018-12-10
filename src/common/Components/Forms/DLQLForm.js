@@ -90,7 +90,6 @@ class DLQLForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchRoadByID, { id: id });
       rtHandle(rt, d => {
-        debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs.split('.');
@@ -280,7 +279,6 @@ class DLQLForm extends Component {
             }
           }
         }
-
         let { errs, saveObj } = this.validate(errors);
         if (errs.length) {
           Modal.error({
@@ -298,12 +296,13 @@ class DLQLForm extends Component {
       }.bind(this)
     );
   };
+  
   async approve(obj) {
     let { result, suggestion } = this.state;
     await Post(url_RoadApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
       notification.success({ description: '审批成功！', message: '成功' });
       this.mObj = {};
-      this.setState({ showCheckIcon: 'empty'});
+      this.setState({ showCheckIcon: 'empty' });
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
       }
@@ -396,7 +395,7 @@ class DLQLForm extends Component {
       fill: false,
       clickable: true,
     };
-    console.log(entity)
+    console.log(entity);
     return (
       <div className={st.DLQLForm}>
         <Spin
@@ -808,8 +807,7 @@ class DLQLForm extends Component {
                                 label="审批退回意见"
                               >
                                 <TextArea
-                                  initalValue={entity.ROLLBACKSSUGGESTION}
-                                  placeholder="审批退回意见"
+                                  value={'不同意' + entity.ROLLBACKSSUGGESTION}
                                   autosize={{ minRows: 2 }}
                                   disabled
                                 />
