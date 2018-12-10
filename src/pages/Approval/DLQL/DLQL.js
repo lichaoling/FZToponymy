@@ -66,7 +66,7 @@ class DLQL extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.ID} id={record.ID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -86,7 +86,7 @@ class DLQL extends Component {
             <Popover
               placement="left"
               trigger="click"
-              content={<FlowViewer id={record.ID} getWorkflow={searchWorkFlowLines} />}
+              content={<FlowViewer key={record.ID}  id={record.ID} getWorkflow={searchWorkFlowLines} />}
             >
               <a>流程</a>
             </Popover>
@@ -131,7 +131,7 @@ class DLQL extends Component {
     this.closeForm();
     this.search(this.condition);
   }
-  
+
   search(cdn) {
     if (!cdn.districtID || cdn.districtID.length <= 1) {
       warn('请选择区级以下行政区');
@@ -186,6 +186,7 @@ class DLQL extends Component {
         </div>
         <div className={st.table}>
           <Table
+            //rowKey={e => e.ID}
             loading={loading}
             pagination={false}
             bordered
@@ -197,7 +198,7 @@ class DLQL extends Component {
           <Pagination
             showTotal={e =>
               `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
-                rows.length}`
+              rows.length}`
             }
             total={total}
             current={pageNum}

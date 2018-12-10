@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Cascader, Select, DatePicker, Button } from 'antd';
+import { Cascader, Select, DatePicker, Button, Spin } from 'antd';
 import { getUserDistricts } from '../../utils/utils.js';
 import { getDistrictTreeByUID } from '../../services/Common';
 
@@ -14,6 +14,7 @@ class Search extends Component {
   }
 
   state = {
+    districtLoading: false,
     reload: false,
     districts: [],
   };
@@ -37,11 +38,13 @@ class Search extends Component {
     onClear && onClear(this.condition);
   }
 
-  getDistricts() {
-    getDistrictTreeByUID(d => {
+  async getDistricts() {
+    this.setState({ districtLoading: true });
+    await getDistrictTreeByUID(d => {
       let districts = getUserDistricts(d);
-      this.setState({ districts: districts });
+      this.setState({ districts: districts, districtLoading: false });
     });
+    this.setState({ districtLoading: false });
   }
 
   componentDidMount() {
@@ -49,22 +52,23 @@ class Search extends Component {
   }
 
   render() {
-    let { reload, districts } = this.state;
+    let { reload, districts, districtLoading } = this.state;
     let { districtID, approvalState, start, end } = this.oCondition;
     let cmp = reload ? null : (
       <div>
-        <Cascader
-          defaultValue={districtID}
-          expandTrigger="hover"
-          changeOnSelect
-          allowClear
-          style={{ width: 400 }}
-          placeholder="行政区划"
-          options={districts}
-          onChange={e => {
-            this.condition.districtID = e;
-          }}
-        />
+        <Spin wrapperClassName="ct-inline-loading" spinning={districtLoading}>
+          <Cascader
+            defaultValue={districtID}
+            expandTrigger="hover"
+            changeOnSelect
+            allowClear
+            style={{ width: 400 }}
+            placeholder="行政区划"
+            options={districts}
+            onChange={e => {
+              this.condition.districtID = e;
+            }}
+          /></Spin>
         &emsp;
         <Select
           // allowClear
