@@ -28,6 +28,7 @@ import {
   url_RemovePicture,
   url_GetPictureUrls,
   url_GetNewGuid,
+  url_HouseBZApprove,
 } from '../../../common/urls.js';
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
@@ -95,18 +96,20 @@ class MPHForm extends Component {
       rtHandle(rt, d => {
         let data = d.Data;
         let dIDs = data.DistrictIDs;
-        data.Districts = dIDs ? dIDs.reverse() : null;
-
+        data.Districts = dIDs.split('.');
         data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
-        this.setState({ entity: data });
+        this.setState({ reload: true }, e => {
+          this.setState({ entity: data, approveState: d.State, reload: false });
+        });
         this.hideLoading();
       });
     } else {
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
-        let { entity } = this.state;
-        entity.ID = d;
+        let entity = {
+          ID: d,
+        };
         this.setState({ entity: entity });
       });
     }
@@ -185,12 +188,22 @@ class MPHForm extends Component {
             )),
           });
         } else {
-          this.save(saveObj);
+          this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
         }
       }.bind(this)
     );
   };
-
+  async approve(obj) {
+    let { result, suggestion } = this.state;
+    await Post(url_HouseBZApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
+      notification.success({ description: '审批成功！', message: '成功' });
+      this.mObj = {};
+      this.setState({ showCheckIcon: 'empty' });
+      if (this.props.onSaveSuccess) {
+        this.props.onSaveSuccess();
+      }
+    });
+  }
   async save(obj) {
     await Post(url_HouseAndBuildingBZ, { mObj: JSON.stringify(obj) }, e => {
       notification.success({ description: '保存成功！', message: '成功' });
@@ -443,6 +456,23 @@ class MPHForm extends Component {
                     申办人信息<span>说明：“ * ”号标识的为必填项</span>
                   </div>
                   <div className={st.groupcontent}>
+                    {entity.ROLLBACKSSUGGESTION && approveState !== 'complete' ? (
+                      <Row>
+                        <Col span={16}>
+                          <FormItem
+                            labelCol={{ span: 4 }}
+                            wrapperCol={{ span: 20 }}
+                            label="审批退回意见"
+                          >
+                            <TextArea
+                              value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                              autosize={{ minRows: 2 }}
+                              disabled
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                    ) : null}
                     <Row>
                       <Col span={8}>
                         <FormItem

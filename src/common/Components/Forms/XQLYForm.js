@@ -27,6 +27,7 @@ import {
   url_HouseAndBuildingApplicant,
   url_SearchRoadNames,
   url_GetNewGuid,
+  url_HouseApprove,
 } from '../../../common/urls.js';
 import { getDistricts } from '../../../utils/utils.js';
 import { rtHandle } from '../../../utils/errorHandle.js';
@@ -97,12 +98,13 @@ class XQLYForm extends Component {
       rtHandle(rt, d => {
         let data = d.Data;
         let dIDs = data.DistrictIDs;
-        data.Districts = dIDs ? dIDs.reverse() : null;
-
+        data.Districts = dIDs.split('.');
         data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
         data.SJSJ = data.SJSJ ? moment(data.SJSJ) : null;
         data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
-        this.setState({ entity: data });
+        this.setState({ reload: true }, e => {
+          this.setState({ entity: data, approveState: d.State, reload: false });
+        });
         this.hideLoading();
       });
     } else {
@@ -110,8 +112,9 @@ class XQLYForm extends Component {
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
-        let { entity } = this.state;
-        entity.ID = d;
+        let entity = {
+          ID: d,
+        };
         this.setState({ entity: entity });
         this.hideLoading();
       });
@@ -315,11 +318,24 @@ class XQLYForm extends Component {
             )),
           });
         } else {
-          this.save(saveObj);
+          this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
         }
       }.bind(this)
     );
   };
+
+  async approve(obj) {
+    let { result, suggestion } = this.state;
+    await Post(url_RoadApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
+      notification.success({ description: '审批成功！', message: '成功' });
+      this.mObj = {};
+      this.setState({ showCheckIcon: 'empty' });
+      if (this.props.onSaveSuccess) {
+        this.props.onSaveSuccess();
+      }
+    });
+  }
+
   async save(obj) {
     await Post(url_HouseAndBuildingApplicant, { mObj: JSON.stringify(obj) }, e => {
       notification.success({ description: '保存成功！', message: '成功' });
@@ -683,7 +699,6 @@ class XQLYForm extends Component {
                                         title="添加"
                                         className={st.tip}
                                         onClick={s => {
-                                          
                                           let r = e;
                                           let isRepeat = false;
                                           selectedRoads.map(t => {
@@ -845,12 +860,29 @@ class XQLYForm extends Component {
                     </Row>
                   </div>
                 </div>
-                {this.props.isApproval ? (
+                {this.props.isApproval && approveState !== 'complete' ? (
                   <div className={st.group}>
                     <div className={st.grouptitle}>
                       审批信息<span>说明：“ * ”号标识的为必填项</span>
                     </div>
                     <div className={st.groupcontent}>
+                      {entity.ROLLBACKSSUGGESTION ? (
+                        <Row>
+                          <Col span={16}>
+                            <FormItem
+                              labelCol={{ span: 4 }}
+                              wrapperCol={{ span: 20 }}
+                              label="审批退回意见"
+                            >
+                              <TextArea
+                                value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                                autosize={{ minRows: 2 }}
+                                disabled
+                              />
+                            </FormItem>
+                          </Col>
+                        </Row>
+                      ) : null}
                       <Row>
                         <Col span={8}>
                           <FormItem
