@@ -306,6 +306,10 @@ class Home extends Component {
               </li>
               <li className="card-item animated fadeIn">
                 <div className="card">
+                  <div className="no-prv">
+                    <Icon type="exclamation-circle" />
+                    无访问权限
+                  </div>
                   <div className="card-title card-title-yyff title-even">
                     <div className="content">
                       <div className="zq-product-img">

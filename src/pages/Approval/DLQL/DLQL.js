@@ -131,6 +131,7 @@ class DLQL extends Component {
     this.closeForm();
     this.search(this.condition);
   }
+  
   search(cdn) {
     if (!cdn.districtID || cdn.districtID.length <= 1) {
       warn('请选择区级以下行政区');
