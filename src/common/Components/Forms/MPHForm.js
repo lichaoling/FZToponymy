@@ -94,12 +94,18 @@ class MPHForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchHouseBZByID, { id: id });
       rtHandle(rt, d => {
+        debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs.split('.');
         data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
         this.setState({ reload: true }, e => {
-          this.setState({ entity: data, approveState: d.State, reload: false });
+          this.setState({
+            entity: data,
+            houseNames: [data.House],
+            approveState: d.State,
+            reload: false,
+          });
         });
         this.hideLoading();
       });
@@ -150,6 +156,20 @@ class MPHForm extends Component {
     // 小区名称必选
     if (!validateObj.HOUSEID) {
       errs.push('请选择小区、楼宇名称');
+    }
+    //联系人
+    if (!validateObj.LXR) {
+      errs.push('请填写联系人');
+    }
+
+    //联系电话
+    if (!validateObj.LXDH) {
+      errs.push('请填写联系电话');
+    }
+
+    //申报单位
+    if (!validateObj.SBDW) {
+      errs.push('请填写申报单位');
     }
     //如果是审批
     if (this.props.isApproval && this.state.approveState != 'complete') {
@@ -278,309 +298,271 @@ class MPHForm extends Component {
             <h1>{this.props.title}</h1>
           </div>
           <div className={st.ct_form}>
-            {reload ? null : (
-              <Form>
-                <div className={st.group}>
-                  <div className={st.grouptitle}>
-                    基本信息<span>说明：“ * ”号标识的为必填项</span>
-                  </div>
-                  <div className={st.groupcontent}>
-                    <Row>
-                      <Col span={12}>
-                        <FormItem
-                          labelCol={{ span: 5 }}
-                          wrapperCol={{ span: 15 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>所在行政区
-                            </span>
-                          }
-                        >
-                          <Cascader
-                            changeOnSelect
-                            initalValue={entity.Districts ? entity.Districts : undefined}
-                            expandTrigger="hover"
-                            options={districts}
-                            placeholder="所在行政区"
-                            onChange={(a, b) => {
-                              this.mObj.districts = a;
-                              this.getHouseNames(a[a.length - 1]);
-                            }}
-                            disabled={approveState === 'notFirst' ? true : false}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={12}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 15 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>小区（楼宇）名称
-                            </span>
-                          }
-                        >
-                          <Select
-                            showSearch
-                            style={{ width: '100%' }}
-                            placeholder="小区（楼宇）名称"
-                            optionFilterProp="children"
-                            defaultValue={entity.HOUSEID ? entity.HOUSEID : undefined}
-                            onChange={e => {
-                              this.mObj.HOUSEID = e;
-                            }}
-                            filterOption={(input, option) =>
-                              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            disabled={approveState === 'notFirst' ? true : false}
-                          >
-                            {houseNames.map(e => {
-                              return <Select.Option value={e.ID}>{e.NAME}</Select.Option>;
-                            })}
-                          </Select>
-                        </FormItem>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
-                <div className={st.group}>
-                  <div className={st.grouptitle}>附件信息</div>
-                  <div className={st.groupcontent}>
-                    <Row>
-                      <Col span={12}>
-                        <FormItem label="立项批文">
-                          <UploadPicture
-                            fileList={entity.LXPW}
-                            id={entity.ID}
-                            fileBasePath={baseUrl}
-                            data={{
-                              fileType: fileType.HouseBZ,
-                              docType: HouseBZUploadFileType.LXPW,
-                            }}
-                            uploadAction={url_UploadPicture}
-                            removeAction={url_RemovePicture}
-                            getAction={url_GetPictureUrls}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={12}>
-                        <FormItem label="营业执照">
-                          <UploadPicture
-                            fileList={entity.YYZZ}
-                            id={entity.ID}
-                            fileBasePath={baseUrl}
-                            data={{
-                              fileType: fileType.HouseBZ,
-                              docType: HouseBZUploadFileType.YYZZ,
-                            }}
-                            uploadAction={url_UploadPicture}
-                            removeAction={url_RemovePicture}
-                            getAction={url_GetPictureUrls}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={12}>
-                        <FormItem label="土地出让合同">
-                          <UploadPicture
-                            fileList={entity.TDCRHT}
-                            id={entity.ID}
-                            fileBasePath={baseUrl}
-                            data={{
-                              fileType: fileType.HouseBZ,
-                              docType: HouseBZUploadFileType.TDCRHT,
-                            }}
-                            uploadAction={url_UploadPicture}
-                            removeAction={url_RemovePicture}
-                            getAction={url_GetPictureUrls}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={12}>
-                        <FormItem label="申请报告">
-                          <UploadFile
-                            fileList={entity.SQBG}
-                            id={entity.ID}
-                            fileBasePath={baseUrl}
-                            data={{
-                              fileType: fileType.HouseBZ,
-                              docType: HouseBZUploadFileType.SQBG,
-                            }}
-                            uploadAction={url_UploadPicture}
-                            removeAction={url_RemovePicture}
-                            getAction={url_GetPictureUrls}
-                            listType="text"
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={12}>
-                        <FormItem label="总平面图">
-                          <UploadPicture
-                            fileList={entity.ZPMT}
-                            id={entity.ID}
-                            fileBasePath={baseUrl}
-                            data={{
-                              fileType: fileType.HouseBZ,
-                              docType: HouseBZUploadFileType.ZPMT,
-                            }}
-                            uploadAction={url_UploadPicture}
-                            removeAction={url_RemovePicture}
-                            getAction={url_GetPictureUrls}
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={12}>
-                        <FormItem label="红线图">
-                          <UploadPicture
-                            fileList={entity.HXT}
-                            id={entity.ID}
-                            fileBasePath={baseUrl}
-                            data={{
-                              fileType: fileType.HouseBZ,
-                              docType: HouseBZUploadFileType.HXT,
-                            }}
-                            uploadAction={url_UploadPicture}
-                            removeAction={url_RemovePicture}
-                            getAction={url_GetPictureUrls}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
-                <div className={st.group}>
-                  <div className={st.grouptitle}>
-                    申办人信息<span>说明：“ * ”号标识的为必填项</span>
-                  </div>
-                  <div className={st.groupcontent}>
-                    {entity.ROLLBACKSSUGGESTION && approveState !== 'complete' ? (
+            <div>
+              {reload ? null : (
+                <Form>
+                  <div className={st.group}>
+                    <div className={st.grouptitle}>
+                      基本信息<span>说明：“ * ”号标识的为必填项</span>
+                    </div>
+                    <div className={st.groupcontent}>
                       <Row>
-                        <Col span={16}>
+                        <Col span={12}>
                           <FormItem
-                            labelCol={{ span: 4 }}
-                            wrapperCol={{ span: 20 }}
-                            label="审批退回意见"
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 15 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>所在行政区
+                              </span>
+                            }
                           >
-                            <TextArea
-                              value={'不同意' + entity.ROLLBACKSSUGGESTION}
-                              autosize={{ minRows: 2 }}
-                              disabled
+                            <Cascader
+                              changeOnSelect
+                              defaultValue={entity.Districts ? entity.Districts : undefined}
+                              expandTrigger="hover"
+                              options={districts}
+                              placeholder="所在行政区"
+                              onChange={(a, b) => {
+                                this.mObj.districts = a;
+                                this.getHouseNames(a[a.length - 1]);
+                              }}
+                              disabled={approveState === 'notFirst' ? true : false}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={12}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 15 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>小区（楼宇）名称
+                              </span>
+                            }
+                          >
+                            <Select
+                              showSearch
+                              style={{ width: '100%' }}
+                              placeholder="小区（楼宇）名称"
+                              optionFilterProp="children"
+                              defaultValue={entity.HOUSEID ? entity.HOUSEID : undefined}
+                              onChange={e => {
+                                this.mObj.HOUSEID = e;
+                              }}
+                              filterOption={(input, option) =>
+                                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                                0
+                              }
+                              disabled={approveState === 'notFirst' ? true : false}
+                            >
+                              {houseNames.map(e => {
+                                return <Select.Option value={e.ID}>{e.NAME}</Select.Option>;
+                              })}
+                            </Select>
+                          </FormItem>
+                        </Col>
+                      </Row>
+                    </div>
+                  </div>
+                  <div className={st.group}>
+                    <div className={st.grouptitle}>附件信息</div>
+                    <div className={st.groupcontent}>
+                      <Row>
+                        <Col span={12}>
+                          <FormItem label="立项批文">
+                            <UploadPicture
+                              fileList={entity.LXPW}
+                              id={entity.ID}
+                              fileBasePath={baseUrl}
+                              data={{
+                                fileType: fileType.HouseBZ,
+                                docType: HouseBZUploadFileType.LXPW,
+                              }}
+                              uploadAction={url_UploadPicture}
+                              removeAction={url_RemovePicture}
+                              getAction={url_GetPictureUrls}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={12}>
+                          <FormItem label="营业执照">
+                            <UploadPicture
+                              fileList={entity.YYZZ}
+                              id={entity.ID}
+                              fileBasePath={baseUrl}
+                              data={{
+                                fileType: fileType.HouseBZ,
+                                docType: HouseBZUploadFileType.YYZZ,
+                              }}
+                              uploadAction={url_UploadPicture}
+                              removeAction={url_RemovePicture}
+                              getAction={url_GetPictureUrls}
                             />
                           </FormItem>
                         </Col>
                       </Row>
-                    ) : null}
-                    <Row>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>联系人
-                            </span>
-                          }
-                        >
-                          <Input
-                            initalValue={entity.LXR ? entity.LXR : undefined}
-                            onChange={e => {
-                              this.mObj.LXR = e.target.value;
-                            }}
-                            placeholder="联系人"
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>联系电话
-                            </span>
-                          }
-                        >
-                          <Input
-                            initalValue={entity.LXDH ? entity.LXDH : undefined}
-                            onChange={e => {
-                              this.mObj.LXDH = e.target.value;
-                            }}
-                            placeholder="联系电话"
-                          />
-                        </FormItem>
-                      </Col>
-                      <Col span={8}>
-                        <FormItem
-                          labelCol={{ span: 8 }}
-                          wrapperCol={{ span: 16 }}
-                          label={
-                            <span>
-                              <span className={st.ired}>*</span>申报单位
-                            </span>
-                          }
-                        >
-                          <Input
-                            initalValue={entity.SBDW ? entity.SBDW : undefined}
-                            onChange={e => {
-                              this.mObj.SBDW = e.target.value;
-                            }}
-                            placeholder="申报单位"
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={16}>
-                        <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
-                          <TextArea
-                            initalValue={entity.BZ ? entity.BZ : undefined}
-                            onChange={e => {
-                              this.mObj.BZ = e.target.value;
-                            }}
-                            placeholder="备注"
-                            autosize={{ minRows: 2 }}
-                          />
-                        </FormItem>
-                      </Col>
-                    </Row>
+                      <Row>
+                        <Col span={12}>
+                          <FormItem label="土地出让合同">
+                            <UploadPicture
+                              fileList={entity.TDCRHT}
+                              id={entity.ID}
+                              fileBasePath={baseUrl}
+                              data={{
+                                fileType: fileType.HouseBZ,
+                                docType: HouseBZUploadFileType.TDCRHT,
+                              }}
+                              uploadAction={url_UploadPicture}
+                              removeAction={url_RemovePicture}
+                              getAction={url_GetPictureUrls}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={12}>
+                          <FormItem label="申请报告">
+                            <UploadFile
+                              fileList={entity.SQBG}
+                              id={entity.ID}
+                              fileBasePath={baseUrl}
+                              data={{
+                                fileType: fileType.HouseBZ,
+                                docType: HouseBZUploadFileType.SQBG,
+                              }}
+                              uploadAction={url_UploadPicture}
+                              removeAction={url_RemovePicture}
+                              getAction={url_GetPictureUrls}
+                              listType="text"
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={12}>
+                          <FormItem label="总平面图">
+                            <UploadPicture
+                              fileList={entity.ZPMT}
+                              id={entity.ID}
+                              fileBasePath={baseUrl}
+                              data={{
+                                fileType: fileType.HouseBZ,
+                                docType: HouseBZUploadFileType.ZPMT,
+                              }}
+                              uploadAction={url_UploadPicture}
+                              removeAction={url_RemovePicture}
+                              getAction={url_GetPictureUrls}
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={12}>
+                          <FormItem label="红线图">
+                            <UploadPicture
+                              fileList={entity.HXT}
+                              id={entity.ID}
+                              fileBasePath={baseUrl}
+                              data={{
+                                fileType: fileType.HouseBZ,
+                                docType: HouseBZUploadFileType.HXT,
+                              }}
+                              uploadAction={url_UploadPicture}
+                              removeAction={url_RemovePicture}
+                              getAction={url_GetPictureUrls}
+                            />
+                          </FormItem>
+                        </Col>
+                      </Row>
+                    </div>
                   </div>
-                </div>
-                {this.props.isApproval ? (
                   <div className={st.group}>
                     <div className={st.grouptitle}>
-                      审批信息<span>说明：“ * ”号标识的为必填项</span>
+                      申办人信息<span>说明：“ * ”号标识的为必填项</span>
                     </div>
                     <div className={st.groupcontent}>
+                      {entity.ROLLBACKSSUGGESTION && approveState !== 'complete' ? (
+                        <Row>
+                          <Col span={16}>
+                            <FormItem
+                              labelCol={{ span: 4 }}
+                              wrapperCol={{ span: 20 }}
+                              label="审批退回意见"
+                            >
+                              <TextArea
+                                value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                                autosize={{ minRows: 2 }}
+                                disabled
+                              />
+                            </FormItem>
+                          </Col>
+                        </Row>
+                      ) : null}
                       <Row>
                         <Col span={8}>
                           <FormItem
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 16 }}
-                            label={<span>审批结果</span>}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>联系人
+                              </span>
+                            }
                           >
-                            <RadioGroup>
-                              <Radio value="1">通过</Radio>
-                              <Radio value="0">不通过</Radio>
-                            </RadioGroup>
+                            <Input
+                              initalValue={entity.LXR ? entity.LXR : undefined}
+                              onChange={e => {
+                                this.mObj.LXR = e.target.value;
+                              }}
+                              placeholder="联系人"
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>联系电话
+                              </span>
+                            }
+                          >
+                            <Input
+                              initalValue={entity.LXDH ? entity.LXDH : undefined}
+                              onChange={e => {
+                                this.mObj.LXDH = e.target.value;
+                              }}
+                              placeholder="联系电话"
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label={
+                              <span>
+                                <span className={st.ired}>*</span>申报单位
+                              </span>
+                            }
+                          >
+                            <Input
+                              initalValue={entity.SBDW ? entity.SBDW : undefined}
+                              onChange={e => {
+                                this.mObj.SBDW = e.target.value;
+                              }}
+                              placeholder="申报单位"
+                            />
                           </FormItem>
                         </Col>
                       </Row>
                       <Row>
                         <Col span={16}>
-                          <FormItem
-                            labelCol={{ span: 4 }}
-                            wrapperCol={{ span: 20 }}
-                            label="审批意见"
-                          >
+                          <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} label="备注">
                             <TextArea
-                              initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                              initalValue={entity.BZ ? entity.BZ : undefined}
                               onChange={e => {
-                                this.mObj.SPYJ = e.target.value;
+                                this.mObj.BZ = e.target.value;
                               }}
-                              placeholder="审批意见"
+                              placeholder="备注"
                               autosize={{ minRows: 2 }}
                             />
                           </FormItem>
@@ -588,9 +570,50 @@ class MPHForm extends Component {
                       </Row>
                     </div>
                   </div>
-                ) : null}
-              </Form>
-            )}
+                  {this.props.isApproval ? (
+                    <div className={st.group}>
+                      <div className={st.grouptitle}>
+                        审批信息<span>说明：“ * ”号标识的为必填项</span>
+                      </div>
+                      <div className={st.groupcontent}>
+                        <Row>
+                          <Col span={8}>
+                            <FormItem
+                              labelCol={{ span: 8 }}
+                              wrapperCol={{ span: 16 }}
+                              label={<span>审批结果</span>}
+                            >
+                              <RadioGroup>
+                                <Radio value="1">通过</Radio>
+                                <Radio value="0">不通过</Radio>
+                              </RadioGroup>
+                            </FormItem>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col span={16}>
+                            <FormItem
+                              labelCol={{ span: 4 }}
+                              wrapperCol={{ span: 20 }}
+                              label="审批意见"
+                            >
+                              <TextArea
+                                initalValue={entity.SPYJ ? entity.SPYJ : undefined}
+                                onChange={e => {
+                                  this.mObj.SPYJ = e.target.value;
+                                }}
+                                placeholder="审批意见"
+                                autosize={{ minRows: 2 }}
+                              />
+                            </FormItem>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  ) : null}
+                </Form>
+              )}
+            </div>
           </div>
           <div className={st.ct_footer}>
             <div style={{ float: 'right' }}>
