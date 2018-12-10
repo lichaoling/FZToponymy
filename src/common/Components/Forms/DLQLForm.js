@@ -93,7 +93,7 @@ class DLQLForm extends Component {
         debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
-        // data.Districts = dIDs ? dIDs.reverse() : null;
+        data.Districts = dIDs.split('.');
         data.BZTIME = data.BZTIME ? moment(data.BZTIME) : null;
         data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
         this.setState({ reload: true }, e => {
@@ -210,7 +210,7 @@ class DLQLForm extends Component {
       }
 
       //如果是审批
-      if (this.props.isApproval) {
+      if (this.props.isApproval && this.state.approveState != 'complete') {
         if (!this.state.result) errs.push('请选择审批结果');
         if (!this.state.suggestion || this.state.suggestion === '') errs.push('请填写审批意见');
       }
@@ -303,11 +303,10 @@ class DLQLForm extends Component {
     await Post(url_RoadApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
       notification.success({ description: '审批成功！', message: '成功' });
       this.mObj = {};
+      this.setState({ showCheckIcon: 'empty'});
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
       }
-      this.setState({ showCheckIcon: 'empty' });
-      this.getFormData(this.state.entity.ID);
     });
   }
 
@@ -389,7 +388,6 @@ class DLQLForm extends Component {
       result,
       suggestion,
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
     let shapeOptions = {
       stroke: true,
       color: 'red',
@@ -398,7 +396,7 @@ class DLQLForm extends Component {
       fill: false,
       clickable: true,
     };
-    console.log(approveState);
+    console.log(entity)
     return (
       <div className={st.DLQLForm}>
         <Spin
@@ -795,12 +793,30 @@ class DLQLForm extends Component {
                       </Row>
                     </div>
                   </div>
-                  {this.props.isApproval && approveState != 'complete' ? (
+                  {this.props.isApproval && approveState !== 'complete' ? (
                     <div className={st.group}>
                       <div className={st.grouptitle}>
                         审批信息<span>说明：“ * ”号标识的为必填项</span>
                       </div>
                       <div className={st.groupcontent}>
+                        {entity.ROLLBACKSSUGGESTION ? (
+                          <Row>
+                            <Col span={16}>
+                              <FormItem
+                                labelCol={{ span: 4 }}
+                                wrapperCol={{ span: 20 }}
+                                label="审批退回意见"
+                              >
+                                <TextArea
+                                  initalValue={entity.ROLLBACKSSUGGESTION}
+                                  placeholder="审批退回意见"
+                                  autosize={{ minRows: 2 }}
+                                  disabled
+                                />
+                              </FormItem>
+                            </Col>
+                          </Row>
+                        ) : null}
                         <Row>
                           <Col span={8}>
                             <FormItem

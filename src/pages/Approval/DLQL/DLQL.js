@@ -127,6 +127,10 @@ class DLQL extends Component {
     this.showForm(row.ID);
   }
 
+  refreshTab() {
+    this.closeForm();
+    this.search(this.condition);
+  }
   search(cdn) {
     if (!cdn.districtID || cdn.districtID.length <= 1) {
       warn('请选择区级以下行政区');
@@ -222,6 +226,7 @@ class DLQL extends Component {
             isApproval={true}
             title="道路、桥梁名称核准、命名（更名）审批单"
             id={this.rowid}
+            onSaveSuccess={this.refreshTab.bind(this)}
           />
         </Modal>
       </div>

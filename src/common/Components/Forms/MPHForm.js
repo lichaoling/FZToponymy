@@ -50,6 +50,9 @@ class MPHForm extends Component {
     showCheckIcon: 'empty',
     houseNames: [],
     reload: false,
+    approveState: null,
+    result: null,
+    suggestion: null,
   };
   // 存储修改后的数据
   mObj = {};
@@ -144,6 +147,11 @@ class MPHForm extends Component {
     // 小区名称必选
     if (!validateObj.HOUSEID) {
       errs.push('请选择小区、楼宇名称');
+    }
+    //如果是审批
+    if (this.props.isApproval && this.state.approveState != 'complete') {
+      if (!this.state.result) errs.push('请选择审批结果');
+      if (!this.state.suggestion || this.state.suggestion === '') errs.push('请填写审批意见');
     }
 
     return { errs, saveObj, validateObj };
@@ -240,6 +248,9 @@ class MPHForm extends Component {
       showCheckIcon,
       houseNames,
       reload,
+      approveState,
+      result,
+      suggestion,
     } = this.state;
     return (
       <div className={st.MPHForm}>
@@ -249,7 +260,7 @@ class MPHForm extends Component {
           size="large"
           tip="数据加载中..."
         />
-        <div className={st.content}>
+        <div className={st.content} style={showLoading ? { filter: 'blur(2px)' } : null}>
           <div className={st.ct_header}>
             <h1>{this.props.title}</h1>
           </div>
@@ -282,6 +293,7 @@ class MPHForm extends Component {
                               this.mObj.districts = a;
                               this.getHouseNames(a[a.length - 1]);
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -303,11 +315,11 @@ class MPHForm extends Component {
                             defaultValue={entity.HOUSEID ? entity.HOUSEID : undefined}
                             onChange={e => {
                               this.mObj.HOUSEID = e;
-                              debugger;
                             }}
                             filterOption={(input, option) =>
                               option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
+                            disabled={approveState === 'notFirst' ? true : false}
                           >
                             {houseNames.map(e => {
                               return <Select.Option value={e.ID}>{e.NAME}</Select.Option>;

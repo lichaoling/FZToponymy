@@ -26,9 +26,9 @@ class Login extends Component {
 
   componentDidMount() {
     initBackground();
-    this.userName = '2';
-    this.password = '2';
-    this.login();
+    // this.userName = '2';
+    // this.password = '2';
+    // this.login();
   }
 
   render() {

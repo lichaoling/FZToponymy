@@ -54,6 +54,9 @@ class XQLYForm extends Component {
     roadName: null,
     selectedRoads: [],
     reload: false,
+    approveState: null,
+    result: null,
+    suggestion: null,
   };
 
   // 存储修改后的数据
@@ -223,6 +226,12 @@ class XQLYForm extends Component {
       if (validateObj.ROADID === '') {
         errs.push('请选择所属道路');
       }
+
+      //如果是审批
+      if (this.props.isApproval && this.state.approveState != 'complete') {
+        if (!this.state.result) errs.push('请选择审批结果');
+        if (!this.state.suggestion || this.state.suggestion === '') errs.push('请填写审批意见');
+      }
     }
     return { errs, saveObj, validateObj };
   }
@@ -379,6 +388,9 @@ class XQLYForm extends Component {
       roadName,
       selectedRoads,
       reload,
+      approveState,
+      result,
+      suggestion,
     } = this.state;
     const { getFieldDecorator } = this.props.form;
     let shapeOptions = {
@@ -432,6 +444,7 @@ class XQLYForm extends Component {
                               this.mObj.districts = a;
                               this.setState({ showCheckIcon: 'empty' });
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -477,6 +490,7 @@ class XQLYForm extends Component {
                               this.mObj.NAME = e.target.value;
                             }}
                             placeholder="宣传名称"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -488,6 +502,7 @@ class XQLYForm extends Component {
                               this.mObj.DJMC = e.target.value;
                             }}
                             placeholder="登记名称"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -499,6 +514,7 @@ class XQLYForm extends Component {
                               this.mObj.GN = e.target.value;
                             }}
                             placeholder="功能"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -513,6 +529,7 @@ class XQLYForm extends Component {
                               <span className={st.ired}>*</span>建筑面积
                             </span>
                           }
+                          disabled={approveState === 'notFirst' ? true : false}
                         >
                           <InputNumber
                             initalValue={entity.JZMJ ? entity.JZMJ : undefined}
@@ -539,6 +556,7 @@ class XQLYForm extends Component {
                             onChange={e => {
                               this.mObj.ZDMJ = e;
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -550,6 +568,7 @@ class XQLYForm extends Component {
                             onChange={e => {
                               this.mObj.DZFLBM = e;
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -563,6 +582,7 @@ class XQLYForm extends Component {
                             onChange={e => {
                               this.mObj.LHL = e;
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -574,6 +594,7 @@ class XQLYForm extends Component {
                             onChange={e => {
                               this.mObj.SJSJ = e;
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -585,6 +606,7 @@ class XQLYForm extends Component {
                             onChange={e => {
                               this.mObj.JCSJ = e;
                             }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -599,6 +621,7 @@ class XQLYForm extends Component {
                               <span className={st.ired}>*</span>命名时间
                             </span>
                           }
+                          disabled={approveState === 'notFirst' ? true : false}
                         >
                           <DatePicker
                             initalValue={entity.BZTIME ? entity.BZTIME : undefined}
@@ -622,6 +645,7 @@ class XQLYForm extends Component {
                             }}
                             placeholder="名称来历及含义"
                             autosize={{ minRows: 2 }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -648,6 +672,7 @@ class XQLYForm extends Component {
                                       this.setState({ roadName: value });
                                       this.searchRoads(pageNum, pageSize, value);
                                     }}
+                                    disabled={approveState === 'notFirst' ? true : false}
                                   />
                                 </div>
                                 <div className={st.content}>
@@ -658,6 +683,7 @@ class XQLYForm extends Component {
                                         title="添加"
                                         className={st.tip}
                                         onClick={s => {
+                                          
                                           let r = e;
                                           let isRepeat = false;
                                           selectedRoads.map(t => {
@@ -670,9 +696,7 @@ class XQLYForm extends Component {
                                         }}
                                       >
                                         <span className={st.roadName}>{e.NAME}</span>
-                                        <span className={st.distName}>
-                                          {e.DistrictName.join('')}
-                                        </span>
+                                        <span className={st.distName}>{e.DistrictName}</span>
                                       </Tooltip>
                                     );
                                   })}
@@ -706,12 +730,11 @@ class XQLYForm extends Component {
                                         });
                                         this.setState({ selectedRoads: roads });
                                       }}
+                                      disabled={approveState === 'notFirst' ? true : false}
                                     >
                                       <Tag color="#2db7f5" className={st.tag}>
                                         <span className={st.roadName}>{e.NAME}</span>
-                                        <span className={st.distName}>
-                                          {e.DistrictName.join('')}
-                                        </span>
+                                        <span className={st.distName}>{e.DistrictName}</span>
                                       </Tag>
                                     </Tooltip>
                                   );
@@ -760,6 +783,7 @@ class XQLYForm extends Component {
                               this.mObj.LXR = e.target.value;
                             }}
                             placeholder="联系人"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -779,6 +803,7 @@ class XQLYForm extends Component {
                               this.mObj.LXDH = e.target.value;
                             }}
                             placeholder="联系电话"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -798,6 +823,7 @@ class XQLYForm extends Component {
                               this.mObj.SBDW = e.target.value;
                             }}
                             placeholder="申报单位"
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
@@ -812,6 +838,7 @@ class XQLYForm extends Component {
                             }}
                             placeholder="审批意见"
                             autosize={{ minRows: 2 }}
+                            disabled={approveState === 'notFirst' ? true : false}
                           />
                         </FormItem>
                       </Col>
