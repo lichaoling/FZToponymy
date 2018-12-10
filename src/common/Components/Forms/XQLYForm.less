@@ -3,21 +3,17 @@
     height: 100%;
     width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
     .content {
         width: 100%;
-        box-shadow: @box-shadow1;
-        overflow: auto;
         background-color: #fff;
-        margin: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         .ct_header {
             padding: 10px 0;
-            width:100%;
-            box-shadow: @box-shadow;
-            border-radius: 3px;
+            width: 100%;
+            border-bottom: 2px solid #eee;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,6 +22,16 @@
             }
         }
         .ct_form {
+            display: flex;
+            justify-content: center;
+            // align-items: center;
+            width: 100%;
+            flex: 1;
+            overflow: auto;
+            >div {
+                max-width: 1600px;
+                width: 100%;
+            }
             .group {
                 margin: 20px;
                 padding: 10px 0;
@@ -166,6 +172,8 @@
             }
         }
         .ct_footer {
+            text-align: right;
+            width: 100%;
             padding: 10px;
             border-top: 1px solid @border-color;
             height: 50px;
