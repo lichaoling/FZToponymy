@@ -74,7 +74,7 @@ export default {
   },
   proxy: {
     '/api': {
-      target: 'http://10.22.112.182/fztoponymy/',
+      target: 'http://localhost:34455/',
       pathRewrite: { '^/api': '' },
       changeOrigin: true,
     },

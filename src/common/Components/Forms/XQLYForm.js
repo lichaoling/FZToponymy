@@ -120,6 +120,7 @@ class XQLYForm extends Component {
       rtHandle(rt, d => {
         let entity = {
           ID: d,
+          BZTIME: moment()
         };
         this.setState({ entity: entity });
         this.hideLoading();
@@ -332,7 +333,7 @@ class XQLYForm extends Component {
 
   async approve(obj) {
     let { result, suggestion } = this.state;
-    await Post(url_RoadApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
+    await Post(url_HouseApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
       notification.success({ description: '审批成功！', message: '成功' });
       this.mObj = {};
       this.setState({ showCheckIcon: 'empty' });
@@ -557,7 +558,7 @@ class XQLYForm extends Component {
                             wrapperCol={{ span: 16 }}
                             label={
                               <span>
-                                <span className={st.ired}>*</span>建筑面积
+                                <span className={st.ired}>*</span>建筑面积（平方千米）
                               </span>
                             }
                             disabled={approveState === 'notFirst' ? true : false}
@@ -577,7 +578,7 @@ class XQLYForm extends Component {
                             wrapperCol={{ span: 16 }}
                             label={
                               <span>
-                                <span className={st.ired}>*</span>占地面积
+                                <span className={st.ired}>*</span>占地面积（平方米）
                               </span>
                             }
                           >
@@ -870,25 +871,6 @@ class XQLYForm extends Component {
                           </FormItem>
                         </Col>
                       </Row>
-                      <Row>
-                        <Col span={16}>
-                          <FormItem
-                            labelCol={{ span: 4 }}
-                            wrapperCol={{ span: 20 }}
-                            label="审批意见"
-                          >
-                            <TextArea
-                              defaultValue={entity.BZ ? entity.BZ : undefined}
-                              onChange={e => {
-                                this.mObj.BZ = e.target.value;
-                              }}
-                              placeholder="审批意见"
-                              autosize={{ minRows: 2 }}
-                              disabled={approveState === 'notFirst' ? true : false}
-                            />
-                          </FormItem>
-                        </Col>
-                      </Row>
                     </div>
                   </div>
                   {this.props.isApproval && approveState !== 'complete' ? (
@@ -921,9 +903,12 @@ class XQLYForm extends Component {
                               wrapperCol={{ span: 16 }}
                               label={<span>审批结果</span>}
                             >
-                              <RadioGroup>
-                                <Radio value="1">通过</Radio>
-                                <Radio value="0">不通过</Radio>
+                              <RadioGroup
+                                onChange={e => {
+                                  this.setState({ result: e.target.value });
+                                }}>
+                                <Radio value="同意">同意</Radio>
+                                <Radio value="不同意">不同意</Radio>
                               </RadioGroup>
                             </FormItem>
                           </Col>
@@ -938,7 +923,7 @@ class XQLYForm extends Component {
                               <TextArea
                                 initalValue={entity.SPYJ ? entity.SPYJ : undefined}
                                 onChange={e => {
-                                  this.mObj.SPYJ = e.target.value;
+                                  this.setState({ suggestion: e.target.value });
                                 }}
                                 placeholder="审批意见"
                                 autosize={{ minRows: 2 }}

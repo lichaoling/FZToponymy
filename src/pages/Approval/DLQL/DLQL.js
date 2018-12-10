@@ -25,12 +25,12 @@ let baseColumns = [
     key: 'NATURE',
   },
   {
-    title: '长度',
+    title: '长度（米）',
     dataIndex: 'LENGTH',
     key: 'LENGTH',
   },
   {
-    title: '宽度',
+    title: '宽度（米）',
     dataIndex: 'WIDTH',
     key: 'WIDTH',
   },
@@ -226,7 +226,7 @@ class DLQL extends Component {
         >
           <DLQLForm
             isApproval={true}
-            title="道路、桥梁名称核准、命名（更名）审批单"
+            title="道路、桥梁名称核准、命名（更名）审批表"
             id={this.rowid}
             onSaveSuccess={this.refreshTab.bind(this)}
           />

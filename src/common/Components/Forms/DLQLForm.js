@@ -108,6 +108,7 @@ class DLQLForm extends Component {
         // let { entity } = this.state;
         let entity = {
           ID: d,
+          BZTIME: moment()
         };
         this.setState({ entity: entity });
         this.hideLoading();

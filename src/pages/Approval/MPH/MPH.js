@@ -213,7 +213,7 @@ class MPH extends Component {
           onCancel={this.closeForm.bind(this)}
           footer={null}
         >
-          <MPHForm isApproval={true} title="新建住宅小区（楼宇）门牌号申请单" id={this.rowid} onSaveSuccess={this.refreshTab.bind(this)} />
+          <MPHForm isApproval={true} title="新建住宅小区（楼宇）门牌号审批表" id={this.rowid} onSaveSuccess={this.refreshTab.bind(this)} />
         </Modal>
       </div>
     );
