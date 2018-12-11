@@ -49,6 +49,7 @@ class DLQLForm extends Component {
     approveState: null,
     result: null,
     suggestion: null,
+    districtLoading: false,
   };
 
   // 存储修改后的数据
@@ -72,13 +73,13 @@ class DLQLForm extends Component {
 
   // 获取行政区数据
   async getDistricts() {
-    this.showLoading();
+    this.setState({ districtLoading: true });
     let rt = await Post(url_GetDistrictTree);
     rtHandle(rt, d => {
       let districts = getDistricts(d);
-      this.setState({ districts: districts });
+      this.setState({ districts: districts, districtLoading: false });
     });
-    this.hideLoading();
+    this.setState({ districtLoading: false });
   }
 
   async getFormData(id) {
@@ -387,6 +388,7 @@ class DLQLForm extends Component {
       approveState,
       result,
       suggestion,
+      districtLoading
     } = this.state;
     let shapeOptions = {
       stroke: true,
@@ -430,6 +432,7 @@ class DLQLForm extends Component {
                               </span>
                             }
                           >
+                            <Spin wrapperClassName="ct-inline-loading" spinning={districtLoading}>
                             <Cascader
                               defaultValue={entity.Districts ? entity.Districts : undefined}
                               expandTrigger="hover"
@@ -442,6 +445,7 @@ class DLQLForm extends Component {
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
                             />
+                            </Spin>
                           </FormItem>
                         </Col>
                         <Col span={8}>
@@ -528,7 +532,7 @@ class DLQLForm extends Component {
                               onChange={e => {
                                 this.mObj.ENDDIRECTION = e.target.value;
                               }}
-                              placeholder="止点"
+                              placeholder="止点（西/北）至"
                               disabled={approveState === 'notFirst' ? true : false}
                             />
                           </FormItem>
@@ -808,7 +812,7 @@ class DLQLForm extends Component {
                                 label="审批退回意见"
                               >
                                 <TextArea
-                                  value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                                  value={'不同意。' + entity.ROLLBACKSSUGGESTION}
                                   autosize={{ minRows: 2 }}
                                   disabled
                                 />

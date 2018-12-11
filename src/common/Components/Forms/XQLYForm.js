@@ -58,6 +58,8 @@ class XQLYForm extends Component {
     approveState: null,
     result: null,
     suggestion: null,
+    districtLoading: false,
+    roadLoading: false,
   };
 
   // 存储修改后的数据
@@ -79,13 +81,13 @@ class XQLYForm extends Component {
 
   // 获取行政区数据
   async getDistricts() {
-    this.showLoading();
+    this.setState({ districtLoading: true });
     let rt = await Post(url_GetDistrictTree);
     rtHandle(rt, d => {
       let districts = getDistricts(d);
-      this.setState({ districts: districts });
+      this.setState({ districts: districts, districtLoading: false });
     });
-    this.hideLoading();
+    this.setState({ districtLoading: false });
   }
   async getFormData(id) {
     if (!id) {
@@ -96,7 +98,6 @@ class XQLYForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchHouseByID, { id: id });
       rtHandle(rt, d => {
-        debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs.split('.');
@@ -120,7 +121,7 @@ class XQLYForm extends Component {
       rtHandle(rt, d => {
         let entity = {
           ID: d,
-          BZTIME: moment()
+          BZTIME: moment(),
         };
         this.setState({ entity: entity });
         this.hideLoading();
@@ -283,10 +284,12 @@ class XQLYForm extends Component {
   }
 
   async searchRoads(pageNum, pageSize, name) {
+    this.setState({ roadLoading: true });
     let rt = await Post(url_SearchRoadNames, { pageNum, pageSize, name });
     rtHandle(rt, d => {
-      this.setState({ roadDatas: d.Data, roadCount: d.Count });
+      this.setState({ roadDatas: d.Data, roadCount: d.Count, roadLoading: false });
     });
+    this.setState({ roadLoading: false });
   }
 
   getCheckIcon() {
@@ -414,6 +417,8 @@ class XQLYForm extends Component {
       approveState,
       result,
       suggestion,
+      districtLoading,
+      roadLoading,
     } = this.state;
     let shapeOptions = {
       stroke: true,
@@ -425,7 +430,6 @@ class XQLYForm extends Component {
       fillOpacity: 0.2,
       clickable: true,
     };
-    console.log(entity);
     return (
       <div className={st.XQLYForm}>
         <Spin
@@ -458,18 +462,20 @@ class XQLYForm extends Component {
                               </span>
                             }
                           >
-                            <Cascader
-                              changeOnSelect
-                              defaultValue={entity.Districts ? entity.Districts : undefined}
-                              expandTrigger="hover"
-                              options={districts}
-                              placeholder="所在行政区"
-                              onChange={(a, b) => {
-                                this.mObj.districts = a;
-                                this.setState({ showCheckIcon: 'empty' });
-                              }}
-                              disabled={approveState === 'notFirst' ? true : false}
-                            />
+                            <Spin wrapperClassName="ct-inline-loading" spinning={districtLoading}>
+                              <Cascader
+                                changeOnSelect
+                                defaultValue={entity.Districts ? entity.Districts : undefined}
+                                expandTrigger="hover"
+                                options={districts}
+                                placeholder="所在行政区"
+                                onChange={(a, b) => {
+                                  this.mObj.districts = a;
+                                  this.setState({ showCheckIcon: 'empty' });
+                                }}
+                                disabled={approveState === 'notFirst' ? true : false}
+                              />
+                            </Spin>
                           </FormItem>
                         </Col>
                         <Col span={8}>
@@ -671,7 +677,6 @@ class XQLYForm extends Component {
                                 <span className={st.ired}>*</span>命名时间
                               </span>
                             }
-                           
                           >
                             <DatePicker
                               defaultValue={entity.BZTIME ? entity.BZTIME : undefined}
@@ -717,16 +722,21 @@ class XQLYForm extends Component {
                             {
                               <div className={st.road}>
                                 <div className={st.roadSelect}>
-                                  <div className={st.search}>
-                                    <Search
-                                      placeholder="道路名称"
-                                      onSearch={value => {
-                                        this.setState({ roadName: value });
-                                        this.searchRoads(pageNum, pageSize, value);
-                                      }}
-                                      disabled={approveState === 'notFirst' ? true : false}
-                                    />
-                                  </div>
+                                  <Spin
+                                    wrapperClassName="ct-inline-roadLoading"
+                                    spinning={roadLoading}
+                                  >
+                                    <div className={st.search}>
+                                      <Search
+                                        placeholder="道路名称"
+                                        onSearch={value => {
+                                          this.setState({ roadName: value });
+                                          this.searchRoads(pageNum, pageSize, value);
+                                        }}
+                                        disabled={approveState === 'notFirst' ? true : false}
+                                      />
+                                    </div>
+                                  </Spin>
                                   <div className={st.content}>
                                     {roadDatas.map(e => {
                                       return (
@@ -747,7 +757,9 @@ class XQLYForm extends Component {
                                           }}
                                         >
                                           <span className={st.roadName}>{e.NAME}</span>
-                                          <span className={st.distName}>{e.DistrictName.replace(/\./g,"")}</span>
+                                          <span className={st.distName}>
+                                            {e.DistrictName.replace(/\./g, '')}
+                                          </span>
                                         </Tooltip>
                                       );
                                     })}
@@ -767,6 +779,7 @@ class XQLYForm extends Component {
                                     />
                                   </div>
                                 </div>
+
                                 <div className={st.roadConetnt}>
                                   {selectedRoads.map(e => {
                                     return (
@@ -896,7 +909,7 @@ class XQLYForm extends Component {
                                 label="审批退回意见"
                               >
                                 <TextArea
-                                  value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                                  value={'不同意。' + entity.ROLLBACKSSUGGESTION}
                                   autosize={{ minRows: 2 }}
                                   disabled
                                 />
@@ -914,7 +927,8 @@ class XQLYForm extends Component {
                               <RadioGroup
                                 onChange={e => {
                                   this.setState({ result: e.target.value });
-                                }}>
+                                }}
+                              >
                                 <Radio value="同意">同意</Radio>
                                 <Radio value="不同意">不同意</Radio>
                               </RadioGroup>

@@ -81,8 +81,8 @@ class MPHForm extends Component {
     rtHandle(rt, d => {
       let districts = getDistricts(d);
       this.setState({ districts: districts });
+      this.hideLoading();
     });
-    this.hideLoading();
   }
 
   async getFormData(id) {
@@ -591,7 +591,7 @@ class MPHForm extends Component {
                                 label="审批退回意见"
                               >
                                 <TextArea
-                                  value={'不同意' + entity.ROLLBACKSSUGGESTION}
+                                  value={'不同意。' + entity.ROLLBACKSSUGGESTION}
                                   autosize={{ minRows: 2 }}
                                   disabled
                                 />
