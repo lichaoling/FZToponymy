@@ -12,6 +12,6 @@ export async function Logout(sf, ef) {
 }
 
 export async function GetUser(sf, ef) {
-  let rt = await Post(`${baseUrl}/Login/GetUser`, null, sf, ef);
+  let rt = await Post(`${baseUrl}/Login/GetCurrentUser`,  sf, ef);
   return rt;
 }
