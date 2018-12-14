@@ -106,12 +106,11 @@ class DLQLForm extends Component {
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
-        // let { entity } = this.state;
-        let entity = {
-          ID: d,
-          BZTIME: moment()
-        };
-        this.setState({ entity: entity });
+        let entity = {};
+        entity.ID = d;
+        entity.BZTIME = moment();
+        this.mObj.BZTIME = moment();
+        this.setState({ reload: true }, e => this.setState({ entity: entity, reload: false }));
         this.hideLoading();
       });
     }
@@ -298,7 +297,7 @@ class DLQLForm extends Component {
       }.bind(this)
     );
   };
-  
+
   async approve(obj) {
     let { result, suggestion } = this.state;
     await Post(url_RoadApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
@@ -351,9 +350,9 @@ class DLQLForm extends Component {
   onAdd() {
     this.mObj = {};
     this.getFormData();
-    this.setState({ reload: true }, e => {
-      this.setState({ reload: false });
-    });
+    // this.setState({ reload: true }, e => {
+    //   this.setState({ reload: false });
+    // });
   }
 
   onEmpty() {
@@ -388,7 +387,7 @@ class DLQLForm extends Component {
       approveState,
       result,
       suggestion,
-      districtLoading
+      districtLoading,
     } = this.state;
     let shapeOptions = {
       stroke: true,
@@ -432,19 +431,22 @@ class DLQLForm extends Component {
                               </span>
                             }
                           >
-                            <Spin wrapperClassName="ct-inline-loading" spinning={districtLoading}>
-                            <Cascader
-                              defaultValue={entity.Districts ? entity.Districts : undefined}
-                              expandTrigger="hover"
-                              changeOnSelect
-                              options={districts}
-                              placeholder="所在（跨）行政区"
-                              onChange={(a, b) => {
-                                this.mObj.districts = a;
-                                this.setState({ showCheckIcon: 'empty' });
-                              }}
-                              disabled={approveState === 'notFirst' ? true : false}
-                            />
+                            <Spin
+                              wrapperClassName="ct-inline-loading-100"
+                              spinning={districtLoading}
+                            >
+                              <Cascader
+                                defaultValue={entity.Districts ? entity.Districts : undefined}
+                                expandTrigger="hover"
+                                changeOnSelect
+                                options={districts}
+                                placeholder="所在（跨）行政区"
+                                onChange={(a, b) => {
+                                  this.mObj.districts = a;
+                                  this.setState({ showCheckIcon: 'empty' });
+                                }}
+                                disabled={approveState === 'notFirst' ? true : false}
+                              />
                             </Spin>
                           </FormItem>
                         </Col>
@@ -504,11 +506,7 @@ class DLQLForm extends Component {
                           </FormItem>
                         </Col>
                         <Col span={8}>
-                          <FormItem
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 16 }}
-                            label="起点"
-                          >
+                          <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="起点">
                             <Input
                               defaultValue={
                                 entity.STARTDIRECTION ? entity.STARTDIRECTION : undefined
@@ -522,11 +520,7 @@ class DLQLForm extends Component {
                           </FormItem>
                         </Col>
                         <Col span={8}>
-                          <FormItem
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 16 }}
-                            label="止点"
-                          >
+                          <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="止点">
                             <Input
                               defaultValue={entity.ENDDIRECTION ? entity.ENDDIRECTION : undefined}
                               onChange={e => {
@@ -686,7 +680,6 @@ class DLQLForm extends Component {
                                 icon="environment"
                                 size="small"
                                 onClick={this.showLocateMap.bind(this)}
-                                disabled={approveState === 'notFirst' ? true : false}
                               />
                             </Tooltip>
                           </FormItem>
@@ -825,7 +818,11 @@ class DLQLForm extends Component {
                             <FormItem
                               labelCol={{ span: 8 }}
                               wrapperCol={{ span: 16 }}
-                              label={<span>审批结果</span>}
+                              label={
+                                <span>
+                                  <span className={st.ired}>*</span>审批结果
+                                </span>
+                              }
                             >
                               <RadioGroup
                                 onChange={e => {
@@ -843,7 +840,11 @@ class DLQLForm extends Component {
                             <FormItem
                               labelCol={{ span: 4 }}
                               wrapperCol={{ span: 20 }}
-                              label="审批意见"
+                              label={
+                                <span>
+                                  <span className={st.ired}>*</span>审批意见
+                                </span>
+                              }
                             >
                               <TextArea
                                 onChange={e => {
@@ -892,11 +893,6 @@ class DLQLForm extends Component {
         >
           <LocateMap
             onMapReady={lm => {
-              // let { Lat, Lng } = this.state.entity;
-              // if (Lat && Lng) {
-              //   lm.mpLayer = L.marker([Lat, Lng], { icon: mp }).addTo(lm.map);
-              //   lm.map.setView([Lat, Lng], 16);
-              // }
               let { GEOM_WKT } = this.state.entity;
               if (GEOM_WKT) {
                 let geometry = Terraformer.WKT.parse(GEOM_WKT);
@@ -920,70 +916,58 @@ class DLQLForm extends Component {
               this.mObj.Lng = entity.Lng;
               this.mObj.Lat = entity.Lat;
             }}
-            beforeBtns={[
-              {
-                id: 'locate',
-                name: '道路、桥梁定位',
-                icon: 'icon-dingwei',
-                onClick: (dom, i, lm) => {
-                  if (!lm.locatePen) {
-                    // lm.locatePen = new L.Draw.Marker(lm.map, { icon: mp });
-                    // lm.locatePen.on(L.Draw.Event.CREATED, e => {
-                    //   lm.mpLayer && lm.mpLayer.remove();
-                    //   var { layer } = e;
-                    //   lm.mpLayer = layer;
-                    //   layer.addTo(lm.map);
-                    // });
-                    lm.locatePen = new L.Draw.Polyline(lm.map, {
-                      shapeOptions: shapeOptions,
-                      icon: new L.DivIcon({
-                        iconSize: new L.Point(8, 8),
-                        className: 'leaflet-div-icon leaflet-editing-icon',
-                      }),
-                      touchIcon: new L.DivIcon({
-                        iconSize: new L.Point(10, 10),
-                        className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
-                      }),
-                    });
-                    lm.locatePen.on(L.Draw.Event.CREATED, e => {
-                      lm.mpLayer && lm.mpLayer.remove();
-                      var { layer } = e;
-                      lm.mpLayer = layer;
-                      layer.addTo(lm.map);
-                    });
-                  }
-                  lm.disableMSTools();
-                  if (lm.locatePen._enabled) {
-                    lm.locatePen.disable();
-                  } else {
-                    lm.locatePen.enable();
-                  }
-                },
-              },
-              {
-                id: 'savelocation',
-                name: '保存定位',
-                icon: 'icon-save',
-                onClick: (dom, item, lm) => {
-                  let geometry = lm.mpLayer.toGeoJSON().geometry;
-                  entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
-                  this.mObj.GEOM_WKT = entity.GEOM_WKT;
-                  // let { lat, lng } = lm.mpLayer.getLatLng();
-                  // let { entity } = this.state;
-
-                  // entity.Lng = lng.toFixed(8) - 0;
-                  // entity.Lat = lat.toFixed(8) - 0;
-
-                  // this.mObj.Lng = entity.Lng;
-                  // this.mObj.Lat = entity.Lat;
-
-                  this.setState({
-                    entity: entity,
-                  });
-                  this.closeLocateMap();
-                },
-              },
-            ]}
+            beforeBtns={
+              approveState === 'notFirst'
+                ? []
+                : [
+                    {
+                      id: 'locate',
+                      name: '道路、桥梁定位',
+                      icon: 'icon-dingwei',
+                      onClick: (dom, i, lm) => {
+                        if (!lm.locatePen) {
+                          lm.locatePen = new L.Draw.Polyline(lm.map, {
+                            shapeOptions: shapeOptions,
+                            icon: new L.DivIcon({
+                              iconSize: new L.Point(8, 8),
+                              className: 'leaflet-div-icon leaflet-editing-icon',
+                            }),
+                            touchIcon: new L.DivIcon({
+                              iconSize: new L.Point(10, 10),
+                              className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
+                            }),
+                          });
+                          lm.locatePen.on(L.Draw.Event.CREATED, e => {
+                            lm.mpLayer && lm.mpLayer.remove();
+                            var { layer } = e;
+                            lm.mpLayer = layer;
+                            layer.addTo(lm.map);
+                          });
+                        }
+                        lm.disableMSTools();
+                        if (lm.locatePen._enabled) {
+                          lm.locatePen.disable();
+                        } else {
+                          lm.locatePen.enable();
+                        }
+                      },
+                    },
+                    {
+                      id: 'savelocation',
+                      name: '保存定位',
+                      icon: 'icon-save',
+                      onClick: (dom, item, lm) => {
+                        let geometry = lm.mpLayer.toGeoJSON().geometry;
+                        entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
+                        this.mObj.GEOM_WKT = entity.GEOM_WKT;
+                        this.setState({
+                          entity: entity,
+                        });
+                        this.closeLocateMap();
+                      },
+                    },
+                  ]
+            }
           />
         </Modal>
       </div>

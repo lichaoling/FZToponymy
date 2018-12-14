@@ -55,6 +55,18 @@ export default [
       { path: '/approval/mpbz', name: '门牌号编制', component: './Approval/MPBZ/MPBZ' },
     ],
   },
+//地名地址服务应用系统
+{
+  path: '/servicemanage',
+  component: './ServiceManage/ServiceManage',
+  name: '地名地址服务应用系统',
+  routes: [
+    { path: '/servicemanage', redirect: '/servicemanage/mapservice' },
+    { path: '/home', name: '主页', component: './Home/Home' },
+    { path: '/servicemanage/mapservice', name: '地图管理', component: './ServiceManage/MapService/MapService' },
+  ],
+},
+
   /*
   // test
   {

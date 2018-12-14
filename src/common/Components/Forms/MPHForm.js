@@ -48,12 +48,12 @@ class MPHForm extends Component {
     entity: { BZTIME: moment() },
     showLocateMap: false,
     showLoading: false,
-    showCheckIcon: 'empty',
     houseNames: [],
     reload: false,
     approveState: null,
     result: null,
     suggestion: null,
+    districtLoading: false,
   };
   // 存储修改后的数据
   mObj = {};
@@ -76,13 +76,13 @@ class MPHForm extends Component {
 
   // 获取行政区数据
   async getDistricts() {
-    this.showLoading();
+    this.setState({ districtLoading: true });
     let rt = await Post(url_GetDistrictTree);
     rtHandle(rt, d => {
       let districts = getDistricts(d);
-      this.setState({ districts: districts });
-      this.hideLoading();
+      this.setState({ districts: districts, districtLoading: false });
     });
+    this.setState({ districtLoading: false });
   }
 
   async getFormData(id) {
@@ -94,7 +94,6 @@ class MPHForm extends Component {
       this.showLoading();
       let rt = await Post(url_SearchHouseBZByID, { id: id });
       rtHandle(rt, d => {
-        debugger;
         let data = d.Data;
         let dIDs = data.DistrictIDs;
         data.Districts = dIDs.split('.');
@@ -107,17 +106,20 @@ class MPHForm extends Component {
             reload: false,
           });
         });
+
         this.hideLoading();
       });
     } else {
+      this.showLoading();
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
-        let entity = {
-          ID: d,
-          BZTIME: moment(),
-        };
-        this.setState({ entity: entity });
+        let entity = {};
+        entity.ID = d;
+        entity.BZTIME = moment();
+        this.mObj.BZTIME = moment();
+        this.setState({ reload: true }, e => this.setState({ entity: entity, reload: false }));
+        this.hideLoading();
       });
     }
   }
@@ -219,7 +221,6 @@ class MPHForm extends Component {
     await Post(url_HouseBZApprove, { mObj: JSON.stringify(obj), result, suggestion }, e => {
       notification.success({ description: '审批成功！', message: '成功' });
       this.mObj = {};
-      this.setState({ showCheckIcon: 'empty' });
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
       }
@@ -232,7 +233,6 @@ class MPHForm extends Component {
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
       }
-      this.setState({ showCheckIcon: 'empty', entity: { BZTIME: moment() } });
       this.getFormData(this.state.entity.ID);
     });
   }
@@ -264,9 +264,6 @@ class MPHForm extends Component {
   onAdd() {
     this.mObj = {};
     this.getFormData();
-    this.setState({ reload: true }, e => {
-      this.setState({ reload: false });
-    });
   }
 
   componentDidMount() {
@@ -285,6 +282,7 @@ class MPHForm extends Component {
       approveState,
       result,
       suggestion,
+      districtLoading
     } = this.state;
     return (
       <div className={st.MPHForm}>
@@ -318,18 +316,23 @@ class MPHForm extends Component {
                               </span>
                             }
                           >
-                            <Cascader
-                              changeOnSelect
-                              defaultValue={entity.Districts ? entity.Districts : undefined}
-                              expandTrigger="hover"
-                              options={districts}
-                              placeholder="所在行政区"
-                              onChange={(a, b) => {
-                                this.mObj.districts = a;
-                                this.getHouseNames(a[a.length - 1]);
-                              }}
-                              disabled={approveState === 'notFirst' ? true : false}
-                            />
+                            <Spin
+                              wrapperClassName="ct-inline-loading-100"
+                              spinning={districtLoading}
+                            >
+                              <Cascader
+                                changeOnSelect
+                                defaultValue={entity.Districts ? entity.Districts : undefined}
+                                expandTrigger="hover"
+                                options={districts}
+                                placeholder="所在行政区"
+                                onChange={(a, b) => {
+                                  this.mObj.districts = a;
+                                  this.getHouseNames(a[a.length - 1]);
+                                }}
+                                disabled={approveState === 'notFirst' ? true : false}
+                              />
+                            </Spin>
                           </FormItem>
                         </Col>
                         <Col span={12}>
@@ -604,7 +607,11 @@ class MPHForm extends Component {
                             <FormItem
                               labelCol={{ span: 8 }}
                               wrapperCol={{ span: 16 }}
-                              label={<span>审批结果</span>}
+                              label={
+                                <span>
+                                  <span className={st.ired}>*</span>审批结果
+                                </span>
+                              }
                             >
                               <RadioGroup
                                 onChange={e => {
@@ -622,7 +629,11 @@ class MPHForm extends Component {
                             <FormItem
                               labelCol={{ span: 4 }}
                               wrapperCol={{ span: 20 }}
-                              label="审批意见"
+                              label={
+                                <span>
+                                  <span className={st.ired}>*</span>审批意见
+                                </span>
+                              }
                             >
                               <TextArea
                                 onChange={e => {

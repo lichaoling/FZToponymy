@@ -6,8 +6,12 @@ import DLQL from './DLQL/DLQL';
 import MPBZ from './MPBZ/MPBZ';
 import MPH from './MPH/MPH';
 import st from './Approval.less';
+import { GetUser } from '../../services/Login';
 
 class Approval extends Component {
+  state = {
+    user: {},
+  };
   getRoutes() {
     let { routes } = this.props.route;
     let cmps = [];
@@ -50,12 +54,20 @@ class Approval extends Component {
           .siblings()
           .removeClass(ac);
       });
+
+    this.getUser();
+  }
+
+  async getUser() {
+    await GetUser({}, d => {
+      this.setState({ user: d });
+    });
   }
   onClick(e) {
-    if(e.key==='3')
-    this.props.history.push('/login');
+    if (e.key === '3') this.props.history.push('/login');
   }
   render() {
+    let { user } = this.state;
     const menu = (
       <Menu onClick={e => this.onClick(e)}>
         <Menu.Item key="1">个人中心</Menu.Item>
@@ -65,7 +77,7 @@ class Approval extends Component {
     );
     let { children } = this.props;
     return (
-      <div className={st.QMZJ}>
+      <div className={st.Approval}>
         <div className={st.header}>
           <div className={st.logo} />
           <div className={st.jz} />
@@ -74,7 +86,7 @@ class Approval extends Component {
             <Dropdown overlay={menu}>
               <a className="ant-dropdown-link" href="#">
                 <Icon type="user" style={{ fontSize: 18 }} />
-                &nbsp;你好, 经办人
+                &nbsp;你好, {user.USERNAME}
               </a>
             </Dropdown>
           </div>

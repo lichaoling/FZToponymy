@@ -43,23 +43,20 @@ const RadioGroup = Radio.Group;
 
 class XQLYForm extends Component {
   state = {
+    open: false,
     districts: [],
     entity: { BZTIME: moment() },
     showLocateMap: false,
     showLoading: false,
     showCheckIcon: 'empty',
-    pageNum: 1,
-    pageSize: 10,
     roadDatas: [],
-    roadCount: 0,
-    roadName: null,
     selectedRoads: [],
     reload: false,
     approveState: null,
     result: null,
     suggestion: null,
     districtLoading: false,
-    roadLoading: false,
+    fetching: false,
   };
 
   // 存储修改后的数据
@@ -107,37 +104,38 @@ class XQLYForm extends Component {
         this.setState({ reload: true }, e => {
           this.setState({
             entity: data,
-            selectedRoads: data.ROADs,
             approveState: d.State,
+            selectedRoads: data.ROADs && data.ROADs.map(e => e.ID),
+            roadDatas: data.ROADs,
             reload: false,
           });
         });
         this.hideLoading();
       });
     } else {
-      this.showLoading();
       // 获取一个新的guid
       let rt = await Post(url_GetNewGuid);
       rtHandle(rt, d => {
-        let entity = {
-          ID: d,
-          BZTIME: moment(),
-        };
-        this.setState({ entity: entity });
-        this.hideLoading();
+        let entity = {};
+        entity.ID = d;
+        entity.BZTIME = moment();
+        this.mObj.BZTIME = moment();
+        this.setState({ reload: true }, e => {
+          this.setState({ reload: false, roadDatas: [], selectedRoads: [], entity: entity });
+        });
       });
     }
   }
   validate(errs, bName) {
     errs = errs || [];
     let { entity, selectedRoads } = this.state;
-    let roadIDs = selectedRoads.map(e => {
-      return e.ID;
-    });
+    debugger;
+    let roadIDs = selectedRoads;
+    let ROADID = roadIDs.join(',');
+    this.mObj.ROADID = ROADID;
     let saveObj = {
       ID: entity.ID,
       ...this.mObj,
-      ROADID: roadIDs.join(','),
     };
     if (saveObj.districts) {
       let ds = saveObj.districts;
@@ -283,13 +281,12 @@ class XQLYForm extends Component {
     }
   }
 
-  async searchRoads(pageNum, pageSize, name) {
-    this.setState({ roadLoading: true });
-    let rt = await Post(url_SearchRoadNames, { pageNum, pageSize, name });
+  async searchRoads(name) {
+    name = name.trim();
+    let rt = await Post(url_SearchRoadNames, { name });
     rtHandle(rt, d => {
-      this.setState({ roadDatas: d.Data, roadCount: d.Count, roadLoading: false });
+      this.setState({ roadDatas: d, open: true });
     });
-    this.setState({ roadLoading: false });
   }
 
   getCheckIcon() {
@@ -382,43 +379,43 @@ class XQLYForm extends Component {
     }
   }
   onAdd() {
-    this.mObj = {};
     this.getFormData();
-    this.setState({ reload: true }, e => {
-      this.setState({ reload: false });
-    });
-    this.setState({
-      pageNum: 1,
-      pageSize: 10,
-      roadDatas: [],
-      roadCount: 0,
-      roadName: null,
-      selectedRoads: [],
-    });
+    this.mObj = {};
   }
+
+  componentDidUpdate() {
+    if (this.select) {
+      $(this.select)
+        .find('input')
+        .unbind('keydown')
+        .on('keydown', e => {
+          if (event.keyCode == 13) {
+            this.searchRoads(e.target.value);
+          }
+        });
+    }
+  }
+
   componentDidMount() {
     this.getDistricts();
     this.getFormData();
   }
   render() {
     let {
+      open,
       districts,
       entity,
       showLocateMap,
       showLoading,
       showCheckIcon,
-      pageNum,
-      pageSize,
       roadDatas,
-      roadCount,
-      roadName,
       selectedRoads,
       reload,
       approveState,
       result,
       suggestion,
       districtLoading,
-      roadLoading,
+      fetching,
     } = this.state;
     let shapeOptions = {
       stroke: true,
@@ -430,8 +427,9 @@ class XQLYForm extends Component {
       fillOpacity: 0.2,
       clickable: true,
     };
+    console.log(entity);
     return (
-      <div className={st.XQLYForm}>
+      <div className={st.XQLYForm} ref={e => (this.root = e)}>
         <Spin
           className={showLoading ? 'active' : ''}
           spinning={showLoading}
@@ -462,8 +460,12 @@ class XQLYForm extends Component {
                               </span>
                             }
                           >
-                            <Spin wrapperClassName="ct-inline-loading" spinning={districtLoading}>
+                            <Spin
+                              wrapperClassName="ct-inline-loading-100"
+                              spinning={districtLoading}
+                            >
                               <Cascader
+                                style={{ width: '100%' }}
                                 changeOnSelect
                                 defaultValue={entity.Districts ? entity.Districts : undefined}
                                 expandTrigger="hover"
@@ -521,7 +523,7 @@ class XQLYForm extends Component {
                             <Input
                               defaultValue={entity.XCMC ? entity.XCMC : undefined}
                               onChange={e => {
-                                this.mObj.NAME = e.target.value;
+                                this.mObj.XCMC = e.target.value;
                               }}
                               placeholder="宣传名称"
                               disabled={approveState === 'notFirst' ? true : false}
@@ -610,7 +612,7 @@ class XQLYForm extends Component {
                               defaultValue={entity.DZFLBM ? entity.DZFLBM : undefined}
                               style={{ width: '100%' }}
                               onChange={e => {
-                                this.mObj.DZFLBM = e;
+                                this.mObj.DZFLBM = e.target.value;
                               }}
                               disabled={approveState === 'notFirst' ? true : false}
                               placeholder="地址分类"
@@ -710,7 +712,6 @@ class XQLYForm extends Component {
                       <Row>
                         <Col span={22}>
                           <FormItem
-                            className={'road_ct'}
                             labelCol={{ span: 3 }}
                             wrapperCol={{ span: 21 }}
                             label={
@@ -719,93 +720,43 @@ class XQLYForm extends Component {
                               </span>
                             }
                           >
-                            {
-                              <div className={st.road}>
-                                <div className={st.roadSelect}>
-                                  <Spin
-                                    wrapperClassName="ct-inline-roadLoading"
-                                    spinning={roadLoading}
-                                  >
-                                    <div className={st.search}>
-                                      <Search
-                                        placeholder="道路名称"
-                                        onSearch={value => {
-                                          this.setState({ roadName: value });
-                                          this.searchRoads(pageNum, pageSize, value);
-                                        }}
-                                        disabled={approveState === 'notFirst' ? true : false}
-                                      />
-                                    </div>
-                                  </Spin>
-                                  <div className={st.content}>
-                                    {roadDatas.map(e => {
-                                      return (
-                                        <Tooltip
-                                          placement="right"
-                                          title="添加"
-                                          className={st.tip}
-                                          onClick={s => {
-                                            let r = e;
-                                            let isRepeat = false;
-                                            selectedRoads.map(t => {
-                                              if (r.ID == t.ID) isRepeat = true;
-                                            });
-                                            if (!isRepeat) {
-                                              selectedRoads.push(r);
-                                              this.setState({ selectedRoads });
-                                            }
-                                          }}
-                                        >
-                                          <span className={st.roadName}>{e.NAME}</span>
-                                          <span className={st.distName}>
-                                            {e.DistrictName.replace(/\./g, '')}
-                                          </span>
-                                        </Tooltip>
-                                      );
-                                    })}
-                                  </div>
-                                  <div className={st.pagenation}>
-                                    <Pagination
-                                      size="small"
-                                      total={roadCount}
-                                      showSizeChanger
-                                      showQuickJumper
-                                      onChange={(pageNum, pageSize) => {
-                                        this.searchRoads(pageNum, pageSize, roadName);
-                                      }}
-                                      onShowSizeChange={(pageNum, pageSize) => {
-                                        this.searchRoads(pageNum, pageSize, roadName);
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-
-                                <div className={st.roadConetnt}>
-                                  {selectedRoads.map(e => {
-                                    return (
-                                      <Tooltip
-                                        placement="right"
-                                        title="删除"
-                                        className={st.tip}
-                                        onClick={s => {
-                                          let r = e;
-                                          let roads = selectedRoads.filter(t => {
-                                            return t.ID != r.ID;
-                                          });
-                                          this.setState({ selectedRoads: roads });
-                                        }}
-                                        disabled={approveState === 'notFirst' ? true : false}
-                                      >
-                                        <Tag color="#2db7f5" className={st.tag}>
-                                          <span className={st.roadName}>{e.NAME}</span>
-                                          <span className={st.distName}>{e.DistrictName}</span>
-                                        </Tag>
-                                      </Tooltip>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            }
+                            <div style={{ width: '100%' }} ref={e => (this.select = e)}>
+                              <Select
+                                open={open}
+                                ref={e => (this.selectO = e)}
+                                dropdownClassName={'road'}
+                                mode="multiple"
+                                labelInValue={false}
+                                value={selectedRoads}
+                                placeholder="请选择道路..."
+                                notFoundContent={fetching ? <Spin size="small" /> : null}
+                                filterOption={false}
+                                // onSearch={this.searchRoads.bind(this)}
+                                onChange={value => {
+                                  let { selectedRoads } = this.state;
+                                  this.setState({
+                                    selectedRoads: value,
+                                    fetching: false,
+                                    open: false,
+                                  });
+                                }}
+                                style={{ width: '100%' }}
+                                disabled={approveState === 'notFirst' ? true : false}
+                              >
+                                {roadDatas.map(d => (
+                                  <Select.Option key={d.ID}>
+                                    {
+                                      <div className={st.road}>
+                                        <div className={st.roadName}>{d.NAME}</div>
+                                        <div className={st.distName}>
+                                          {d.DistrictName && d.DistrictName.replace(/\./g, '')}
+                                        </div>
+                                      </div>
+                                    }
+                                  </Select.Option>
+                                ))}
+                              </Select>
+                            </div>
                           </FormItem>
                         </Col>
                         <Col span={2}>
@@ -922,7 +873,11 @@ class XQLYForm extends Component {
                             <FormItem
                               labelCol={{ span: 8 }}
                               wrapperCol={{ span: 16 }}
-                              label={<span>审批结果</span>}
+                              label={
+                                <span>
+                                  <span className={st.ired}>*</span>审批结果
+                                </span>
+                              }
                             >
                               <RadioGroup
                                 onChange={e => {
@@ -940,7 +895,11 @@ class XQLYForm extends Component {
                             <FormItem
                               labelCol={{ span: 4 }}
                               wrapperCol={{ span: 20 }}
-                              label="审批意见"
+                              label={
+                                <span>
+                                  <span className={st.ired}>*</span>审批意见
+                                </span>
+                              }
                             >
                               <TextArea
                                 onChange={e => {
@@ -989,11 +948,6 @@ class XQLYForm extends Component {
         >
           <LocateMap
             onMapReady={lm => {
-              // let { Lat, Lng } = this.state.entity;
-              // if (Lat && Lng) {
-              //   lm.mpLayer = L.marker([Lat, Lng], { icon: mp }).addTo(lm.map);
-              //   lm.map.setView([Lat, Lng], 16);
-              // }
               let { GEOM_WKT } = this.state.entity;
               if (GEOM_WKT) {
                 let geometry = Terraformer.WKT.parse(GEOM_WKT);
@@ -1024,13 +978,6 @@ class XQLYForm extends Component {
                 icon: 'icon-dingwei',
                 onClick: (dom, i, lm) => {
                   if (!lm.locatePen) {
-                    // lm.locatePen = new L.Draw.Marker(lm.map, { icon: mp });
-                    // lm.locatePen.on(L.Draw.Event.CREATED, e => {
-                    //   lm.mpLayer && lm.mpLayer.remove();
-                    //   var { layer } = e;
-                    //   lm.mpLayer = layer;
-                    //   layer.addTo(lm.map);
-                    // });
                     lm.locatePen = new L.Draw.Polygon(lm.map, {
                       shapeOptions: shapeOptions,
                       icon: new L.DivIcon({
