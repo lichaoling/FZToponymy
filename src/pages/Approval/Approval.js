@@ -77,7 +77,7 @@ class Approval extends Component {
     );
     let { children } = this.props;
     return (
-      <div className={st.QMZJ}>
+      <div className={st.Approval}>
         <div className={st.header}>
           <div className={st.logo} />
           <div className={st.jz} />
