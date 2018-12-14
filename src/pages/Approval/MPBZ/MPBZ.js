@@ -107,7 +107,7 @@ class MPBZ extends Component {
 
   saveLocate(mObj) {
     houseBZLocate({ mObj: JSON.stringify(mObj) }, e => {
-      success("保存成功！");
+      success('保存成功！');
       this.search(this.condition);
     });
   }
@@ -115,7 +115,7 @@ class MPBZ extends Component {
   showMap(row, isNew = false) {
     this.row = {
       ...row,
-      isNew
+      isNew,
     };
     this.setState({ showMap: true });
   }
@@ -195,7 +195,7 @@ class MPBZ extends Component {
           <Pagination
             showTotal={e =>
               `共：${total}，当前：${(pageNum - 1) * pageSize + 1}-${(pageNum - 1) * pageSize +
-              rows.length}`
+                rows.length}`
             }
             total={total}
             current={pageNum}
@@ -226,8 +226,8 @@ class MPBZ extends Component {
             beforeBtns={[
               {
                 id: 'mpbz',
-                icon:'icon-paizhao',
-                name: "门牌编制",
+                icon: 'icon-paizhao',
+                name: '门牌编制',
                 onClick: ((e, i, cmp) => {
                   let row = this.row;
 
@@ -243,15 +243,23 @@ class MPBZ extends Component {
 
                     var latlngs = layer.getLatLng();
                     let { lat, lng } = latlngs;
-                    let dom = document.createElement("div");
+                    let dom = document.createElement('div');
                     let popup = ReactDOM.render(
                       <Popup
                         saveLocate={e => {
-                          let obj = { ...e, X: lng.toFixed(8) - 0, Y: lat.toFixed(8) - 0, ID: this.row.ID };
+                          let obj = {
+                            ...e,
+                            X: lng.toFixed(8) - 0,
+                            Y: lat.toFixed(8) - 0,
+                            ID: this.row.ID,
+                          };
                           this.saveLocate(obj);
                         }}
                         MPNUM={row.MPNUM}
-                        MPNUM_NO={row.MPNUM_NO} />, dom);
+                        MPNUM_NO={row.MPNUM_NO}
+                      />,
+                      dom
+                    );
                     this.mpMarker
                       .bindPopup(dom)
                       .addTo(cmp.map)
@@ -260,8 +268,8 @@ class MPBZ extends Component {
 
                   cmp.disableMSTools();
                   this.mpbzTool.enable();
-                }).bind(this)
-              }
+                }).bind(this),
+              },
             ]}
             onMapReady={e => {
               let row = this.row;
@@ -273,12 +281,21 @@ class MPBZ extends Component {
                     this.mpMarker.remove();
                     this.mpMarker = null;
                   }
-                  let dom = document.createElement("div");
-                  let popup = ReactDOM.render(<Popup saveLocate={e => {
-                    let obj = { ...e, X, Y, ID: this.row.ID };
-                    this.saveLocate(obj);
-                  }} MPNUM={row.MPNUM} MPNUM_NO={row.MPNUM_NO} />, dom);
-                  this.mpMarker = L.marker([Y, X], { icon: mpIcon }).bindPopup(dom).addTo(e.map);
+                  let dom = document.createElement('div');
+                  let popup = ReactDOM.render(
+                    <Popup
+                      saveLocate={e => {
+                        let obj = { ...e, X, Y, ID: this.row.ID };
+                        this.saveLocate(obj);
+                      }}
+                      MPNUM={row.MPNUM}
+                      MPNUM_NO={row.MPNUM_NO}
+                    />,
+                    dom
+                  );
+                  this.mpMarker = L.marker([Y, X], { icon: mpIcon })
+                    .bindPopup(dom)
+                    .addTo(e.map);
                   setTimeout(e => {
                     this.mpMarker.openPopup();
                   }, 1000);
@@ -295,47 +312,61 @@ class MPBZ extends Component {
 class Popup extends Component {
   constructor(ps) {
     super(ps);
-    this.state = ps.MPNUM ? {
-      MPNUM: ps.MPNUM,
-      MPNUM_NO: ps.MPNUM_NO.substring(ps.MPNUM_NO.indexOf(ps.MPNUM) + ps.MPNUM.length, ps.MPNUM_NO.length)
-    } : {
-        MPNUM_NO: '号'
-      };
+    this.state = ps.MPNUM_NO
+      ? {
+          MPNUM: ps.MPNUM.substring(
+            ps.MPNUM.indexOf(ps.MPNUM_NO) + ps.MPNUM_NO.length,
+            ps.MPNUM.length
+          ),
+          MPNUM_NO: ps.MPNUM_NO,
+        }
+      : {
+          MPNUM: '号',
+        };
   }
 
   save() {
     let { MPNUM, MPNUM_NO } = this.state;
-    if (!MPNUM) {
-      warn("请填写门牌号后再保存！");
+    if (!MPNUM_NO) {
+      warn('请填写门牌号后再保存！');
     } else {
       let { saveLocate } = this.props;
       saveLocate({
-        MPNUM, MPNUM_NO: MPNUM + MPNUM_NO
+        MPNUM: MPNUM_NO + MPNUM,
+        MPNUM_NO,
       });
     }
   }
 
   render() {
     let { MPNUM, MPNUM_NO } = this.state;
-    return <div className={st.popup}>
-      <div>
-        <Input
-          placeholder="请输入门牌号"
-          value={MPNUM}
-          onChange={e => this.setState({ MPNUM: e.target.value })}
-          addonBefore="门牌号："
-          addonAfter={
-            <Select value={MPNUM_NO} onChange={e => {
-              this.setState({ MPNUM_NO: e });
-            }}>
-              <Select.Option value="号">号</Select.Option>
-            </Select>
-          } />
+    return (
+      <div className={st.popup}>
+        <div>
+          <Input
+            placeholder="请输入门牌号"
+            value={MPNUM_NO}
+            onChange={e => this.setState({ MPNUM_NO: e.target.value })}
+            addonBefore="门牌号："
+            addonAfter={
+              <Select
+                value={MPNUM}
+                onChange={e => {
+                  this.setState({ MPNUM: e });
+                }}
+              >
+                <Select.Option value="号">号</Select.Option>
+              </Select>
+            }
+          />
+        </div>
+        <div>
+          <Button type="primary" onClick={e => this.save()}>
+            保存
+          </Button>
+        </div>
       </div>
-      <div>
-        <Button type="primary" onClick={e => this.save()}>保存</Button>
-      </div>
-    </div>;
+    );
   }
 }
 
