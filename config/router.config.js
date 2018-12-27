@@ -21,7 +21,11 @@ export default [
         name: '小区、楼宇命名申请',
         component: './Developer/XQLY/XQLY',
       },
-      { path: '/developer/mph', name: '门牌号申请', component: './Developer/MPH/MPH' },
+      { 
+        path: '/developer/mph',
+        name: '门牌号申请',
+        component: './Developer/MPH/MPH' 
+      },
     ],
   },
 

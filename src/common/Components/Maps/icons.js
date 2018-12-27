@@ -75,6 +75,11 @@ let getDivIcons = () => {
       iconAnchor: [20, 18],
       className: 'ct-icon-lp',
     }),
+    xq: L.divIcon({
+      iconSize: [42, 40],
+      iconAnchor: [20, 18],
+      className: 'ct-icon-lp',
+    }),
   };
 };
 

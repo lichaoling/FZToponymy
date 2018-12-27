@@ -40,6 +40,7 @@ const FormItem = Form.Item;
 const { TextArea } = Input;
 const Search = Input.Search;
 const RadioGroup = Radio.Group;
+const { xq } = getDivIcons();
 
 class XQLYForm extends Component {
   state = {
@@ -325,7 +326,16 @@ class XQLYForm extends Component {
             )),
           });
         } else {
-          this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
+          Modal.confirm({
+            title: '提醒',
+            content: '提交后不能再次修改，是否确认提交？',
+            okText: '确定',
+            cancelText: '取消',
+            onOk: async () => {
+              this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
+            },
+            onCancel() {},
+          });
         }
       }.bind(this)
     );
@@ -345,7 +355,7 @@ class XQLYForm extends Component {
 
   async save(obj) {
     await Post(url_HouseAndBuildingApplicant, { mObj: JSON.stringify(obj) }, e => {
-      notification.success({ description: '保存成功！', message: '成功' });
+      notification.success({ description: '提交成功！', message: '成功' });
       this.mObj = {};
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
@@ -417,6 +427,7 @@ class XQLYForm extends Component {
       districtLoading,
       fetching,
     } = this.state;
+
     let shapeOptions = {
       stroke: true,
       color: 'red',
@@ -710,10 +721,10 @@ class XQLYForm extends Component {
                         </Col>
                       </Row>
                       <Row>
-                        <Col span={22}>
+                        <Col span={12}>
                           <FormItem
-                            labelCol={{ span: 3 }}
-                            wrapperCol={{ span: 21 }}
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 19 }}
                             label={
                               <span>
                                 <span className={st.ired}>*</span>所属道路
@@ -740,23 +751,39 @@ class XQLYForm extends Component {
                                     open: false,
                                   });
                                 }}
-                                style={{ width: '100%' }}
                                 disabled={approveState === 'notFirst' ? true : false}
                               >
-                                {roadDatas.map(d => (
-                                  <Select.Option key={d.ID}>
-                                    {
-                                      <div className={st.road}>
-                                        <div className={st.roadName}>{d.NAME}</div>
-                                        <div className={st.distName}>
-                                          {d.DistrictName && d.DistrictName.replace(/\./g, '')}
+                                {roadDatas
+                                  .filter(o => !selectedRoads.includes(o))
+                                  .map(d => (
+                                    <Select.Option key={d.ID}>
+                                      {
+                                        <div className={st.road}>
+                                          <div className={st.roadName}>{d.NAME}</div>
+                                          <div className={st.distName}>
+                                            {d.DistrictName}
+                                            {/* {d.DistrictName && d.DistrictName.replace(/\./g, '')} */}
+                                          </div>
                                         </div>
-                                      </div>
-                                    }
-                                  </Select.Option>
-                                ))}
+                                      }
+                                    </Select.Option>
+                                  ))}
                               </Select>
                             </div>
+                          </FormItem>
+                        </Col>
+                        <Col span={10}>
+                          <FormItem
+                            labelCol={{ span: 6 }}
+                            wrapperCol={{ span: 18 }}
+                            label={'空间定位'}
+                          >
+                            <Input
+                              value={entity.X && entity.Y ? `${entity.Y},${entity.X}` : undefined}
+                              style={{ width: '100%' }}
+                              disabled={true}
+                              placeholder="空间定位"
+                            />
                           </FormItem>
                         </Col>
                         <Col span={2}>
@@ -921,7 +948,7 @@ class XQLYForm extends Component {
           <div className={st.ct_footer}>
             <div style={{ float: 'right' }}>
               <Button onClick={this.onSaveClick.bind(this)} type="primary">
-                保存
+                提交
               </Button>
               &emsp;
               {this.props.isApproval ? (
@@ -948,28 +975,34 @@ class XQLYForm extends Component {
         >
           <LocateMap
             onMapReady={lm => {
-              let { GEOM_WKT } = this.state.entity;
-              if (GEOM_WKT) {
-                let geometry = Terraformer.WKT.parse(GEOM_WKT);
-                lm.mpLayer = L.geoJSON(geometry, {
-                  style: function(feature) {
-                    return shapeOptions;
-                  },
-                }).addTo(lm.map);
-                let coordinates = geometry.coordinates[0].map(e => {
-                  return e.reverse();
-                });
-                lm.map.fitBounds(coordinates);
+              // let { GEOM_WKT } = this.state.entity;
+              // if (GEOM_WKT) {
+              //   let geometry = Terraformer.WKT.parse(GEOM_WKT);
+              //   lm.mpLayer = L.geoJSON(geometry, {
+              //     style: function(feature) {
+              //       return shapeOptions;
+              //     },
+              //   }).addTo(lm.map);
+              //   let coordinates = geometry.coordinates[0].map(e => {
+              //     return e.reverse();
+              //   });
+              //   lm.map.fitBounds(coordinates);
+              let { Y, X } = this.state.entity;
+              if (Y && X) {
+                lm.mpLayer = L.marker([Y, X], { icon: xq }).addTo(lm.map);
+                lm.map.setView([Y, X], 16);
               }
             }}
             onMapClear={lm => {
               lm.mpLayer && lm.mpLayer.remove();
               lm.mpLayer = null;
               let { entity } = this.state;
-              entity.Lat = null;
-              entity.Lng = null;
-              this.mObj.Lng = entity.Lng;
-              this.mObj.Lat = entity.Lat;
+              entity.X = null;
+              entity.Y = null;
+              entity.GEOM_WKT=null;
+              this.mObj.X = entity.X;
+              this.mObj.Y = entity.Y;
+              this.mObj.GEOM_WKT=entity.GEOM_WKT;
             }}
             beforeBtns={[
               {
@@ -978,17 +1011,18 @@ class XQLYForm extends Component {
                 icon: 'icon-dingwei',
                 onClick: (dom, i, lm) => {
                   if (!lm.locatePen) {
-                    lm.locatePen = new L.Draw.Polygon(lm.map, {
-                      shapeOptions: shapeOptions,
-                      icon: new L.DivIcon({
-                        iconSize: new L.Point(8, 8),
-                        className: 'leaflet-div-icon leaflet-editing-icon',
-                      }),
-                      touchIcon: new L.DivIcon({
-                        iconSize: new L.Point(10, 10),
-                        className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
-                      }),
-                    });
+                    // lm.locatePen = new L.Draw.Polygon(lm.map, {
+                    //   shapeOptions: shapeOptions,
+                    //   icon: new L.DivIcon({
+                    //     iconSize: new L.Point(8, 8),
+                    //     className: 'leaflet-div-icon leaflet-editing-icon',
+                    //   }),
+                    //   touchIcon: new L.DivIcon({
+                    //     iconSize: new L.Point(10, 10),
+                    //     className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
+                    //   }),
+                    // });
+                    lm.locatePen = new L.Draw.Marker(lm.map, { icon: xq });
                     lm.locatePen.on(L.Draw.Event.CREATED, e => {
                       lm.mpLayer && lm.mpLayer.remove();
                       var { layer } = e;
@@ -1010,16 +1044,16 @@ class XQLYForm extends Component {
                 icon: 'icon-save',
                 onClick: (dom, item, lm) => {
                   let geometry = lm.mpLayer.toGeoJSON().geometry;
+                  let { lat, lng } = lm.mpLayer.getLatLng();
+                  let { entity } = this.state;
+
+                  entity.X = lng.toFixed(8) - 0;
+                  entity.Y = lat.toFixed(8) - 0;
                   entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
+
+                  this.mObj.X = entity.X;
+                  this.mObj.Y = entity.Y;
                   this.mObj.GEOM_WKT = entity.GEOM_WKT;
-                  // let { lat, lng } = lm.mpLayer.getLatLng();
-                  // let { entity } = this.state;
-
-                  // entity.Lng = lng.toFixed(8) - 0;
-                  // entity.Lat = lat.toFixed(8) - 0;
-
-                  // this.mObj.Lng = entity.Lng;
-                  // this.mObj.Lat = entity.Lat;
 
                   this.setState({
                     entity: entity,

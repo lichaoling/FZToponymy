@@ -16,6 +16,7 @@ import {
   Spin,
   notification,
   Radio,
+  Tag,
 } from 'antd';
 import st from './DLQLForm.less';
 import {
@@ -292,7 +293,17 @@ class DLQLForm extends Component {
             )),
           });
         } else {
-          this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
+          Modal.confirm({
+            title: '提醒',
+            content: '提交后不能再次修改，是否确认提交？',
+            okText: '确定',
+            cancelText: '取消',
+            onOk: async () => {
+              this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
+            },
+            onCancel() {},
+          });
+          // this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
         }
       }.bind(this)
     );
@@ -312,7 +323,7 @@ class DLQLForm extends Component {
 
   async save(obj) {
     await Post(url_RoadAndBridgeApplicant, { mObj: JSON.stringify(obj) }, e => {
-      notification.success({ description: '保存成功！', message: '成功' });
+      notification.success({ description: '提交成功！', message: '成功' });
       this.mObj = {};
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
@@ -670,7 +681,21 @@ class DLQLForm extends Component {
                             />
                           </FormItem>
                         </Col>
-                        <Col span={2}>
+                        <Col span={7}>
+                          <FormItem
+                            labelCol={{ span: 10 }}
+                            wrapperCol={{ span: 14 }}
+                            label={'空间定位'}
+                          >
+                            <Input
+                              value={entity.GEOM_WKT ? `已定位` : '未定位'}
+                              style={{ width: '100%' }}
+                              disabled={true}
+                              placeholder="空间定位"
+                            />
+                          </FormItem>
+                        </Col>
+                        <Col span={1}>
                           <FormItem>
                             <Tooltip placement="right" title="定位">
                               <Button
@@ -866,7 +891,7 @@ class DLQLForm extends Component {
           <div className={st.ct_footer}>
             <div style={{ float: 'right' }}>
               <Button onClick={this.onSaveClick.bind(this)} type="primary">
-                保存
+                提交
               </Button>
               &emsp;
               {this.props.isApproval ? (

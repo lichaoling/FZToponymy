@@ -211,7 +211,16 @@ class MPHForm extends Component {
             )),
           });
         } else {
-          this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
+          Modal.confirm({
+            title: '提醒',
+            content: '提交后不能再次修改，是否确认提交？',
+            okText: '确定',
+            cancelText: '取消',
+            onOk: async () => {
+              this.props.isApproval ? this.approve(saveObj) : this.save(saveObj);
+            },
+            onCancel() {},
+          });
         }
       }.bind(this)
     );
@@ -228,7 +237,7 @@ class MPHForm extends Component {
   }
   async save(obj) {
     await Post(url_HouseAndBuildingBZ, { mObj: JSON.stringify(obj) }, e => {
-      notification.success({ description: '保存成功！', message: '成功' });
+      notification.success({ description: '提交成功！', message: '成功' });
       this.mObj = {};
       if (this.props.onSaveSuccess) {
         this.props.onSaveSuccess();
@@ -655,7 +664,7 @@ class MPHForm extends Component {
           <div className={st.ct_footer}>
             <div style={{ float: 'right' }}>
               <Button onClick={this.onSaveClick.bind(this)} type="primary">
-                保存
+                提交
               </Button>
               &emsp;
               {this.props.isApproval ? (
