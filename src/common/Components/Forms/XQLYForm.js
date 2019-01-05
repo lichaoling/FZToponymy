@@ -58,6 +58,7 @@ class XQLYForm extends Component {
     suggestion: null,
     districtLoading: false,
     fetching: false,
+    nameCheckMessage: null,
   };
 
   // 存储修改后的数据
@@ -130,7 +131,6 @@ class XQLYForm extends Component {
   validate(errs, bName) {
     errs = errs || [];
     let { entity, selectedRoads } = this.state;
-    debugger;
     let roadIDs = selectedRoads;
     let ROADID = roadIDs.join(',');
     this.mObj.ROADID = ROADID;
@@ -248,15 +248,21 @@ class XQLYForm extends Component {
   async checkName() {
     let { errs, saveObj, validateObj, showCheckIcon } = this.validate([], true);
     if (errs.length) {
-      Modal.error({
-        title: '错误',
-        okText: '知道了',
-        content: errs.map((e, i) => (
-          <div>
-            {i + 1}、{e}；
-          </div>
-        )),
-      });
+      // Modal.error({
+      //   title: '错误',
+      //   okText: '知道了',
+      //   content: errs.map((e, i) => (
+      //     <div>
+      //       {i + 1}、{e}；
+      //     </div>
+      //   )),
+      // });
+      // nameCheckMessage = errs.map((e, i) => (
+      //   <div>
+      //     {i + 1}、{e}；
+      //   </div>
+      // ));
+      // this.setState({ showCheckIcon: 'no' });
     } else {
       let { ID, DISTRICTID, NAME } = validateObj;
       await Post(
@@ -268,14 +274,22 @@ class XQLYForm extends Component {
         },
         e => {
           if (e.length == 0) {
-            notification.success({ description: '“命名”有效、可用！', message: '成功' });
-            this.setState({ showCheckIcon: 'yes' });
-          } else {
-            notification.error({
-              description: e.map(t => <span>{t}</span>),
-              message: '失败',
+            // notification.success({ description: '“命名”有效、可用！', message: '成功' });
+            // this.setState({ showCheckIcon: 'yes' });
+            this.setState({
+              nameCheckMessage: '“命名”有效、可用！',
+              showCheckIcon: 'yes',
             });
-            this.setState({ showCheckIcon: 'no' });
+          } else {
+            // notification.error({
+            //   description: e.map(t => <span>{t}</span>),
+            //   message: '失败',
+            // });
+            // this.setState({ showCheckIcon: 'no' });
+            this.setState({
+              nameCheckMessage: e.map(t => <span>{t}</span>),
+              showCheckIcon: 'no',
+            });
           }
         }
       );
@@ -426,6 +440,7 @@ class XQLYForm extends Component {
       suggestion,
       districtLoading,
       fetching,
+      nameCheckMessage,
     } = this.state;
 
     let shapeOptions = {
@@ -484,7 +499,8 @@ class XQLYForm extends Component {
                                 placeholder="所在行政区"
                                 onChange={(a, b) => {
                                   this.mObj.districts = a;
-                                  this.setState({ showCheckIcon: 'empty' });
+                                  this.setState({ showCheckIcon: 'empty', nameCheckMessage: null });
+                                  this.checkName();
                                 }}
                                 disabled={approveState === 'notFirst' ? true : false}
                               />
@@ -501,26 +517,34 @@ class XQLYForm extends Component {
                               </span>
                             }
                           >
-                            <Input
+                            <input
+                              class="ant-input"
+                              type="text"
                               defaultValue={entity.NAME ? entity.NAME : undefined}
                               onChange={e => {
                                 this.mObj.NAME = e.target.value;
-                                this.setState({ showCheckIcon: 'empty' });
+                                this.setState({ showCheckIcon: 'empty', nameCheckMessage: null });
+                              }}
+                              onBlur={e => {
+                                this.checkName();
                               }}
                               placeholder="标准名称"
                             />
                           </FormItem>
                         </Col>
-                        <Col span={1}>
+                        <Col span={8}>
                           <FormItem>
                             {this.getCheckIcon()}
-                            <Button
+                            {/* <Button
                               onClick={this.checkName.bind(this)}
                               style={{ marginLeft: '20px', display: 'flex' }}
                               type="primary"
                             >
                               命名检查
-                            </Button>
+                            </Button> */}
+                            <div style={{ color: showCheckIcon === 'no' ? 'red' : 'green' }}>
+                              {nameCheckMessage}
+                            </div>
                           </FormItem>
                         </Col>
                       </Row>
@@ -999,10 +1023,10 @@ class XQLYForm extends Component {
               let { entity } = this.state;
               entity.X = null;
               entity.Y = null;
-              entity.GEOM_WKT=null;
+              entity.GEOM_WKT = null;
               this.mObj.X = entity.X;
               this.mObj.Y = entity.Y;
-              this.mObj.GEOM_WKT=entity.GEOM_WKT;
+              this.mObj.GEOM_WKT = entity.GEOM_WKT;
             }}
             beforeBtns={[
               {

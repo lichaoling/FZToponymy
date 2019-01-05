@@ -1,12 +1,176 @@
 @import '~@/default.less';
 .MapService {
     height: 100%;
-    .MapContainer{
+    .MapContainer {
         width: 100%;
         height: 100%;
         left: 0;
         right: 0;
-        top:0;
+        top: 0;
         bottom: 0;
+    }
+    .LeftPanel {
+        z-index: 999;
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        overflow: hidden; // pointer-events: none;
+        height: calc(~'100% - 20px');
+        .searchbox {
+            border-radius: 2px;
+            width: 425px;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            .searchbox_container {
+                position: relative;
+                z-index: 2;
+                pointer-events: auto;
+                width: 368px;
+                float: left;
+                box-sizing: border-box;
+                box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+                .searchbox_content {
+                    position: relative;
+                    width: 368px;
+                    border-radius: 2px 0 0 2px;
+                    background: #fff;
+                    input {
+                        border: 0;
+                        border-right: 10px solid transparent;
+                        box-sizing: border-box;
+                        padding: 9px 0;
+                        border-left: 10px solid transparent;
+                        line-height: 20px;
+                        font-size: 16px;
+                        height: 38px;
+                        color: #333;
+                        position: relative;
+                        border-radius: 2px 0 0 2px;
+                        float: left;
+                        width: 368px;
+                    }
+                    .input_clear {
+                        right: 2px;
+                        cursor: pointer;
+                        position: absolute;
+                        background: url(//webmap1.bdimg.com/wolfman/static/common/images/new/searchbox_f175577.png) no-repeat 0 -114px #fff;
+                        width: 27px;
+                        height: 38px;
+                        top: 0;
+                        // display: none;
+                    } // .cancel_button {
+                    //     background: url(//webmap1.bdimg.com/wolfman/static/common/images/new/searchbox_f175577.png) no-repeat 0 -38px;
+                    //     box-sizing: border-box;
+                    //     float: left;
+                    //     height: 38px;
+                    //     width: 39px;
+                    //     cursor: pointer;
+                    //     position: relative;
+                    //     background-color: white;
+                    //     &::before {
+                    //         content: '';
+                    //         position: absolute;
+                    //         width: 38px;
+                    //         left: 0;
+                    //         top: 6px;
+                    //         height: 26px;
+                    //         border-left: 1px solid #eee;
+                    //     }
+                    // }
+                }
+            }
+            button {
+                pointer-events: auto;
+                background: url(//webmap1.bdimg.com/wolfman/static/common/images/new/searchbox_f175577.png) no-repeat 0 -76px #3385ff;
+                width: 57px;
+                height: 38px;
+                float: left;
+                border: 0;
+                padding: 0;
+                cursor: pointer;
+                border-radius: 0 2px 2px 0;
+                box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+            }
+        }
+        .card0 {
+            width: 368px;
+            position: relative;
+            background: white;
+            box-shadow: @box-shadow;
+            z-index: 100;
+            max-height: calc(~'100% - 500px');
+            display: none;
+            border-radius: 2px;
+            box-sizing: border-box;
+            .card0_list {
+                cursor: pointer;
+                padding: 10px;
+                width: 100%;
+                >span {
+                    font-size: 15px;
+                }
+                .ct {
+                    margin-left: 10px;
+                }
+                &:hover {
+                    background-color: #ebebeb;
+                }
+            }
+        }
+        .card1 {
+            width: 368px;
+            position: relative;
+            padding: 10px;
+            background: white;
+            box-shadow: @box-shadow;
+            z-index: 100;
+            max-height: calc(~'100% - 100px');
+            margin-top: 10px;
+            display: none;
+            border-radius: 2px;
+            .list {
+                cursor: pointer;
+                position: relative; // &:not(:first-child) {
+                //     margin-top: 10px;
+                // }
+                transition: 0.2s;
+                &:hover {
+                    transform: translate(2px, -2px);
+                    .marker {
+                        background-image: url('../../../common/Img/服务应用/切图/地图图标/R.png');
+                    }
+                }
+                >span {
+                    font-size: 15px;
+                }
+                .marker {
+                    background-image: url('../../../common/Img/服务应用/切图/地图图标/B.png');
+                    display: inline-block;
+                    width: 21px;
+                    height: 33px;
+                    &::before {
+                        content: '1';
+                        position: absolute;
+                        left: 5px;
+                        top: 0px;
+                        color: white;
+                    }
+                }
+                .ct {
+                    position: absolute;
+                    top: 0;
+                    left: 25px;
+                    margin-left: 10px;
+                    font-size: 13px;
+                    .name {
+                        color: #3385ff;
+                    }
+                }
+            }
+            .divide {
+                margin: 10px 0;
+            }
+        }
     }
 }

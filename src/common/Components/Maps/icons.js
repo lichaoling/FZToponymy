@@ -20,6 +20,7 @@ let normalIcons = {
     iconSize: [16, 16],
     className: 'ct-touchicon',
   }),
+
 };
 
 let svgicons = {
@@ -71,14 +72,19 @@ let getDivIcons = () => {
       className: 'ct-icon-mp',
     }),
     lp: L.divIcon({
-      iconSize: [42, 40],
+      iconSize: [42, 50],
       iconAnchor: [20, 18],
       className: 'ct-icon-lp',
     }),
     xq: L.divIcon({
-      iconSize: [42, 40],
+      iconSize: [32, 43],
       iconAnchor: [20, 18],
-      className: 'ct-icon-lp',
+      className: 'ct-icon-xq',
+    }),
+    dl: L.divIcon({
+      iconSize: [32, 43],
+      iconAnchor: [20, 18],
+      className: 'ct-icon-dl',
     }),
   };
 };

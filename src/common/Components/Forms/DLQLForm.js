@@ -33,10 +33,12 @@ import { rtHandle } from '../../../utils/errorHandle.js';
 import { Post } from '../../../utils/request.js';
 import LocateMap from '../Maps/LocateMap2.js';
 import { getDivIcons } from '../Maps/icons';
+import icons from '../Maps/icons';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const { mp } = getDivIcons();
+const { touchIcon } = icons;
 const RadioGroup = Radio.Group;
 
 class DLQLForm extends Component {
@@ -51,6 +53,7 @@ class DLQLForm extends Component {
     result: null,
     suggestion: null,
     districtLoading: false,
+    nameCheckMessage: null,
   };
 
   // 存储修改后的数据
@@ -223,15 +226,15 @@ class DLQLForm extends Component {
   async checkName() {
     let { errs, saveObj, validateObj, showCheckIcon } = this.validate([], true);
     if (errs.length) {
-      Modal.error({
-        title: '错误',
-        okText: '知道了',
-        content: errs.map((e, i) => (
-          <div>
-            {i + 1}、{e}；
-          </div>
-        )),
-      });
+      // Modal.error({
+      //   title: '错误',
+      //   okText: '知道了',
+      //   content: errs.map((e, i) => (
+      //     <div>
+      //       {i + 1}、{e}；
+      //     </div>
+      //   )),
+      // });
     } else {
       let { ID, DISTRICTID, NAME } = validateObj;
       await Post(
@@ -243,14 +246,22 @@ class DLQLForm extends Component {
         },
         e => {
           if (e.length === 0) {
-            notification.success({ description: '“命名”有效、可用！', message: '成功' });
-            this.setState({ showCheckIcon: 'yes' });
-          } else {
-            notification.error({
-              description: e.map(t => <span>{t}</span>),
-              message: '失败',
+            // notification.success({ description: '“命名”有效、可用！', message: '成功' });
+            // this.setState({ showCheckIcon: 'yes' });
+            this.setState({
+              nameCheckMessage: '“命名”有效、可用！',
+              showCheckIcon: 'yes',
             });
-            this.setState({ showCheckIcon: 'no' });
+          } else {
+            // notification.error({
+            //   description: e.map(t => <span>{t}</span>),
+            //   message: '失败',
+            // });
+            // this.setState({ showCheckIcon: 'no' });
+            this.setState({
+              nameCheckMessage: e.map(t => <span>{t}</span>),
+              showCheckIcon: 'no',
+            });
           }
         }
       );
@@ -399,15 +410,9 @@ class DLQLForm extends Component {
       result,
       suggestion,
       districtLoading,
+      nameCheckMessage,
     } = this.state;
-    let shapeOptions = {
-      stroke: true,
-      color: 'red',
-      weight: 6,
-      opacity: 1,
-      fill: false,
-      clickable: true,
-    };
+
     console.log(entity);
     return (
       <div className={st.DLQLForm}>
@@ -454,7 +459,8 @@ class DLQLForm extends Component {
                                 placeholder="所在（跨）行政区"
                                 onChange={(a, b) => {
                                   this.mObj.districts = a;
-                                  this.setState({ showCheckIcon: 'empty' });
+                                  this.setState({ showCheckIcon: 'empty', nameCheckMessage: null });
+                                  this.checkName();
                                 }}
                                 disabled={approveState === 'notFirst' ? true : false}
                               />
@@ -471,31 +477,34 @@ class DLQLForm extends Component {
                               </span>
                             }
                           >
-                            <Input
+                            <input
+                              class="ant-input"
+                              type="text"
                               defaultValue={entity.NAME ? entity.NAME : undefined}
                               onChange={e => {
-                                // let { entity } = this.state;
                                 this.mObj.NAME = e.target.value;
-                                this.setState({
-                                  // entity: entity,
-                                  showCheckIcon: 'empty',
-                                  // isSaved: false,
-                                });
+                                this.setState({ showCheckIcon: 'empty', nameCheckMessage: null });
+                              }}
+                              onBlur={e => {
+                                this.checkName();
                               }}
                               placeholder="标准名称"
                             />
                           </FormItem>
                         </Col>
-                        <Col span={1}>
+                        <Col span={8}>
                           <FormItem>
                             {this.getCheckIcon()}
-                            <Button
+                            {/* <Button
                               onClick={this.checkName.bind(this)}
                               style={{ marginLeft: '20px', display: 'flex' }}
                               type="primary"
                             >
                               命名检查
-                            </Button>
+                            </Button> */}
+                            <div style={{ color: showCheckIcon === 'no' ? 'red' : 'green' }}>
+                              {nameCheckMessage}
+                            </div>
                           </FormItem>
                         </Col>
                       </Row>
@@ -952,15 +961,15 @@ class DLQLForm extends Component {
                       onClick: (dom, i, lm) => {
                         if (!lm.locatePen) {
                           lm.locatePen = new L.Draw.Polyline(lm.map, {
-                            shapeOptions: shapeOptions,
-                            icon: new L.DivIcon({
-                              iconSize: new L.Point(8, 8),
-                              className: 'leaflet-div-icon leaflet-editing-icon',
-                            }),
-                            touchIcon: new L.DivIcon({
-                              iconSize: new L.Point(10, 10),
-                              className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon',
-                            }),
+                            shapeOptions: {
+                              stroke: true,
+                              color: 'red',
+                              weight: 4,
+                              opacity: 0.5,
+                              fill: false,
+                              clickable: true,
+                            },
+                            icon: touchIcon,
                           });
                           lm.locatePen.on(L.Draw.Event.CREATED, e => {
                             lm.mpLayer && lm.mpLayer.remove();
