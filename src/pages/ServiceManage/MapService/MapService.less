@@ -1,175 +1,193 @@
-@import '~@/default.less';
+@import '../../../default.less';
 .MapService {
+    position: relative;
     height: 100%;
-    .MapContainer {
-        width: 100%;
-        height: 100%;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-    }
-    .LeftPanel {
-        z-index: 999;
+    width: 100%;
+    .mapcontainer {
         position: absolute;
-        left: 20px;
-        top: 20px;
-        overflow: hidden; // pointer-events: none;
-        height: calc(~'100% - 20px');
-        .searchbox {
-            border-radius: 2px;
-            width: 425px;
-            position: relative;
-            z-index: 5;
+        top: 0;
+        height: 100%;
+        width: 100%;
+    }
+    .searchbar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 400px;
+        z-index: 999;
+        position: relative;
+        >i {
+            position: absolute;
+            right: 60px;
+            top: 11px;
+            cursor: pointer;
+            font-size: 12px;
+            color: white;
+            background: #ddd;
+            border-radius: 50%;
+            padding: 3px;
+            cursor: pointer;
+            transition: 0.3s;
+            &:hover {
+                background: #aaa;
+            }
+        }
+        :global {
+            .hidden {
+                display: none;
+            }
+            .ant-input-search {
+                >input {
+                    font-size: 14px;
+                    border: 0;
+                    box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
+                }
+                >span {
+                    width: 50px;
+                    >button {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+    .quicksearchresult,
+    .finalsearchresult {
+        position: absolute;
+        top: 55px;
+        left: 10px;
+        z-index: 999;
+        display: none;
+        overflow: auto;
+        background: white;
+        width: 350px;
+        border-radius: 3px;
+        box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
+        padding: 5px;
+        &:global(.active) {
+            display: block;
+        }
+        .searchloading {
             display: flex;
-            .searchbox_container {
-                position: relative;
-                z-index: 2;
-                pointer-events: auto;
-                width: 368px;
-                float: left;
-                box-sizing: border-box;
-                box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
-                .searchbox_content {
-                    position: relative;
-                    width: 368px;
-                    border-radius: 2px 0 0 2px;
-                    background: #fff;
-                    input {
-                        border: 0;
-                        border-right: 10px solid transparent;
-                        box-sizing: border-box;
-                        padding: 9px 0;
-                        border-left: 10px solid transparent;
-                        line-height: 20px;
-                        font-size: 16px;
-                        height: 38px;
-                        color: #333;
-                        position: relative;
-                        border-radius: 2px 0 0 2px;
-                        float: left;
-                        width: 368px;
-                    }
-                    .input_clear {
-                        right: 2px;
-                        cursor: pointer;
-                        position: absolute;
-                        background: url(//webmap1.bdimg.com/wolfman/static/common/images/new/searchbox_f175577.png) no-repeat 0 -114px #fff;
-                        width: 27px;
-                        height: 38px;
-                        top: 0;
-                        // display: none;
-                    } // .cancel_button {
-                    //     background: url(//webmap1.bdimg.com/wolfman/static/common/images/new/searchbox_f175577.png) no-repeat 0 -38px;
-                    //     box-sizing: border-box;
-                    //     float: left;
-                    //     height: 38px;
-                    //     width: 39px;
-                    //     cursor: pointer;
-                    //     position: relative;
-                    //     background-color: white;
-                    //     &::before {
-                    //         content: '';
-                    //         position: absolute;
-                    //         width: 38px;
-                    //         left: 0;
-                    //         top: 6px;
-                    //         height: 26px;
-                    //         border-left: 1px solid #eee;
-                    //     }
-                    // }
-                }
-            }
-            button {
-                pointer-events: auto;
-                background: url(//webmap1.bdimg.com/wolfman/static/common/images/new/searchbox_f175577.png) no-repeat 0 -76px #3385ff;
-                width: 57px;
-                height: 38px;
-                float: left;
-                border: 0;
-                padding: 0;
-                cursor: pointer;
-                border-radius: 0 2px 2px 0;
-                box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
-            }
-        }
-        .card0 {
-            width: 368px;
-            position: relative;
-            background: white;
-            box-shadow: @box-shadow;
-            z-index: 100;
-            max-height: calc(~'100% - 500px');
-            display: none;
-            border-radius: 2px;
-            box-sizing: border-box;
-            .card0_list {
-                cursor: pointer;
-                padding: 10px;
-                width: 100%;
-                >span {
-                    font-size: 15px;
-                }
-                .ct {
-                    margin-left: 10px;
-                }
-                &:hover {
-                    background-color: #ebebeb;
-                }
-            }
-        }
-        .card1 {
-            width: 368px;
-            position: relative;
+            justify-content: center;
+            align-items: center;
             padding: 10px;
-            background: white;
-            box-shadow: @box-shadow;
-            z-index: 100;
-            max-height: calc(~'100% - 100px');
-            margin-top: 10px;
-            display: none;
-            border-radius: 2px;
-            .list {
+        }
+    }
+    .quicksearchresult {
+        .container {
+            .item {
+                padding: 4px 10px;
+                transition: 0.3s;
+                color: #888;
                 cursor: pointer;
-                position: relative; // &:not(:first-child) {
-                //     margin-top: 10px;
-                // }
-                transition: 0.2s;
                 &:hover {
-                    transform: translate(2px, -2px);
-                    .marker {
-                        background-image: url('../../../common/Img/服务应用/切图/地图图标/R.png');
-                    }
+                    background: #eee;
+                }
+                >i {
+                    color: #aaa;
                 }
                 >span {
-                    font-size: 15px;
-                }
-                .marker {
-                    background-image: url('../../../common/Img/服务应用/切图/地图图标/B.png');
                     display: inline-block;
-                    width: 21px;
-                    height: 33px;
-                    &::before {
-                        content: '1';
-                        position: absolute;
-                        left: 5px;
-                        top: 0px;
-                        color: white;
-                    }
-                }
-                .ct {
-                    position: absolute;
-                    top: 0;
-                    left: 25px;
+                    border: 1px solid #ddd;
+                    border-radius: 3px;
+                    padding: 0 5px;
                     margin-left: 10px;
-                    font-size: 13px;
-                    .name {
-                        color: #3385ff;
+                    color: #aaa;
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+    .noresult {
+        padding: 10px;
+        color: rgb(245, 98, 98);
+        text-align: center;
+        font-size: 15px;
+    }
+    .finalsearchresult {
+        bottom: 10px;
+        .container {
+            height: 100%;
+            .results {
+                height: calc(~'100% - 40px');
+                overflow: auto;
+                .item:not(:last-child) {
+                    margin-bottom: 3px;
+                }
+                .item {
+                    display: flex;
+                    border-radius: 3px;
+                    padding: 5px;
+                    cursor: pointer;
+                    &:hover,
+                    &:global(.active) {
+                        background: #f2f2f2;
+                        transition: 0.3s;
+                    }
+                    &:global(.active) {
+                        .index>div {
+                            background-image: url(../../../common/Img/服务应用/切图/地图图标/B.png);
+                        }
+                    }
+                    .index {
+                        width: 50px;
+                        display: flex;
+                        justify-content: center;
+                        >div {
+                            background-image: url(../../../common/Img/服务应用/切图/地图图标/R.png);
+                            width: 21px;
+                            height: 33px;
+                            color: white;
+                            text-align: center;
+                            margin-top: 5px;
+                        }
+                    }
+                    .content {
+                        flex: 1;
+                        .name {
+                            color: @primary-color;
+                            font-size: 14px;
+                            >span {
+                                display: inline-block;
+                                margin-left: 10px;
+                                border: 1px solid @primary-color;
+                                border-radius: 3px;
+                                padding: 0 5px;
+                                font-size: 12px;
+                            }
+                        }
+                        .describles {
+                            color: black;
+                            display: flex;
+                            .describle {
+                                padding-top: 5px;
+                                flex: 1;
+                                font-size: 12px;
+                                color: #888;
+                            }
+                            .pic {
+                                background: white;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 100px;
+                                height: 70px; // border: 1px solid #f8f8f8;
+                                >img {
+                                    max-height: 100%;
+                                    max-width: 100%;
+                                }
+                            }
+                        }
                     }
                 }
             }
-            .divide {
-                margin: 10px 0;
+            .pagination {
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-top: 1px solid #eee;
             }
         }
     }

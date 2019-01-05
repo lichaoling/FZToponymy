@@ -3,7 +3,6 @@
     position: relative;
     height: 100%;
     width: 100%;
-    border: @border;
     .mapdom {
         height: 100%;
         width: 100%;
@@ -12,7 +11,7 @@
         position: absolute;
         z-index: 999;
         right: 10px;
-        bottom: 100px;
+        bottom: 60px;
         height: 80px;
         width: 80px;
         >div {
@@ -39,12 +38,13 @@
     .back {
         position: absolute;
         z-index: 999;
-        bottom: 285px;
-        right: 35px;
+        bottom: 223px;
+        right: 10px;
         height: 29px;
         width: 30px;
         background-color: white;
         border-radius: 5px;
+        box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -56,7 +56,7 @@
     .logo {
         position: absolute;
         z-index: 999;
-        bottom: 30px;
+        bottom: 5px;
         right: 10px;
         width: 281px;
         height: 55px;
@@ -64,7 +64,7 @@
     .toolbar {
         position: absolute;
         z-index: 999;
-        box-shadow: @box-shadow;
+        box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
         background: white;
         border-radius: 3px;
         padding: 0 10px;
@@ -111,12 +111,13 @@
     :global {
         .leaflet-control-zoom {
             position: absolute;
-            bottom: 200px;
-            right: 25px;
+            bottom: 140px;
+            right: 0;
             border: none;
             >a {
-                border-radius: 5px; // color: rgb(161, 161, 161);
+                border-radius: 5px !important;
                 font-size: 18px;
+                box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15) !important;
                 &:first-child {
                     margin-bottom: 6px;
                 }
