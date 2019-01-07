@@ -113,12 +113,15 @@ class TopItem {
   }
 
   addRoadSubItems(item) {
-    if (item.mps && item.mps.length) {
-      item.mps.map(i => {
-        let { X, Y } = i;
-        if (X && Y) {
-          let l = L.marker([Y, X], {
-            icon: getOrangeIcon('<span class="iconfont icon-bianhao"></span>'),
+    if (item.MPList && item.MPList.length) {
+      item.MPList.map(i => {
+        let { GEOM_WKT } = i;
+        if (GEOM_WKT) {
+          let l = L.geoJSON(Terraformer.WKT.parse(GEOM_WKT), {
+            onEachFeature: (f, l) => {
+              if (l.setIcon)
+                l.setIcon(getOrangeIcon('<span class="iconfont icon-bianhao"></span>'));
+            },
           })
             .unbindPopup()
             .bindTooltip(i.MPNUM, {
@@ -135,12 +138,15 @@ class TopItem {
   addHouseSubItems(item) {
     if (item.LZList && item.LZList.length) {
       item.LZList.map(i => {
-        let { X, Y } = i;
-        if (X && Y) {
+        let { GEOM_WKT } = i;
+        if (GEOM_WKT) {
           let dom = $('<div></div>').get(0);
           let popup = ReactDOM.render(<LZPopup data={i} name={item.NAME} />, dom);
-          let l = L.marker([Y, X], {
-            icon: getOrangeIcon('<span class="iconfont icon-jianzhu"></span>'),
+          let l = L.geoJSON(Terraformer.WKT.parse(GEOM_WKT), {
+            onEachFeature: (f, l) => {
+              if (l.setIcon)
+                l.setIcon(getOrangeIcon('<span class="iconfont icon-jianzhu"></span>'));
+            },
           })
             .unbindPopup()
             .bindPopup(dom)

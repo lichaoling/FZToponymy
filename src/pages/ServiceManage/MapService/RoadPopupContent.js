@@ -39,7 +39,7 @@ class RoadPopupContent extends Component {
         ) : error ? (
           <div className={st.error}>{error}</div>
         ) : (
-            <div className={st.content}>
+          <div className={st.content}>
             <div className={st.name}>{item.NAME}</div>
             <table className={st.items}>
               <tr>
@@ -51,12 +51,20 @@ class RoadPopupContent extends Component {
                 <td>{item.ApprovalTime || '无'}</td>
               </tr>
               <tr>
-                <th>小&emsp;&emsp;区：</th>
-                <td>{item.houses ? item.houses.map(i => <span>{i.NAME}</span>) : '无'}</td>
+                <th>小区（{item.HouseList ? item.HouseList.length : 0}）：</th>
+                <td>
+                  <div className={st.items}>
+                    {item.HouseList ? item.HouseList.map(i => <span>{i.NAME}</span>) : '无'}
+                  </div>
+                </td>
               </tr>
               <tr>
-                <th>门&emsp;&emsp;牌：</th>
-                <td>{item.mps ? item.mps.map(i => <span>{i.MPNUM}</span>) : '无'}</td>
+                <th>门牌（{item.MPList ? item.MPList.length : 0}）：</th>
+                <td>
+                  <div className={st.items}>
+                    {item.MPList ? item.MPList.map(i => <span>{i.MPNUM}</span>) : '无'}
+                  </div>
+                </td>
               </tr>
             </table>
             <div className={st.pic}>
