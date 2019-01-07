@@ -1,0 +1,41 @@
+@import '../../../default.less';
+.DistrictPopupContent {
+    width: 300px;
+    .loading {
+        text-align: center;
+        padding: 5px;
+        font-size: 14px;
+        color: #888;
+    }
+    .error {
+        text-align: center;
+        padding: 5px;
+        font-size: 14px;
+        color: red;
+    }
+    .content {
+        .name {
+            color: @primary-color;
+            font-size: 15px;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .fulladdress {
+            color: #888;
+            padding: 5px 0;
+        }
+        .pic {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #eee;
+            border-radius: 3px; // border-bottom: 1px solid #eee;
+            margin-top: 5px;
+            img {
+                max-height: 100%;
+                max-width: 100%;
+            }
+        }
+    }
+}

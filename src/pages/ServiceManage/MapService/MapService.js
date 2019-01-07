@@ -5,8 +5,17 @@ import st from './MapService.less';
 import Map from '../../../common/Components/Maps/Map';
 import { SearchFromLucene } from '../../../services/ServiceManage';
 import { getRedIcon, getBlueIcon } from '../../../common/LIcons';
+import TopItem from './TopItem';
 
 let aCls = 'active';
+
+let tmpLineWkt =
+  'LINESTRING(119.32180166244507 26.084225177764893,119.32197332382202 26.0795259475708,119.32214498519897 26.077938079833984,119.32231664657593 26.075899600982666,119.3228530883789 26.07330322265625,119.32328224182129 26.071457862854004,119.3238615989685 26.06858253479004)';
+let tmpPolygonWkt =
+  'POLYGON((119.3034553527832 26.089954376220703,119.31169509887695 26.090726852416992,119.31521415710449 26.091928482055664,119.32611465454102 26.096134185791016,119.32929039001465 26.092357635498047,119.32971954345703 26.08454704284668,119.33049201965332 26.07733726501465,119.33100700378418 26.06884002685547,119.32405471801758 26.068496704101562,119.31538581848145 26.06832504272461,119.30817604064941 26.066608428955078,119.30740356445312 26.074419021606445,119.30577278137207 26.079483032226562,119.3034553527832 26.089954376220703))';
+
+window.tmpLineWkt = tmpLineWkt;
+window.tmpPolygonWkt = tmpPolygonWkt;
 
 class MapService extends Component {
   state = {
@@ -97,6 +106,32 @@ class MapService extends Component {
   clearMap() {
     this.clearResultLayerGroup();
     this.clearItemLayerGroup();
+    this.clearActiveItem();
+  }
+
+  activeItem(item, center = true) {
+    if (!item.GEOM_WKT) {
+      // message.error('不包含空间数据，无法定位！');
+      //return;
+      if (item.TYPE === 'ROAD') {
+        item.GEOM_WKT = tmpLineWkt;
+      } else if (item.TYPE === 'DISTRICT') {
+        item.GEOM_WKT = tmpPolygonWkt;
+      }
+    }
+
+    this.clearActiveItem();
+    let _activeItem = new TopItem(item, this.map, null, '★');
+    _activeItem.activeItem(this.itemLayerGroup);
+    if (center) _activeItem.center();
+    this._activeItem = _activeItem;
+  }
+
+  clearActiveItem() {
+    if (this._activeItem) {
+      this._activeItem.clear();
+      this._activeItem = null;
+    }
   }
 
   clearResultLayerGroup() {
@@ -138,38 +173,39 @@ class MapService extends Component {
     }
   }
 
-  locateItem(item, idx) {
-    console.log(item, idx);
-    this.clearItemLayerGroup();
-    L.marker([26.077768 + Math.random() / 10, 119.311231 + Math.random() / 10], {
-      icon: getBlueIcon(idx),
-    }).addTo(this.itemLayerGroup);
-  }
-
   locateItems(items) {
     this.clearResultLayerGroup();
     items.map((item, idx) => {
-      L.marker([26.077768 + Math.random() / 10, 119.311231 + Math.random() / 10], {
-        icon: getRedIcon(idx + 1),
-      })
-        .addTo(this.resultLayerGroup)
-        .on('click', e => {
-          this.clearItemLayerGroup();
-          this.locateItem(item, idx + 1);
+      if (!item.GEOM_WKT) {
+        if (item.TYPE === 'ROAD') item.GEOM_WKT = tmpLineWkt;
+        if (item.TYPE === 'DISTRICT') item.GEOM_WKT = tmpPolygonWkt;
+      }
+      let topItem = new TopItem(
+        item,
+        this.map,
+        t => {
+          // this.clearItemLayerGroup();
+          this.clearActiveItem();
+          this.activeItem(item, false);
           $($(this.refFinalSearchResults).find('>div')[idx])
             .addClass(aCls)
             .siblings()
             .removeClass(aCls);
-        });
+        },
+        idx + 1
+      );
+      topItem.addTo(this.resultLayerGroup);
     });
+    this.map.fitBounds(this.resultLayerGroup.getBounds(), { padding: [100, 100] });
   }
 
   initMap() {
     if (this.refMap) {
       let { map } = this.refMap;
       this.map = map;
-      this.resultLayerGroup = L.layerGroup().addTo(map);
-      this.itemLayerGroup = L.layerGroup().addTo(map);
+      window.map = map;
+      this.resultLayerGroup = L.geoJSON().addTo(map);
+      this.itemLayerGroup = L.geoJSON().addTo(map);
     }
   }
 
@@ -236,7 +272,8 @@ class MapService extends Component {
                     className={st.item}
                     onClick={e => {
                       this.clearMap();
-                      this.locateItem(item, 1);
+                      this.activeItem(item);
+                      this.hideQuickSearchResultPanel(true);
                     }}
                   >
                     <Icon type="search" />
@@ -264,8 +301,9 @@ class MapService extends Component {
                     <div
                       className={st.item}
                       onClick={e => {
-                        this.clearItemLayerGroup();
-                        this.locateItem(item, idx + 1);
+                        // this.clearItemLayerGroup();
+                        this.clearActiveItem();
+                        this.activeItem(item);
                       }}
                     >
                       <div className={st.index}>
