@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Icon } from 'antd';
+import { Icon, Badge } from 'antd';
 import st from './RoadPopupContent.less';
 import { SearchDetails } from '../../../services/ServiceManage';
 
@@ -51,7 +51,11 @@ class RoadPopupContent extends Component {
                 <td>{item.ApprovalTime || '无'}</td>
               </tr>
               <tr>
-                <th>小区（{item.HouseList ? item.HouseList.length : 0}）：</th>
+                <th>
+                  <Badge count={item.HouseList ? item.HouseList.length : 0} showZero>
+                    小区
+                  </Badge>
+                </th>
                 <td>
                   <div className={st.items}>
                     {item.HouseList ? item.HouseList.map(i => <span>{i.NAME}</span>) : '无'}
@@ -59,7 +63,11 @@ class RoadPopupContent extends Component {
                 </td>
               </tr>
               <tr>
-                <th>门牌（{item.MPList ? item.MPList.length : 0}）：</th>
+                <th>
+                  <Badge count={item.MPList ? item.MPList.length : 0} showZero>
+                    门牌
+                  </Badge>
+                </th>
                 <td>
                   <div className={st.items}>
                     {item.MPList ? item.MPList.map(i => <span>{i.MPNUM}</span>) : '无'}

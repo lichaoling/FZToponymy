@@ -22,7 +22,6 @@ class HousePopupContent extends Component {
         callback && callback(d);
       },
       e => {
-        console.log(e);
         this.setState({ loading: false, error: '未能获取指定的数据' });
       }
     );
@@ -49,11 +48,11 @@ class HousePopupContent extends Component {
               </tr>
               <tr>
                 <th>区&emsp;&emsp;划：</th>
-                <td>{item.DistrictName || '无'}</td>
+                <td>{item.DISTRICTNAME || '无'}</td>
               </tr>
               <tr>
                 <th>申请时间：</th>
-                <td>{item.ApprovalTime || '无'}</td>
+                <td>{item.BZTIME || '无'}</td>
               </tr>
               <tr>
                 <th>楼&emsp;&emsp;幢：</th>

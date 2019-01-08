@@ -196,7 +196,8 @@ class MapService extends Component {
       );
       topItem.addTo(this.resultLayerGroup);
     });
-    this.map.fitBounds(this.resultLayerGroup.getBounds(), { padding: [100, 100] });
+    if (items && items.length)
+      this.map.fitBounds(this.resultLayerGroup.getBounds(), { padding: [100, 100] });
   }
 
   initMap() {

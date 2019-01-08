@@ -125,7 +125,7 @@ class TopItem {
           })
             .unbindPopup()
             .bindTooltip(i.MPNUM, {
-              permanent: true,
+              // permanent: true,
               direction: 'top',
               className: 'ct-lztip',
             });
@@ -151,7 +151,7 @@ class TopItem {
             .unbindPopup()
             .bindPopup(dom)
             .bindTooltip(i.LZNUM, {
-              permanent: true,
+              // permanent: true,
               direction: 'top',
               className: 'ct-lztip',
             });
