@@ -1,8 +1,12 @@
 import { baseUrl } from '../common/urls';
 import { Post } from '../utils/request';
 
-export async function SearchFromLucene(params, sf, ef) {
-  let rt = await Post(`${baseUrl}/ServiceManage/SearchFromLucene`, params, sf, ef);
+export async function SearchAllAddress(params, sf, ef) {
+  let rt = await Post(`${baseUrl}/ServiceManage/SearchAllAddress`, params, sf, ef);
+  return rt;
+}
+export async function SearchTopAddress(params, sf, ef) {
+  let rt = await Post(`${baseUrl}/ServiceManage/SearchTopAddress`, params, sf, ef);
   return rt;
 }
 
