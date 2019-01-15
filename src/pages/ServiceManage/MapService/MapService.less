@@ -41,12 +41,35 @@
           font-size: 14px;
           border: 0;
           box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
+          border-radius: 2px;
+          font-Family:'SimSun';
+          font-style:normal;
+          
         }
+        >input::-webkit-input-placeholder {
+          /* placeholder颜色  */
+           color: #aaaaaa;
+          /* placeholder字体大小  */
+          font-size: 14px;
+           /* placeholder位置  */
+          text-align: left;
+          font-family: 'SimSun'
+      }
         > span {
           width: 50px;
           > button {
             width: 100%;
           }
+        }
+        .ant-btn-primary{
+          background-color: #3385ff !important;
+          border-color: #3385ff !important;
+          border-radius: 2px;
+        }
+        .ant-input-suffix > .ant-input-search-button > .anticon-search{
+          font-size: 24px;
+          margin-top: 3px;
+          margin-left: -3px;
         }
       }
     }
@@ -77,10 +100,12 @@
   .quicksearchresult {
     .container {
       .item {
-        padding: 4px 10px;
+        padding: 8px 10px;
         transition: 0.3s;
         color: #888;
         cursor: pointer;
+        font-family: 'SimSun';
+        font-size: 12px;
         &:hover {
           background: #eee;
         }
@@ -106,7 +131,7 @@
     font-size: 15px;
   }
   .finalsearchresult {
-    bottom: 10px;
+    bottom:100px;
     .container {
       height: 100%;
       .results {
@@ -146,8 +171,12 @@
           .content {
             flex: 1;
             .name {
-              color: @primary-color;
+              color: #3385ff;
               font-size: 14px;
+              font-family: 'SimSun';
+              //font-weight: bold;
+              padding:5px 0;
+              -webkit-font-smoothing: subpixel-antialiased;
               > span {
                 display: inline-block;
                 margin-left: 10px;
@@ -160,15 +189,17 @@
             .describles {
               color: black;
               display: flex;
+              
               .describle {
                 padding-top: 5px;
                 padding-right: 5px;
                 flex: 1;
                 font-size: 12px;
-                color: #888;
+                color: #666;
+              font-family: 'SimSun';
               }
               .pic {
-                background: white;
+                background: #fafafa;
                 display: flex;
                 justify-content: center;
                 align-items: center;

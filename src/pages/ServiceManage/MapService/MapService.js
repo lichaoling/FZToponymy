@@ -3,7 +3,7 @@ import { Input, Icon, Pagination, message } from 'antd';
 import st from './MapService.less';
 
 import Map from '../../../common/Components/Maps/Map';
-import { SearchFromLucene } from '../../../services/ServiceManage';
+import { SearchAllAddress, SearchTopAddress } from '../../../services/ServiceManage';
 import { getRedIcon, getBlueIcon } from '../../../common/LIcons';
 import TopItem from './TopItem';
 
@@ -40,8 +40,8 @@ class MapService extends Component {
     this.hideFinalSearchResultPanel(true);
     this.showQuickSearchResultPanel();
     this.setState({ qsLoading: true });
-    SearchFromLucene(
-      { pageSize: 10, pageNum: 1, word: v },
+    SearchTopAddress(
+      { word: v },
       e => {
         this.setState({ qsLoading: false, quickSearchResults: (e && e.Data) || [] });
       },
@@ -61,7 +61,7 @@ class MapService extends Component {
   _finalSearch(pageNum, pageSize, word, sf, ef) {
     let newCondition = { pageSize, pageNum, word };
     this.setState({ fsLoading: true });
-    SearchFromLucene(
+    SearchAllAddress(
       newCondition,
       e => {
         this.condition = newCondition;
