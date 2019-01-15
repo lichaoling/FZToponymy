@@ -29,7 +29,7 @@ class HousePopupContent extends Component {
 
   render() {
     let { item, error, loading } = this.state;
-    let {FULLADDRESS}=this.props;
+    let { FULLADDRESS } = this.props;
     return (
       <div className={st.HousePopupContent}>
         {loading ? (
@@ -60,12 +60,16 @@ class HousePopupContent extends Component {
                 <td>{item.BZTIME || '无'}</td>
               </tr>
               <tr>
+                <th>门&emsp;&emsp;牌：</th>
+                <td>{item.MPList ? item.MPList.map(i => <span>{i.MPNUM}</span>) : '无'}</td>
+              </tr>
+              <tr>
                 <th>楼&emsp;&emsp;幢：</th>
                 <td>{item.LZList ? item.LZList.map(i => <span>{i.LZNUM}</span>) : '无'}</td>
               </tr>
               <tr>
-                <th>门&emsp;&emsp;牌：</th>
-                <td>{item.MPList ? item.MPList.map(i => <span>{i.MPNUM}</span>) : '无'}</td>
+                <th>户&emsp;&emsp;数：</th>
+                <td>{item.RoomCount ? `共 ${item.RoomCount} 户` : '无'}</td>
               </tr>
             </table>
             <div className={st.pic}>
