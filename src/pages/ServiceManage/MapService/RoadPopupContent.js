@@ -53,7 +53,7 @@ class RoadPopupContent extends Component {
               <tr>
                 <th>
                   <Badge count={item.HouseList ? item.HouseList.length : 0} showZero>
-                    小区
+                  小&emsp;区
                   </Badge>
                 </th>
                 <td>
@@ -65,7 +65,7 @@ class RoadPopupContent extends Component {
               <tr>
                 <th>
                   <Badge count={item.MPList ? item.MPList.length : 0} showZero>
-                    门牌
+                  门&emsp;牌
                   </Badge>
                 </th>
                 <td>
