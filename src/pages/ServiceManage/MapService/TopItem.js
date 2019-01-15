@@ -88,6 +88,7 @@ class TopItem {
         .get(0);
       let popup = ReactDOM.render(
         <PCls
+          FULLADDRESS={this.item.FULLADDRESS}
           callback={d => {
             this.addSubItems(d);
           }}
@@ -99,7 +100,7 @@ class TopItem {
       this.popupDom = popupDom;
       this.popup = popup;
       //this.layer.bindPopup(popupDom);
-      this.activeMarker.bindPopup(popupDom).openPopup();
+      this.activeMarker.bindPopup(popupDom, { maxWidth: 400 }).openPopup();
     }
   }
 

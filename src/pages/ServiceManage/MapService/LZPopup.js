@@ -11,7 +11,7 @@ class LZPopup extends Component {
           {data.DYList.map(i => {
             return (
               <div>
-                <div>{i.DYNUM || '空'}</div>
+                <div>{i.DYNUM || '无单元号'}</div>
                 <div>
                   {i.HSList && i.HSList.length
                     ? i.HSList.map(h => {

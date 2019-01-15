@@ -29,6 +29,7 @@ class DistrictPopupContent extends Component {
 
   render() {
     let { item, error, loading } = this.state;
+    let { FULLADDRESS } = this.props;
     return (
       <div className={st.DistrictPopupContent}>
         {loading ? (
@@ -41,7 +42,7 @@ class DistrictPopupContent extends Component {
         ) : (
           <div className={st.content}>
             <div className={st.name}>{item.NAME}</div>
-            <div className={st.fulladdress}>{item.NAME}</div>
+            <div className={st.fulladdress}>{FULLADDRESS}</div>
             <div className={st.pic}>
               <img src={item.pic || require('../../../common/assets/none-picture.png')} />
             </div>

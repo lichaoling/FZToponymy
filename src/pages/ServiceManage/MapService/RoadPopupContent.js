@@ -29,6 +29,7 @@ class RoadPopupContent extends Component {
 
   render() {
     let { item, error, loading } = this.state;
+    let {FULLADDRESS}=this.props;
     return (
       <div className={st.RoadPopupContent}>
         {loading ? (
@@ -51,9 +52,37 @@ class RoadPopupContent extends Component {
                 <td>{item.ApprovalTime || '无'}</td>
               </tr>
               <tr>
+                <th>原规划名：</th>
+                <td>{item.PLANNAME || '无'}</td>
+              </tr>
+              <tr>
+                <th>长&emsp;&emsp;度：</th>
+                <td>{(item.LENGTH && item.LENGTH.toFixed(2) + '米') || '无'}</td>
+              </tr>
+              <tr>
+                <th>宽&emsp;&emsp;度：</th>
+                <td>{(item.WIDTH && item.WIDTH.toFixed(2) + '米') || '无'}</td>
+              </tr>
+              <tr>
+                <th>建成时间：</th>
+                <td>{item.JCSJ || '无'}</td>
+              </tr>
+              <tr>
+                <th>性&emsp;&emsp;质：</th>
+                <td>{item.DLLB || '无'}</td>
+              </tr>
+              <tr>
+                <th>建设单位：</th>
+                <td>{item.SBDW || '无'}</td>
+              </tr>
+              <tr>
+                <th>完整地址：</th>
+                <td>{FULLADDRESS || '无'}</td>
+              </tr>
+              <tr>
                 <th>
                   <Badge count={item.HouseList ? item.HouseList.length : 0} showZero>
-                  小&emsp;区
+                    小&emsp;区
                   </Badge>
                 </th>
                 <td>
@@ -65,7 +94,7 @@ class RoadPopupContent extends Component {
               <tr>
                 <th>
                   <Badge count={item.MPList ? item.MPList.length : 0} showZero>
-                  门&emsp;牌
+                    门&emsp;牌
                   </Badge>
                 </th>
                 <td>

@@ -1,226 +1,236 @@
 @import '../../../default.less';
 .MapService {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  .mapcontainer {
-    position: absolute;
-    top: 0;
+    position: relative;
     height: 100%;
     width: 100%;
-  }
-  .searchbar {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 400px;
-    z-index: 999;
-    position: relative;
-    > i {
-      position: absolute;
-      right: 60px;
-      top: 11px;
-      cursor: pointer;
-      font-size: 12px;
-      color: white;
-      background: #ddd;
-      border-radius: 50%;
-      padding: 3px;
-      cursor: pointer;
-      transition: 0.3s;
-      &:hover {
-        background: #aaa;
-      }
+    .mapcontainer {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 100%;
     }
-    :global {
-      .hidden {
-        display: none;
-      }
-      .ant-input-search {
-        > input {
-          font-size: 14px;
-          border: 0;
-          box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
-          border-radius: 2px;
-          font-Family:'SimSun';
-          font-style:normal;
-          
-        }
-        >input::-webkit-input-placeholder {
-          /* placeholder颜色  */
-           color: #aaaaaa;
-          /* placeholder字体大小  */
-          font-size: 14px;
-           /* placeholder位置  */
-          text-align: left;
-          font-family: 'SimSun'
-      }
-        > span {
-          width: 50px;
-          > button {
-            width: 100%;
-          }
-        }
-        .ant-btn-primary{
-          background-color: #3385ff !important;
-          border-color: #3385ff !important;
-          border-radius: 2px;
-        }
-        .ant-input-suffix > .ant-input-search-button > .anticon-search{
-          font-size: 24px;
-          margin-top: 3px;
-          margin-left: -3px;
-        }
-      }
-    }
-  }
-  .quicksearchresult,
-  .finalsearchresult {
-    position: absolute;
-    top: 55px;
-    left: 10px;
-    z-index: 999;
-    display: none;
-    overflow: auto;
-    background: white;
-    width: 350px;
-    border-radius: 3px;
-    box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
-    padding: 5px;
-    &:global(.active) {
-      display: block;
-    }
-    .searchloading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-    }
-  }
-  .quicksearchresult {
-    .container {
-      .item {
-        padding: 8px 10px;
-        transition: 0.3s;
-        color: #888;
-        cursor: pointer;
-        font-family: 'SimSun';
-        font-size: 12px;
-        &:hover {
-          background: #eee;
-        }
-        > i {
-          color: #aaa;
-        }
-        > span {
-          display: inline-block;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          padding: 0 5px;
-          margin-left: 10px;
-          color: #aaa;
-          font-size: 12px;
-        }
-      }
-    }
-  }
-  .noresult {
-    padding: 10px;
-    color: rgb(245, 98, 98);
-    text-align: center;
-    font-size: 15px;
-  }
-  .finalsearchresult {
-    bottom:100px;
-    .container {
-      height: 100%;
-      .results {
-        height: calc(~'100% - 40px');
-        overflow: auto;
-        .item:not(:last-child) {
-          margin-bottom: 3px;
-        }
-        .item {
-          display: flex;
-          border-radius: 3px;
-          padding: 5px;
-          cursor: pointer;
-          &:hover,
-          &:global(.active) {
-            background: #f2f2f2;
+    .searchbar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 400px;
+        z-index: 999;
+        position: relative;
+        >i {
+            position: absolute;
+            right: 60px;
+            top: 11px;
+            cursor: pointer;
+            font-size: 12px;
+            color: white;
+            background: #ddd;
+            border-radius: 50%;
+            padding: 3px;
+            cursor: pointer;
             transition: 0.3s;
-          }
-          &:global(.active) {
-            .index > div {
-              background-image: url(../../../common/Img/服务应用/切图/地图图标/B.png);
+            &:hover {
+                background: #aaa;
             }
-          }
-          .index {
-            width: 50px;
+        }
+        :global {
+            .hidden {
+                display: none;
+            }
+            .ant-input-search {
+                >input {
+                    font-size: 14px;
+                    border: 0;
+                    box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
+                    border-radius: 2px;
+                    font-family: 'SimSun';
+                    font-style: normal;
+                }
+                >input::-webkit-input-placeholder {
+                    /* placeholder颜色  */
+                    color: #aaaaaa;
+                    /* placeholder字体大小  */
+                    font-size: 14px;
+                    /* placeholder位置  */
+                    text-align: left;
+                    font-family: 'SimSun';
+                }
+                >span {
+                    width: 50px;
+                    >button {
+                        width: 100%;
+                    }
+                }
+                .ant-btn-primary {
+                    background-color: #3385ff !important;
+                    border-color: #3385ff !important;
+                    border-radius: 2px;
+                }
+                .ant-input-suffix>.ant-input-search-button>.anticon-search {
+                    font-size: 24px;
+                    margin-top: 3px;
+                    margin-left: -3px;
+                }
+            }
+        }
+    }
+    .quicksearchresult,
+    .finalsearchresult {
+        position: absolute;
+        top: 55px;
+        left: 10px;
+        z-index: 999;
+        display: none;
+        overflow: auto;
+        background: white;
+        width: 350px;
+        border-radius: 3px;
+        box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.15);
+        padding: 5px;
+        &:global(.active) {
+            display: block;
+        }
+        .searchloading {
             display: flex;
             justify-content: center;
-            > div {
-              background-image: url(../../../common/Img/服务应用/切图/地图图标/R.png);
-              width: 21px;
-              height: 33px;
-              color: white;
-              text-align: center;
-              margin-top: 5px;
-            }
-          }
-          .content {
-            flex: 1;
-            .name {
-              color: #3385ff;
-              font-size: 14px;
-              font-family: 'SimSun';
-              //font-weight: bold;
-              padding:5px 0;
-              -webkit-font-smoothing: subpixel-antialiased;
-              > span {
-                display: inline-block;
-                margin-left: 10px;
-                border: 1px solid @primary-color;
-                border-radius: 3px;
-                padding: 0 5px;
+            align-items: center;
+            padding: 10px;
+        }
+    }
+    .quicksearchresult {
+        .container {
+            .item {
+                display: flex;
+                padding: 8px 10px;
+                transition: 0.3s;
+                color: #888;
+                cursor: pointer;
+                font-family: 'SimSun';
                 font-size: 12px;
-              }
+                &:hover {
+                    background: #eee;
+                }
+                .icon {
+                    width: 20px;
+                    >i {
+                        color: #aaa;
+                        font-size: 14px;
+                        transform: translateY(3px);
+                    }
+                }
+                .content {
+                    flex: 1;
+                    span {
+                        display: inline-block;
+                        border: 1px solid #ddd;
+                        border-radius: 3px;
+                        padding: 0 5px;
+                        margin-left: 10px;
+                        color: #aaa;
+                        font-size: 12px;
+                    }
+                    >div:first-child {
+                        font-size: 14px;
+                        padding-bottom: 3px;
+                    }
+                }
             }
-            .describles {
-              color: black;
-              display: flex;
-              
-              .describle {
-                padding-top: 5px;
-                padding-right: 5px;
-                flex: 1;
-                font-size: 12px;
-                color: #666;
-              font-family: 'SimSun';
-              }
-              .pic {
-                background: #fafafa;
+        }
+    }
+    .noresult {
+        padding: 10px;
+        color: rgb(245, 98, 98);
+        text-align: center;
+        font-size: 15px;
+    }
+    .finalsearchresult {
+        bottom: 100px;
+        .container {
+            height: 100%;
+            .results {
+                height: calc(~'100% - 40px');
+                overflow: auto;
+                .item:not(:last-child) {
+                    margin-bottom: 3px;
+                }
+                .item {
+                    display: flex;
+                    border-radius: 3px;
+                    padding: 5px;
+                    cursor: pointer;
+                    &:hover,
+                    &:global(.active) {
+                        background: #f2f2f2;
+                        transition: 0.3s;
+                    }
+                    &:global(.active) {
+                        .index>div {
+                            background-image: url(../../../common/Img/服务应用/切图/地图图标/B.png);
+                        }
+                    }
+                    .index {
+                        width: 50px;
+                        display: flex;
+                        justify-content: center;
+                        >div {
+                            background-image: url(../../../common/Img/服务应用/切图/地图图标/R.png);
+                            width: 21px;
+                            height: 33px;
+                            color: white;
+                            text-align: center;
+                            margin-top: 5px;
+                        }
+                    }
+                    .content {
+                        flex: 1;
+                        .name {
+                            color: #3385ff;
+                            font-size: 14px;
+                            font-family: 'SimSun'; //font-weight: bold;
+                            padding: 5px 0;
+                            -webkit-font-smoothing: subpixel-antialiased;
+                            >span {
+                                display: inline-block;
+                                margin-left: 10px;
+                                border: 1px solid @primary-color;
+                                border-radius: 3px;
+                                padding: 0 5px;
+                                font-size: 12px;
+                            }
+                        }
+                        .describles {
+                            color: black;
+                            display: flex;
+                            .describle {
+                                padding-top: 5px;
+                                padding-right: 5px;
+                                flex: 1;
+                                font-size: 12px;
+                                color: #666;
+                                font-family: 'SimSun';
+                            }
+                            .pic {
+                                background: #fafafa;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 100px;
+                                height: 70px; // border: 1px solid #f8f8f8;
+                                >img {
+                                    max-height: 100%;
+                                    max-width: 100%;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .pagination {
+                height: 40px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 100px;
-                height: 70px; // border: 1px solid #f8f8f8;
-                > img {
-                  max-height: 100%;
-                  max-width: 100%;
-                }
-              }
+                border-top: 1px solid #eee;
             }
-          }
         }
-      }
-      .pagination {
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-top: 1px solid #eee;
-      }
     }
-  }
 }

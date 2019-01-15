@@ -29,6 +29,7 @@ class HousePopupContent extends Component {
 
   render() {
     let { item, error, loading } = this.state;
+    let {FULLADDRESS}=this.props;
     return (
       <div className={st.HousePopupContent}>
         {loading ? (
@@ -49,6 +50,10 @@ class HousePopupContent extends Component {
               <tr>
                 <th>区&emsp;&emsp;划：</th>
                 <td>{item.DISTRICTNAME || '无'}</td>
+              </tr>
+              <tr>
+                <th>完整地址：</th>
+                <td>{FULLADDRESS || '无'}</td>
               </tr>
               <tr>
                 <th>申请时间：</th>

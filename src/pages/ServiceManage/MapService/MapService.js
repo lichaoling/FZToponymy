@@ -277,9 +277,15 @@ class MapService extends Component {
                       this.hideQuickSearchResultPanel(true);
                     }}
                   >
-                    <Icon type="search" />
-                    &ensp;{item.NAME}
-                    {item.TYPE ? <span>{this.getType(item.TYPE)}</span> : null}
+                    <div className={st.icon}>
+                      <Icon type="search" />
+                    </div>
+                    <div className={st.content}>
+                      <div>
+                        {item.NAME}&ensp;{item.TYPE ? <span>{this.getType(item.TYPE)}</span> : null}
+                      </div>
+                      <div>{item.DISTRICTNAME}</div>
+                    </div>
                   </div>
                 ))
               ) : (
