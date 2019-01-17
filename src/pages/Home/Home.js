@@ -186,7 +186,7 @@ class Home extends Component {
                       </Tooltip>
                       <Tooltip title="点击进入住宅门牌号编制">
                         <li className="other-info-list">
-                          <a href={'#/approval/mphbz'} className="no-effect">
+                          <a href={'#/approval/mpbz'} className="no-effect">
                             <span className="other-head">住宅门牌号编制</span>
                           </a>
                         </li>

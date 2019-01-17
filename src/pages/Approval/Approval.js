@@ -30,7 +30,7 @@ class Approval extends Component {
     let { pathname } = this.props.location;
     let { routes } = this.props.route;
     let navs = [];
-    for (let i = 0; i < routes.length - 1; i++) {
+    for (let i = 0; i < routes.length; i++) {
       if (routes[i].path && !routes[i].redirect)
         navs.push(
           <Link

@@ -51,6 +51,7 @@ export default {
   publicPath: './',
   // add for transfer to umi
   plugins,
+  hash: true,
   targets: {
     ie: 11,
   },

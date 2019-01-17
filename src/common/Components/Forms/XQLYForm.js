@@ -104,11 +104,12 @@ class XQLYForm extends Component {
         data.SJSJ = data.SJSJ ? moment(data.SJSJ) : null;
         data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
         this.setState({ reload: true }, e => {
+          debugger;
           this.setState({
             entity: data,
             approveState: d.State,
-            selectedRoads: data.ROADs && data.ROADs.map(e => e.ID),
-            roadDatas: data.ROADs,
+            selectedRoads: (data.RoadList || []).map(e => e.ID),
+            roadDatas: data.RoadList || [],
             reload: false,
           });
         });
@@ -132,6 +133,7 @@ class XQLYForm extends Component {
     errs = errs || [];
     let { entity, selectedRoads } = this.state;
     let roadIDs = selectedRoads;
+    debugger;
     let ROADID = roadIDs.join(',');
     this.mObj.ROADID = ROADID;
     let saveObj = {
@@ -777,21 +779,21 @@ class XQLYForm extends Component {
                                 }}
                                 disabled={approveState === 'notFirst' ? true : false}
                               >
-                                {(roadDatas||[])
-                                    .filter(o => !selectedRoads.includes(o))
-                                    .map(d => (
-                                      <Select.Option key={d.ID}>
-                                        {
-                                          <div className={st.road}>
-                                            <div className={st.roadName}>{d.NAME}</div>
-                                            <div className={st.distName}>
-                                              {d.DistrictName}
-                                              {/* {d.DistrictName && d.DistrictName.replace(/\./g, '')} */}
-                                            </div>
+                                {(roadDatas || [])
+                                  .filter(o => !selectedRoads.includes(o))
+                                  .map(d => (
+                                    <Select.Option key={d.ID}>
+                                      {
+                                        <div className={st.road}>
+                                          <div className={st.roadName}>{d.NAME}</div>
+                                          <div className={st.distName}>
+                                            {d.DistrictName}
+                                            {/* {d.DistrictName && d.DistrictName.replace(/\./g, '')} */}
                                           </div>
-                                        }
-                                      </Select.Option>
-                                    ))}
+                                        </div>
+                                      }
+                                    </Select.Option>
+                                  ))}
                               </Select>
                             </div>
                           </FormItem>
