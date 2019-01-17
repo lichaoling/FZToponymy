@@ -49,7 +49,7 @@ class RoadPopupContent extends Component {
               </tr>
               <tr>
                 <th>申请时间：</th>
-                <td>{item.ApprovalTime || '无'}</td>
+                <td>{item.BZTIME || '无'}</td>
               </tr>
               <tr>
                 <th>原规划名：</th>
@@ -76,32 +76,8 @@ class RoadPopupContent extends Component {
                 <td>{item.SBDW || '无'}</td>
               </tr>
               <tr>
-                <th>完整地址：</th>
+                <th>标准地址：</th>
                 <td>{FULLADDRESS || '无'}</td>
-              </tr>
-              <tr>
-                <th>
-                  <Badge count={item.HouseList ? item.HouseList.length : 0} showZero>
-                    小&emsp;区
-                  </Badge>
-                </th>
-                <td>
-                  <div className={st.items}>
-                    {item.HouseList ? item.HouseList.map(i => <span>{i.NAME}</span>) : '无'}
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th>
-                  <Badge count={item.MPList ? item.MPList.length : 0} showZero>
-                    门&emsp;牌
-                  </Badge>
-                </th>
-                <td>
-                  <div className={st.items}>
-                    {item.MPList ? item.MPList.map(i => <span>{i.MPNUM}</span>) : '无'}
-                  </div>
-                </td>
               </tr>
             </table>
             <div className={st.pic}>

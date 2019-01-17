@@ -52,7 +52,7 @@ class HousePopupContent extends Component {
                 <td>{item.DISTRICTNAME || '无'}</td>
               </tr>
               <tr>
-                <th>完整地址：</th>
+                <th>标准地址：</th>
                 <td>{FULLADDRESS || '无'}</td>
               </tr>
               <tr>

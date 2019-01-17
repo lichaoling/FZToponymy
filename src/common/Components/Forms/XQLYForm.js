@@ -777,21 +777,21 @@ class XQLYForm extends Component {
                                 }}
                                 disabled={approveState === 'notFirst' ? true : false}
                               >
-                                {roadDatas
-                                  .filter(o => !selectedRoads.includes(o))
-                                  .map(d => (
-                                    <Select.Option key={d.ID}>
-                                      {
-                                        <div className={st.road}>
-                                          <div className={st.roadName}>{d.NAME}</div>
-                                          <div className={st.distName}>
-                                            {d.DistrictName}
-                                            {/* {d.DistrictName && d.DistrictName.replace(/\./g, '')} */}
+                                {(roadDatas||[])
+                                    .filter(o => !selectedRoads.includes(o))
+                                    .map(d => (
+                                      <Select.Option key={d.ID}>
+                                        {
+                                          <div className={st.road}>
+                                            <div className={st.roadName}>{d.NAME}</div>
+                                            <div className={st.distName}>
+                                              {d.DistrictName}
+                                              {/* {d.DistrictName && d.DistrictName.replace(/\./g, '')} */}
+                                            </div>
                                           </div>
-                                        </div>
-                                      }
-                                    </Select.Option>
-                                  ))}
+                                        }
+                                      </Select.Option>
+                                    ))}
                               </Select>
                             </div>
                           </FormItem>
