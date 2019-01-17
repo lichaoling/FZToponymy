@@ -1,45 +1,81 @@
 import { Component } from 'react';
 import { Icon, Input, Button, Checkbox } from 'antd';
 import st from './Login.less';
-import { url_Login } from '../../common/urls.js';
-import { Post } from '../../utils/request.js';
-import { rtHandle } from '../../utils/errorHandle.js';
+import { getCookie, setCookie, delCookie } from '../../utils/cookie';
+import { login, getUser } from '../../utils/login';
+import { error } from '../../utils/notification';
+
+let un = 'FZ_U_NAME',
+  uw = 'FZ_U_WORD';
 
 class Login extends Component {
+  rememberPassword = true;
+
   state = {
-    showLoading: false,
+    loading: false,
   };
-  async login() {
-    this.showLoading();
-    let rt = await Post(url_Login, { userName: this.userName, password: md5(this.password) }, e => {
-      this.props.history.push('/home');
-      this.hideLoading();
-    });
-  }
-  showLoading() {
-    this.setState({ showLoading: true });
+
+  constructor(ps) {
+    super(ps);
+
+    // 当前已登录则直接跳转至home页面
+    // if (getUser()) {
+    //   this.props.history.push('/home');
+    // }
+
+    let uname = getCookie(un);
+    let uword = getCookie(uw);
+    if (uname && uword) {
+      this.username = uname;
+      this.password = uword;
+    }
   }
 
-  hideLoading() {
-    this.setState({ showLoading: false });
+  login() {
+    if (this.username && this.password) {
+      var password = this.modified ? md5(this.password) : this.password;
+      this.setState({ loading: true });
+      login(
+        this.username,
+        password,
+        e => {
+          this.setState({ loading: false });
+          let user = getUser();
+          if (user) {
+            if (this.rememberPassword) {
+              setCookie(un, this.username, 3);
+              setCookie(uw, password, 3);
+            } else {
+              delCookie(un);
+              delCookie(uw);
+            }
+            this.props.history.push('/home');
+          } else {
+            error('登录失败！');
+          }
+        },
+        er => {
+          error(er.message);
+          this.setState({ loading: false });
+        }
+      );
+    } else {
+      error('请输入用户名、密码！');
+    }
   }
 
   componentDidMount() {
     initBackground();
-    // this.userName = '2';
-    // this.password = '2';
-    // this.login();
   }
 
   render() {
-    let { showLoading } = this.state;
+    let { loading } = this.state;
     return (
       <div className={st.login}>
         <canvas id="canvas" />
         <div className={st.title}>
           <div />
         </div>
-        {/* <div className={st.nh} /> */}
         <div className={st.right}>
           <div className={st.bg} />
           <div className={st.loginpanel}>
@@ -52,42 +88,52 @@ class Login extends Component {
               size="large"
               type="text"
               placeholder="用户名"
+              defaultValue={this.username}
               onChange={e => {
-                this.userName = e.target.value;
+                this.username = e.target.value;
               }}
+              onPressEnter={this.login.bind(this)}
             />
             <Input
               prefix={<Icon type="key" style={{ color: 'rgba(0,0,0,.25)' }} />}
               size="large"
               type="password"
               placeholder="密码"
+              defaultValue={this.password}
               onChange={e => {
+                // 标识密码已经被修改过
+                this.modified = true;
                 this.password = e.target.value;
               }}
+              onPressEnter={this.login.bind(this)}
             />
             <div className={st.btns}>
-              <Checkbox>记住密码</Checkbox>
+              <Checkbox
+                defaultChecked={this.rememberPassword}
+                onChange={e => {
+                  this.rememberPassword = e.target.checked;
+                }}
+              >
+                记住密码
+              </Checkbox>
               <a href="#">忘记密码？</a>
             </div>
             <Button
+              loading={loading}
               size="large"
               className={st.loginbtn}
               type="primary"
               onClick={this.login.bind(this)}
-              style={showLoading ? { filter: 'blur(1px)' } : null}
             >
-              {showLoading ? <Icon type="loading" /> : null}
               登录
             </Button>
           </div>
           {/* <div className={st.rightfooter}>
             <a href="http://jx.zjzwfw.gov.cn/" target="_blank">
-              <Icon type="global" theme="outlined" />
-              &ensp;嘉兴市政务服务网
+              <Icon type="global" theme="outlined" />&ensp;嘉兴市政务服务网
             </a>
             <a href="http://www.jxsmz.gov.cn" target="_blank">
-              <Icon type="link" theme="outlined" />
-              &ensp;嘉兴市民政局
+              <Icon type="link" theme="outlined" />&ensp;嘉兴市民政局
             </a>
           </div> */}
         </div>
@@ -99,6 +145,7 @@ class Login extends Component {
     );
   }
 }
+
 function initBackground() {
   function Star(id, x, y) {
     this.id = id;

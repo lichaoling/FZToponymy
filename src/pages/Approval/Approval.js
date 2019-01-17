@@ -7,31 +7,22 @@ import MPBZ from './MPBZ/MPBZ';
 import MPH from './MPH/MPH';
 import st from './Approval.less';
 import { GetUser } from '../../services/Login';
+import { logout } from '../../utils/login';
+import { validateC_ID } from '../../utils/Authorized4';
 
 class Approval extends Component {
   state = {
     user: {},
   };
-  getRoutes() {
-    let { routes } = this.props.route;
-    let cmps = [];
-    for (let i = 0; i < routes.length - 1; i++) {
-      let Component = routes[i].component;
-      if (routes[i].redirect)
-        cmps.push(<Redirect key={i} exact path={routes[i].path} to={routes[i].redirect} />);
-      if (routes[i].path && !routes[i].redirect)
-        cmps.push(
-          <Route key={i} path={routes[i].path} render={ps => <Component {...routes[i]} />} />
-        );
-    }
-    return cmps;
-  }
+
   getNavs() {
     let { pathname } = this.props.location;
     let { routes } = this.props.route;
     let navs = [];
     for (let i = 0; i < routes.length; i++) {
-      if (routes[i].path && !routes[i].redirect)
+      let r = routes[i];
+      let v = validateC_ID(r.c_id);
+      if (r.path && !r.redirect && v.pass)
         navs.push(
           <Link
             key={i}
@@ -72,7 +63,14 @@ class Approval extends Component {
       <Menu onClick={e => this.onClick(e)}>
         <Menu.Item key="1">个人中心</Menu.Item>
         <Menu.Item key="2">账号设置</Menu.Item>
-        <Menu.Item key="3">退出</Menu.Item>
+        <Menu.Item
+          key="3"
+          onClick={e => {
+            logout();
+          }}
+        >
+          退出
+        </Menu.Item>
       </Menu>
     );
     let { children } = this.props;

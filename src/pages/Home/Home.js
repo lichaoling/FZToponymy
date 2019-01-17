@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Icon, Input, Tooltip } from 'antd';
 import { Link } from 'dva/router';
 import st from './Home.less';
-import Authorized from '../../utils/Authorized2';
 import '../../common/Extends/手风琴/css/style.less';
 
 class Home extends Component {

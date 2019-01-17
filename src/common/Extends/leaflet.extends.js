@@ -173,25 +173,25 @@ L.tileLayer.TDTJX = options => {
 
 // 天地图·国家 4490
 L.tileLayer.tdtgj_imgo = options =>
-  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=img_c&x={x}&y={y}&l={z}&tk=eaba60b085f5d0bbd40e460c5c0156b2', {
+  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=img_c&x={x}&y={y}&l={z}&tk=2b5132605fc11fcc5b0ac81cb31d1dd7', {
     ...options,
     subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
   });
 
 L.tileLayer.tdtgj_imga = options =>
-  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=cia_c&x={x}&y={y}&l={z}&tk=eaba60b085f5d0bbd40e460c5c0156b2', {
+  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=cia_c&x={x}&y={y}&l={z}&tk=2b5132605fc11fcc5b0ac81cb31d1dd7', {
     ...options,
     subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
   });
 
 L.tileLayer.tdtgj_veco = options =>
-  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=vec_c&x={x}&y={y}&l={z}&tk=eaba60b085f5d0bbd40e460c5c0156b2', {
+  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=vec_c&x={x}&y={y}&l={z}&tk=2b5132605fc11fcc5b0ac81cb31d1dd7', {
     ...options,
     subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
   });
 
 L.tileLayer.tdtgj_veca = options =>
-  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=cva_c&x={x}&y={y}&l={z}&tk=eaba60b085f5d0bbd40e460c5c0156b2', {
+  L.tileLayer('http://t{s}.tianditu.gov.cn/DataServer?T=cva_c&x={x}&y={y}&l={z}&tk=2b5132605fc11fcc5b0ac81cb31d1dd7', {
     ...options,
     subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
   });

@@ -1,30 +1,35 @@
 export default [
   //建设单位
   {
+    c_id: 'developer',
     path: '/developer',
-    component: './Developer/Developer',
+    component: './Developer/Developer_Auth',
     name: '建设单位',
     routes: [
       { path: '/developer', redirect: '/developer/home' },
       {
+        c_id: 'developer.home',
         path: '/developer/home',
-        component: './DeveloperHome/DeveloperHome',
+        component: './DeveloperHome/DeveloperHome_Auth',
         name: '主页',
       },
       {
+        c_id: 'developer.dlql',
         path: '/developer/dlql',
         name: '道路、桥梁命名申请',
-        component: './Developer/DLQL/DLQL',
+        component: './Developer/DLQL/DLQL_Auth',
       },
       {
+        c_id: 'developer.xqly',
         path: '/developer/xqly',
         name: '小区、楼宇命名申请',
-        component: './Developer/XQLY/XQLY',
+        component: './Developer/XQLY/XQLY_Auth',
       },
-      { 
+      {
+        c_id: 'developer.mph',
         path: '/developer/mph',
         name: '门牌号申请',
-        component: './Developer/MPH/MPH' 
+        component: './Developer/MPH/MPH_Auth',
       },
     ],
   },
@@ -41,35 +46,63 @@ export default [
   },
   //经办人主页
   {
+    c_id: 'home',
     path: '/home',
-    component: './Home/Home',
+    component: './Home/Home_Auth',
     name: '用户主页',
   },
   //地名地址审批管理系统
   {
+    c_id: 'approval',
     path: '/approval',
-    component: './Approval/Approval',
+    component: './Approval/Approval_Auth',
     name: '地名地址审批管理系统',
     routes: [
       { path: '/approval', redirect: '/approval/dlql' },
-      { path: '/home', name: '主页', component: './Home/Home' },
-      { path: '/approval/dlql', name: '道路、桥梁命名审批', component: './Approval/DLQL/DLQL' },
-      { path: '/approval/xqly', name: '小区、楼宇命名审批', component: './Approval/XQLY/XQLY' },
-      { path: '/approval/mph', name: '门牌号审批', component: './Approval/MPH/MPH' },
-      { path: '/approval/mpbz', name: '门牌号编制', component: './Approval/MPBZ/MPBZ' },
+      { c_id: 'home', path: '/home', name: '主页', component: './Home/Home_Auth' },
+      {
+        c_id: 'approval.dlql',
+        path: '/approval/dlql',
+        name: '道路、桥梁命名审批',
+        component: './Approval/DLQL/DLQL_Auth',
+      },
+      {
+        c_id: 'approval.xqly',
+        path: '/approval/xqly',
+        name: '小区、楼宇命名审批',
+        component: './Approval/XQLY/XQLY_Auth',
+      },
+      {
+        c_id: 'approval.mph',
+        path: '/approval/mph',
+        name: '门牌号审批',
+        component: './Approval/MPH/MPH_Auth',
+      },
+      {
+        c_id: 'approval.mpbz',
+        path: '/approval/mpbz',
+        name: '门牌号编制',
+        component: './Approval/MPBZ/MPBZ_Auth',
+      },
     ],
   },
-//地名地址服务应用系统
-{
-  path: '/servicemanage',
-  component: './ServiceManage/ServiceManage',
-  name: '地名地址服务应用系统',
-  routes: [
-    { path: '/servicemanage', redirect: '/servicemanage/mapservice' },
-    { path: '/home', name: '主页', component: './Home/Home' },
-    { path: '/servicemanage/mapservice', name: '地图管理', component: './ServiceManage/MapService/MapService' },
-  ],
-},
+  //地名地址服务应用系统
+  {
+    c_id: 'servicemanage',
+    path: '/servicemanage',
+    component: './ServiceManage/ServiceManage',
+    name: '地名地址服务应用系统',
+    routes: [
+      { path: '/servicemanage', redirect: '/servicemanage/mapservice' },
+      { c_id: 'home', path: '/home', name: '主页', component: './Home/Home_Auth' },
+      {
+        c_id: 'servicemanage.mapservice',
+        path: '/servicemanage/mapservice',
+        name: '地图管理',
+        component: './ServiceManage/MapService/MapService_Auth',
+      },
+    ],
+  },
 
   /*
   // test

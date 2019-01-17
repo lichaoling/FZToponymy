@@ -6,6 +6,7 @@ import st from './Developer.less';
 import DLQL from './DLQL/DLQL';
 import XQLY from './XQLY/XQLY';
 import MPH from './MPH/MPH';
+import { validateC_ID } from '../../utils/Authorized4';
 
 class Developer extends Component {
   // getRoutes() {
@@ -27,7 +28,9 @@ class Developer extends Component {
     let { routes } = this.props.route;
     let navs = [];
     for (let i = 0; i < routes.length; i++) {
-      if (routes[i].path && !routes[i].redirect) {
+      let r = routes[i];
+      let v = validateC_ID(r.c_id);
+      if (r.path && !r.redirect && v.pass) {
         navs.push(
           <Link
             key={i}
