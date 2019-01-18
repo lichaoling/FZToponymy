@@ -92,7 +92,7 @@ class XQLYForm extends Component {
     if (!id) {
       id = this.props.id;
     }
-    id = 'd2dcfa99-0d1c-4149-ab90-befd797d2af8';
+    // id = 'd2dcfa99-0d1c-4149-ab90-befd797d2af8';
     // 获取小区楼宇的申请数据
     if (id) {
       this.showLoading();
@@ -795,7 +795,7 @@ class XQLYForm extends Component {
                                 }}
                               >
                                 <Input
-                                  placeholder="请选择道路..."
+                                  placeholder="请查询并选择道路..."
                                   onFocus={e => {
                                     this.setState({ open: true });
                                   }}
