@@ -10,7 +10,7 @@ class NoneAuthrized extends Component {
         <div className={st.content}>
           您当前无权查看该内容！
           <br />
-          请检查您的登录状态以及访问权限！
+          请检查您的登录状态和访问权限！
           <div className={st.btns}>
             <Button
               type="primary"
@@ -18,7 +18,7 @@ class NoneAuthrized extends Component {
                 router.goBack();
               }}
             >
-              返回上一页面
+              返回上一页
             </Button>
             &emsp;
             <Button
