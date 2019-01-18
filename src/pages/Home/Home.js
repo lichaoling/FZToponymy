@@ -3,6 +3,7 @@ import { Icon, Input, Tooltip } from 'antd';
 import { Link } from 'dva/router';
 import st from './Home.less';
 import '../../common/Extends/手风琴/css/style.less';
+import { validateC_ID } from '../../utils/Authorized4';
 
 class Home extends Component {
   constructor(ps) {
@@ -128,6 +129,14 @@ class Home extends Component {
             <ul id="cardArea" className="card-area clearfix">
               <li className="card-item animated fadeIn">
                 <div className="card">
+                  {validateC_ID('approval').pass ? null : (
+                    <div className="no-prv">
+                      <div>
+                        <Icon type="exclamation-circle" />
+                        无访问权限
+                      </div>
+                    </div>
+                  )}
                   <div className="card-title card-title-sp title-even">
                     <div className="content">
                       <div className="zq-product-img">
@@ -176,13 +185,15 @@ class Home extends Component {
                           </a>
                         </li>
                       </Tooltip>
-                      <Tooltip title="点击进入住宅门牌号审批">
-                        <li className="other-info-list">
-                          <a href={'#/approval/mph'} className="no-effect">
-                            <span className="other-head">住宅门牌号审批</span>
-                          </a>
-                        </li>
-                      </Tooltip>
+                      {validateC_ID('approval.mph').pass ? (
+                        <Tooltip title="点击进入住宅门牌号审批">
+                          <li className="other-info-list">
+                            <a href={'#/approval/mph'} className="no-effect">
+                              <span className="other-head">住宅门牌号审批</span>
+                            </a>
+                          </li>
+                        </Tooltip>
+                      ) : null}
                       <Tooltip title="点击进入住宅门牌号编制">
                         <li className="other-info-list">
                           <a href={'#/approval/mpbz'} className="no-effect">
@@ -341,17 +352,18 @@ class Home extends Component {
                       <p className="main-tip">
                         基于地名地址数据，提供权威的、标准化的电子地图、数据接口服务，为各委办局基于地名地址的信息化工作提供基础服务支撑。
                       </p>
-                      <button
-                        className="main-btn"
-                        onClick={() => window.open('#/servicemanage')}
-                      >
+                      <button className="main-btn" onClick={() => window.open('#/servicemanage')}>
                         点击进入
                       </button>
                     </div>
                     <ul className="other-info clearfix">
                       <Tooltip title="点击进入服务应用">
                         <li className="other-info-list">
-                          <a href={'#/servicemanage/mapservice'} className="no-effect" target="view_window">
+                          <a
+                            href={'#/servicemanage/mapservice'}
+                            className="no-effect"
+                            target="view_window"
+                          >
                             <span className="other-head">服务应用</span>
                           </a>
                         </li>
