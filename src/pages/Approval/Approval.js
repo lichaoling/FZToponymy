@@ -9,6 +9,7 @@ import st from './Approval.less';
 import { GetUser } from '../../services/Login';
 import { logout } from '../../utils/login';
 import { validateC_ID } from '../../utils/Authorized4';
+import UserBadge from '../Login/UserBadge';
 
 class Approval extends Component {
   state = {
@@ -59,34 +60,15 @@ class Approval extends Component {
   }
   render() {
     let { user } = this.state;
-    const menu = (
-      <Menu onClick={e => this.onClick(e)}>
-        <Menu.Item key="1">个人中心</Menu.Item>
-        <Menu.Item key="2">账号设置</Menu.Item>
-        <Menu.Item
-          key="3"
-          onClick={e => {
-            logout();
-          }}
-        >
-          退出
-        </Menu.Item>
-      </Menu>
-    );
+
     let { children } = this.props;
     return (
       <div className={st.Approval}>
         <div className={st.header}>
           <div className={st.logo} />
           <div className={st.jz} />
-
           <div className={st.user}>
-            <Dropdown overlay={menu}>
-              <a className="ant-dropdown-link" href="#">
-                <Icon type="user" style={{ fontSize: 18 }} />
-                &nbsp;你好, {user.USERNAME}
-              </a>
-            </Dropdown>
+            <UserBadge />
           </div>
         </div>
         <div ref={e => (this.nave = e)} className={st.nave}>

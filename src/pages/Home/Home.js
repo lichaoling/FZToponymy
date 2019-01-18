@@ -4,6 +4,7 @@ import { Link } from 'dva/router';
 import st from './Home.less';
 import '../../common/Extends/手风琴/css/style.less';
 import { validateC_ID } from '../../utils/Authorized4';
+import UserBadge from '../Login/UserBadge';
 
 class Home extends Component {
   constructor(ps) {
@@ -117,7 +118,7 @@ class Home extends Component {
               <span ref={e => (this.t2 = e)}>{/* {year}/{month + 1}/{date}&ensp;周{day} */}</span>
               &emsp;
               <span className={st.user}>
-                <Icon type="user" />
+                <UserBadge />
               </span>
             </div>
           </div>

@@ -160,10 +160,14 @@ function login(userName, password, sf, ef) {
   );
 }
 
-function logout() {
+function logout(f) {
   user = null;
   Logout(e => {
-    window.location.reload();
+    if (f) {
+      f();
+    } else {
+      window.location.reload();
+    }
   });
 }
 

@@ -29,8 +29,7 @@ class Developer extends Component {
     let navs = [];
     for (let i = 0; i < routes.length; i++) {
       let r = routes[i];
-      let v = validateC_ID(r.c_id);
-      if (r.path && !r.redirect && v.pass) {
+      if (r.path && !r.redirect ) {
         navs.push(
           <Link
             key={i}

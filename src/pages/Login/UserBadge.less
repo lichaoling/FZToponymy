@@ -1,0 +1,42 @@
+@import '../../default.less';
+:global {
+    .UserBadge {
+        display: inline-flex;
+        align-items: center;
+    }
+    .UserBadge.normal {
+        .usericon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            background: @primary-color;
+        }
+        .username {
+            margin-left: 10px;
+            font-size: 24px;
+            color: @primary-color;
+        }
+    }
+    .UserBadgePopover {
+        .ant-popover-inner-content {
+            padding: 10px;
+        }
+        .UserBadgePanel {
+            >div {
+                transition: 0.3s;
+                cursor: pointer;
+                padding: 5px 15px;
+                min-width: 120px;
+                &:hover {
+                    color: @primary-color;
+                    background: rgb(237, 249, 255);
+                }
+            }
+        }
+    }
+}
