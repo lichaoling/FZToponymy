@@ -92,6 +92,7 @@ class XQLYForm extends Component {
     if (!id) {
       id = this.props.id;
     }
+    id = 'd2dcfa99-0d1c-4149-ab90-befd797d2af8';
     // 获取小区楼宇的申请数据
     if (id) {
       this.showLoading();
@@ -104,11 +105,11 @@ class XQLYForm extends Component {
         data.SJSJ = data.SJSJ ? moment(data.SJSJ) : null;
         data.JCSJ = data.JCSJ ? moment(data.JCSJ) : null;
         this.setState({ reload: true }, e => {
-          debugger;
+          // debugger;
           this.setState({
             entity: data,
             approveState: d.State,
-            selectedRoads: (data.RoadList || []).map(e => e.ID),
+            selectedRoads: data.RoadList,
             roadDatas: data.RoadList || [],
             reload: false,
           });
@@ -132,8 +133,8 @@ class XQLYForm extends Component {
   validate(errs, bName) {
     errs = errs || [];
     let { entity, selectedRoads } = this.state;
-    let roadIDs = selectedRoads;
-    debugger;
+    let roadIDs = (selectedRoads || []).map(x => x.ID);
+
     let ROADID = roadIDs.join(',');
     this.mObj.ROADID = ROADID;
     let saveObj = {
@@ -409,18 +410,18 @@ class XQLYForm extends Component {
     this.mObj = {};
   }
 
-  componentDidUpdate() {
-    if (this.select) {
-      $(this.select)
-        .find('input')
-        .unbind('keydown')
-        .on('keydown', e => {
-          if (event.keyCode == 13) {
-            this.searchRoads(e.target.value);
-          }
-        });
-    }
-  }
+  // componentDidUpdate() {
+  //   if (this.select) {
+  //     $(this.select)
+  //       .find('input')
+  //       .unbind('keydown')
+  //       .on('keydown', e => {
+  //         if (event.keyCode == 13) {
+  //           this.searchRoads(e.target.value);
+  //         }
+  //       });
+  //   }
+  // }
 
   componentDidMount() {
     this.getDistricts();
@@ -457,7 +458,13 @@ class XQLYForm extends Component {
     };
     console.log(entity);
     return (
-      <div className={st.XQLYForm} ref={e => (this.root = e)}>
+      <div
+        className={st.XQLYForm}
+        ref={e => (this.root = e)}
+        onClick={e => {
+          this.setState({ open: false });
+        }}
+      >
         <Spin
           className={showLoading ? 'active' : ''}
           spinning={showLoading}
@@ -757,7 +764,76 @@ class XQLYForm extends Component {
                               </span>
                             }
                           >
-                            <div style={{ width: '100%' }} ref={e => (this.select = e)}>
+                            <div className={st.selectroads}>
+                              {selectedRoads && selectedRoads.length ? (
+                                <div className={st.selectedroads}>
+                                  {(selectedRoads || []).map(x => {
+                                    return (
+                                      <span>
+                                        {x.NAME}
+                                        &emsp;
+                                        <Icon
+                                          type="close"
+                                          onClick={e => {
+                                            let { selectedRoads } = this.state;
+                                            selectedRoads = (selectedRoads || []).filter(
+                                              t => t.ID !== x.ID
+                                            );
+                                            this.setState({ selectedRoads: selectedRoads });
+                                          }}
+                                        />
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              ) : null}
+                              <div
+                                className={st.roadssearch}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  e.nativeEvent.stopImmediatePropagation();
+                                }}
+                              >
+                                <Input
+                                  placeholder="请选择道路..."
+                                  onFocus={e => {
+                                    this.setState({ open: true });
+                                  }}
+                                  onChange={e => {
+                                    let v = e.target.value;
+                                    if (v) this.searchRoads(v);
+                                  }}
+                                />
+                                {open ? (
+                                  <div className={st.roads}>
+                                    {roadDatas && roadDatas.length ? (
+                                      roadDatas.map(r => {
+                                        return (
+                                          <div>
+                                            {r.NAME}
+                                            <Icon
+                                              type="plus"
+                                              onClick={e => {
+                                                let { selectedRoads } = this.state;
+                                                let idx = (selectedRoads || []).findIndex(
+                                                  i => i.ID === r.ID
+                                                );
+                                                if (idx === -1) selectedRoads.push(r);
+                                                this.setState({ selectedRoads: selectedRoads });
+                                              }}
+                                            />
+                                          </div>
+                                        );
+                                      })
+                                    ) : (
+                                      <div className={st.noneresult}>未找到相关道路</div>
+                                    )}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </div>
+
+                            {/* <div style={{ width: '100%' }} ref={e => (this.select = e)}>
                               <Select
                                 open={open}
                                 ref={e => (this.selectO = e)}
@@ -788,14 +864,13 @@ class XQLYForm extends Component {
                                           <div className={st.roadName}>{d.NAME}</div>
                                           <div className={st.distName}>
                                             {d.DistrictName}
-                                            {/* {d.DistrictName && d.DistrictName.replace(/\./g, '')} */}
                                           </div>
                                         </div>
                                       }
                                     </Select.Option>
                                   ))}
                               </Select>
-                            </div>
+                            </div> */}
                           </FormItem>
                         </Col>
                         <Col span={10}>
