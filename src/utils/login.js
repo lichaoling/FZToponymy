@@ -1,7 +1,23 @@
 import { Login, Logout, GetUser } from '../services/Login';
 
 let user = null;
-let privileges = {
+
+let getPrivileges = role => {
+  switch (role) {
+    case '区民政局':
+      return qmzjPrivileges;
+    case '市民政局':
+      return smzjPrivileges;
+    case '市政府':
+      return szfPrivileges;
+    case 'admin':
+      return adminPrivileges;
+    default:
+      return {};
+  }
+};
+
+let adminPrivileges = {
   home: {
     edit: true,
     pass: true,
@@ -26,23 +42,80 @@ let privileges = {
     edit: true,
     pass: true,
   },
-  developer: {
+  servicemanage: {
     edit: true,
     pass: true,
   },
-  'developer.home': {
+  'servicemanage.mapservice': {
     edit: true,
     pass: true,
   },
-  'developer.dlql': {
+};
+
+let qmzjPrivileges = {
+  home: {
     edit: true,
     pass: true,
   },
-  'developer.xqly': {
+  approval: {
     edit: true,
     pass: true,
   },
-  'developer.mph': {
+  'approval.dlql': {
+    edit: true,
+    pass: true,
+  },
+  'approval.xqly': {
+    edit: true,
+    pass: true,
+  },
+  servicemanage: {
+    edit: true,
+    pass: true,
+  },
+  'servicemanage.mapservice': {
+    edit: true,
+    pass: true,
+  },
+};
+
+let smzjPrivileges = {
+  home: {
+    edit: true,
+    pass: true,
+  },
+  approval: {
+    edit: true,
+    pass: true,
+  },
+  'approval.dlql': {
+    edit: true,
+    pass: true,
+  },
+  'approval.xqly': {
+    edit: true,
+    pass: true,
+  },
+  servicemanage: {
+    edit: true,
+    pass: true,
+  },
+  'servicemanage.mapservice': {
+    edit: true,
+    pass: true,
+  },
+};
+
+let szfPrivileges = {
+  home: {
+    edit: true,
+    pass: true,
+  },
+  approval: {
+    edit: true,
+    pass: true,
+  },
+  'approval.dlql': {
     edit: true,
     pass: true,
   },
@@ -62,7 +135,7 @@ async function getCurrentUser() {
     let rt = await GetUser();
     if (rt && rt.data) {
       user = rt.data.Data;
-      if (user) user.privileges = privileges;
+      if (user) user.privileges = getPrivileges(user.RoleNames[0]);
     }
   }
   return user;
@@ -79,7 +152,7 @@ function login(userName, password, sf, ef) {
     { userName, password },
     e => {
       user = e;
-      if (user) user.privileges = privileges;
+      if (user) user.privileges = getPrivileges(user.RoleNames[0]);
       console.log(e);
       sf(e);
     },

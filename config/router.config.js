@@ -3,33 +3,33 @@ export default [
   {
     c_id: 'developer',
     path: '/developer',
-    component: './Developer/Developer_Auth',
+    component: './Developer/Developer',
     name: '建设单位',
     routes: [
       { path: '/developer', redirect: '/developer/home' },
       {
         c_id: 'developer.home',
         path: '/developer/home',
-        component: './DeveloperHome/DeveloperHome_Auth',
+        component: './DeveloperHome/DeveloperHome',
         name: '主页',
       },
       {
         c_id: 'developer.dlql',
         path: '/developer/dlql',
         name: '道路、桥梁命名申请',
-        component: './Developer/DLQL/DLQL_Auth',
+        component: './Developer/DLQL/DLQL',
       },
       {
         c_id: 'developer.xqly',
         path: '/developer/xqly',
         name: '小区、楼宇命名申请',
-        component: './Developer/XQLY/XQLY_Auth',
+        component: './Developer/XQLY/XQLY',
       },
       {
         c_id: 'developer.mph',
         path: '/developer/mph',
         name: '门牌号申请',
-        component: './Developer/MPH/MPH_Auth',
+        component: './Developer/MPH/MPH',
       },
     ],
   },
