@@ -666,6 +666,49 @@ class XQLYForm extends Component {
                       </Row>
                       <Row>
                         <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="小区类型"
+                          >
+                            <Select
+                              defaultValue={
+                                [entity.XQLX, entity.DZBM] ? [entity.XQLX, entity.DZBM] : undefined
+                              }
+                              allowClear
+                              onChange={e => {
+                                this.mObj.XQLX = e[0];
+                                this.mObj.DZBM = e[1];
+                                this.mObj.DZFLBM = e[1];
+                              }}
+                              placeholder="小区类型"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            >
+                              <Select.Option key="31" value={['小区', '31']}>
+                                小区
+                              </Select.Option>
+                              <Select.Option key="32" value={['大厦院落', '32']}>
+                                大厦院落
+                              </Select.Option>
+                              <Select.Option key="33" value={['单位院落', '33']}>
+                                单位院落
+                              </Select.Option>
+                              <Select.Option key="34" value={['工矿企业', '34']}>
+                                工矿企业
+                              </Select.Option>
+                              <Select.Option key="35" value={['文体娱乐', '35']}>
+                                文体娱乐
+                              </Select.Option>
+                              <Select.Option key="36" value={['宗教场所', '36']}>
+                                宗教场所
+                              </Select.Option>
+                              <Select.Option key="37" value={['其它', '37']}>
+                                其它
+                              </Select.Option>
+                            </Select>
+                          </FormItem>
+                        </Col>
+                        <Col span={8}>
                           <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} label="绿化率">
                             <InputNumber
                               defaultValue={entity.LHL ? entity.LHL : undefined}
@@ -695,6 +738,8 @@ class XQLYForm extends Component {
                             />
                           </FormItem>
                         </Col>
+                      </Row>
+                      <Row>
                         <Col span={8}>
                           <FormItem
                             labelCol={{ span: 8 }}
@@ -712,8 +757,6 @@ class XQLYForm extends Component {
                             />
                           </FormItem>
                         </Col>
-                      </Row>
-                      <Row>
                         <Col span={8}>
                           <FormItem
                             labelCol={{ span: 8 }}
@@ -735,23 +778,23 @@ class XQLYForm extends Component {
                             />
                           </FormItem>
                         </Col>
-                        <Col span={16}>
-                          <FormItem
-                            labelCol={{ span: 5 }}
-                            wrapperCol={{ span: 19 }}
-                            label="名称来历及含义"
-                          >
-                            <TextArea
-                              defaultValue={entity.MCHY ? entity.MCHY : undefined}
-                              onChange={e => {
-                                this.mObj.MCHY = e.target.value;
-                              }}
-                              placeholder="名称来历及含义"
-                              autosize={{ minRows: 2 }}
-                              disabled={approveState === 'notFirst' ? true : false}
-                            />
-                          </FormItem>
-                        </Col>
+                      </Row>
+                      <Row>
+                        <FormItem
+                          labelCol={{ span: 3 }}
+                          wrapperCol={{ span: 21 }}
+                          label="名称来历及含义"
+                        >
+                          <TextArea
+                            defaultValue={entity.MCHY ? entity.MCHY : undefined}
+                            onChange={e => {
+                              this.mObj.MCHY = e.target.value;
+                            }}
+                            placeholder="名称来历及含义"
+                            autosize={{ minRows: 2 }}
+                            disabled={approveState === 'notFirst' ? true : false}
+                          />
+                        </FormItem>
                       </Row>
                       <Row>
                         <Col span={12}>

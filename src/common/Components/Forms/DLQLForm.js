@@ -720,6 +720,47 @@ class DLQLForm extends Component {
                         </Col>
                       </Row>
                       <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="道路类别"
+                          >
+                            <Select
+                              defaultValue={
+                                [entity.DLLB, entity.DZFLBM]
+                                  ? [entity.DLLB, entity.DZFLBM]
+                                  : undefined
+                              }
+                              allowClear
+                              onChange={e => {
+                                this.mObj.DLLB = e[0];
+                                this.mObj.DZFLBM = e[1];
+                              }}
+                              placeholder="道路类别"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            >
+                              <Select.Option key="31" value={['街', '11']}>
+                                街
+                              </Select.Option>
+                              <Select.Option key="32" value={['路', '12']}>
+                                路
+                              </Select.Option>
+                              <Select.Option key="33" value={['巷', '13']}>
+                                巷
+                              </Select.Option>
+                              <Select.Option key="34" value={['弄', '14']}>
+                                弄
+                              </Select.Option>
+                              <Select.Option key="15" value={['其它', '15']}>
+                                其它
+                              </Select.Option>
+                              <Select.Option key="16" value={['桥梁', '16']}>
+                                桥梁
+                              </Select.Option>
+                            </Select>
+                          </FormItem>
+                        </Col>
                         <Col span={16}>
                           <FormItem
                             labelCol={{ span: 5 }}
