@@ -6,7 +6,7 @@ import {
   redStyle,
   blueStyle,
 } from '../../../common/LIcons';
-import { SearchDetails } from '../../../services/ServiceManage';
+
 import HousePopupContent from './HousePopupContent';
 import DistrictPopupContent from './DistrictPopupContent';
 import RoadPopupContent from './RoadPopupContent';
@@ -61,6 +61,7 @@ class TopItem {
   }
 
   addTo(map) {
+    if(this.layer)
     this.layer.addTo(map);
   }
 
@@ -78,7 +79,7 @@ class TopItem {
   activeItem(map) {
     map = map || this.map;
     this.clear();
-    this.layer.addTo(map);
+    this.addTo(map);
     this.activeMarker.addTo(map);
     // 请求获取popup等
     let PCls = this.getPopupClass();
@@ -155,6 +156,9 @@ class TopItem {
               // permanent: true,
               direction: 'top',
               className: 'ct-lztip',
+            });
+            l.on('click',e=>{
+              popup.getLZInfos();
             });
           this.layer.addLayer(l);
         }

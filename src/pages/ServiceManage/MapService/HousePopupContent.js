@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { Icon } from 'antd';
 import st from './HousePopupContent.less';
-import { SearchDetails } from '../../../services/ServiceManage';
+import { SearchDetails2 } from '../../../services/ServiceManage';
 
 class HousePopupContent extends Component {
   state = {
@@ -12,7 +12,7 @@ class HousePopupContent extends Component {
 
   componentDidMount() {
     let { type, id, callback } = this.props;
-    SearchDetails(
+    SearchDetails2(
       {
         type: type,
         id: id,
