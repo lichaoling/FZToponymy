@@ -42,6 +42,22 @@ let adminPrivileges = {
     edit: true,
     pass: true,
   },
+  collaborativeupdating: {
+    edit: true,
+    pass: true,
+  },
+  'collaborativeupdating.dataimport': {
+    edit: true,
+    pass: true,
+  },
+  'collaborativeupdating.statistic': {
+    edit: true,
+    pass: true,
+  },
+  // databasemanage: {
+  //   edit: true,
+  //   pass: true,
+  // },
   servicemanage: {
     edit: true,
     pass: true,

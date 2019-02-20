@@ -129,11 +129,11 @@ class Map extends Component {
     return (
       <div className={st.map}>
         <div ref={e => (this.mapDom = e)} className={st.mapdom} />
-        <div ref={e => (this.layerToggle = e)} className={st.layerptoggle}>
+        <div ref={e => (this.layerToggle = e)} className={'map-layertoggle ' + st.layerptoggle}>
           {this.getLayerToggle()}
         </div>
         <div
-          className={st.back}
+          className={'map-back ' + st.back}
           title="返回主页"
           onClick={e => {
             window.location.href = '#/home';
@@ -141,7 +141,7 @@ class Map extends Component {
         >
           <span className="iconfont icon-caidan1" />
         </div>
-        <img className={st.logo} src={require('../../Img/服务应用/切图/title.png')}/>
+        <img className={'map-logo ' + st.logo} src={require('../../Img/服务应用/切图/title.png')} />
       </div>
     );
   }
