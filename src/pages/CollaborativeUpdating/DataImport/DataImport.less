@@ -1,0 +1,59 @@
+@import '../../../common/default.less';
+.DataImport {
+    display: flex;
+    flex-direction: column;
+    .header {
+        padding: 10px;
+        border-bottom: 1px solid @border-color;
+        .loading {
+            display: inline;
+        }
+    }
+    .content {
+        flex: 1;
+        display: flex;
+        >div {
+            height: 100%;
+        }
+        .results {
+            width: 0;
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            .resultsitems {
+                flex: 1;
+                overflow: auto;
+            }
+            .resultsfooter {
+                text-align: right;
+                padding: 10px 5px;
+                border-top: 1px solid @border-color;
+            }
+        }
+        .map {
+            width: 500px;
+            border-left: 1px solid @border-color;
+            :global {
+                .map-back,
+                .map-logo {
+                    display: none;
+                }
+
+                .map-layertoggle{
+                    bottom:10px;
+                }
+                .leaflet-control-zoom{
+                    bottom: 70px;
+                }
+            }
+        }
+    }
+    :global {
+        .dataimport-loading {
+            display: inline;
+            .ant-spin-container {
+                display: inline-block;
+            }
+        }
+    }
+}

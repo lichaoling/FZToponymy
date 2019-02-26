@@ -51,6 +51,7 @@ class LZPopup extends Component {
             this.setState({ loading: false, DYList: d || [] });
           },
           e => {
+            this.bGeted = false;
             this.setState({ loading: false, error: '未能获取指定的数据' });
           }
         );

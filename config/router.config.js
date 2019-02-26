@@ -86,6 +86,29 @@ export default [
       },
     ],
   },
+  //协同更新
+  {
+    c_id: 'collaborativeupdating',
+    path: '/collaborativeupdating',
+    component: './CollaborativeUpdating/CollaborativeUpdating_Auth',
+    name: '业务协同更新系统',
+    routes: [
+      { path: '/collaborativeupdating', redirect: '/collaborativeupdating/dataimport' },
+      { c_id: 'home', path: '/home', name: '主页', component: './Home/Home_Auth' },
+      {
+        c_id: 'collaborativeupdating.dataimport',
+        path: '/collaborativeupdating/dataimport',
+        name: '地址数据入库',
+        component: './CollaborativeUpdating/DataImport/DataImport_Auth',
+      },
+      {
+        c_id: 'collaborativeupdating.statistic',
+        path: '/collaborativeupdating/statistic',
+        name: '协同更新统计',
+        component: './CollaborativeUpdating/Statistic/Statistic_Auth',
+      },
+    ],
+  },
   //地名地址服务应用系统
   {
     c_id: 'servicemanage',
