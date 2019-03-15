@@ -369,7 +369,12 @@ class Home extends Component {
                       <p className="main-tip">
                         基于地名地址数据，提供权威的、标准化的电子地图、数据接口服务，为各委办局基于地名地址的信息化工作提供基础服务支撑。
                       </p>
-                      <button className="main-btn" onClick={() => window.open('#/servicemanage')}>
+                      <button
+                        className="main-btn"
+                        onClick={() => {
+                          this.props.history.push('/servicemanage');
+                        }}
+                      >
                         点击进入
                       </button>
                     </div>
@@ -379,7 +384,6 @@ class Home extends Component {
                           <a
                             href={'#/servicemanage/mapservice'}
                             className="no-effect"
-                            target="view_window"
                           >
                             <span className="other-head">服务应用</span>
                           </a>
