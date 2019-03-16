@@ -36,9 +36,13 @@ class DataImport extends Component {
       key: 'DISTRICTNAME',
     },
     {
-      title: '道路',
+      title: '道路（自然村）',
       dataIndex: 'ROADNAME',
       key: 'ROADNAME',
+      render: (text, record, index) => {
+        let { ROADNAME, VILLAGENAME } = record;
+        return ROADNAME || VILLAGENAME;
+      },
     },
     {
       title: '门牌',
@@ -193,7 +197,7 @@ class DataImport extends Component {
       return;
     }
     if (!start || !end) {
-      warn('请选择编制时间');
+      warn('请选择入库时间');
       return;
     }
     this.setState({ tableLoading: true });
