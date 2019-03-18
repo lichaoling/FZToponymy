@@ -94,29 +94,33 @@ class DataImport extends Component {
   }
 
   activeItem(item, center) {
-    if (center) {
+    if (center && item.latlng) {
       this.map.setView(item.latlng);
     }
 
-    this.clearActiveItem();
-    this._activeItem = L.featureGroup().addTo(this.map);
-    let activeMarker = L.marker(item.latlng, { icon: getBlueIcon('★') }).addTo(this._activeItem);
-    if (item.HOUSEWKT) {
-      let popupDom = $('<div></div>')
-        .addClass('topitem')
-        .get(0);
-      let popup = ReactDOM.render(
-        <HousePopupContent
-          FULLADDRESS={item.HOUSEFULLADDRESS}
-          callback={d => {
-            this.addHouseSubItems(d);
-          }}
-          type={'HOUSE'}
-          id={item.HOUSEID}
-        />,
-        popupDom
-      );
-      activeMarker.bindPopup(popupDom, { maxWidth: 400 }).openPopup();
+    if (item.latlng) {
+      this.clearActiveItem();
+      this._activeItem = L.featureGroup().addTo(this.map);
+      let activeMarker = L.marker(item.latlng, { icon: getBlueIcon('★') }).addTo(this._activeItem);
+      if (item.HOUSEWKT) {
+        let popupDom = $('<div></div>')
+          .addClass('topitem')
+          .get(0);
+        let popup = ReactDOM.render(
+          <HousePopupContent
+            FULLADDRESS={item.HOUSEFULLADDRESS}
+            callback={d => {
+              this.addHouseSubItems(d);
+            }}
+            type={'HOUSE'}
+            id={item.HOUSEID}
+          />,
+          popupDom
+        );
+        activeMarker.bindPopup(popupDom, { maxWidth: 400 }).openPopup();
+      }
+    } else {
+      warn('该数据不包含空间位置信息');
     }
   }
 
