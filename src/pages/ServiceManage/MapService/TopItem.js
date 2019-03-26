@@ -61,8 +61,7 @@ class TopItem {
   }
 
   addTo(map) {
-    if(this.layer)
-    this.layer.addTo(map);
+    if (this.layer) this.layer.addTo(map);
   }
 
   getPopupClass() {
@@ -151,15 +150,15 @@ class TopItem {
             },
           })
             .unbindPopup()
-            .bindPopup(dom)
+            .bindPopup(dom, { maxWidth: 370 })
             .bindTooltip(i.LZNUM, {
               // permanent: true,
               direction: 'top',
               className: 'ct-lztip',
             });
-            l.on('click',e=>{
-              popup.getLZInfos();
-            });
+          l.on('click', e => {
+            popup.getLZInfos();
+          });
           this.layer.addLayer(l);
         }
       });
