@@ -72,7 +72,7 @@ class Index extends Component {
     rows: [],
     total: 0,
     pageSize: 10,
-    pageNum: 0,
+    pageNum: 1,
     reload: false,
     tableLoading: false,
     reset: false,
@@ -161,7 +161,7 @@ class Index extends Component {
               &ensp;
               <Input
                 style={{ width: 200 }}
-                placeholder="道路名称"
+                placeholder="名称"
                 onChange={e => {
                   this.condition.roadName = e.target.value;
                 }}
@@ -197,7 +197,15 @@ class Index extends Component {
                 }}
               />
               &ensp;
-              <Button type="primary" icon="search" onClick={e => this.search()}>
+              <Button
+                type="primary"
+                icon="search"
+                onClick={e => {
+                  this.setState({ pageNum: 1 }, e => {
+                    this.search();
+                  });
+                }}
+              >
                 查询
               </Button>
               &ensp;

@@ -138,14 +138,8 @@ export default [
       {
         c_id: 'databasemanage.dl',
         path: '/databasemanage/dl',
-        name: '道路管理',
+        name: '道路、桥梁管理',
         component: './DatabaseManage/DL/Index_Auth',
-      },
-      {
-        c_id: 'databasemanage.ql',
-        path: '/databasemanage/ql',
-        name: '桥梁管理',
-        component: './DatabaseManage/QL/Index_Auth',
       },
       {
         c_id: 'databasemanage.yl',
