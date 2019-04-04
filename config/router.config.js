@@ -126,7 +126,41 @@ export default [
       },
     ],
   },
-
+  //数据库管理
+  {
+    c_id: 'databasemanage',
+    path: '/databasemanage',
+    component: './DatabaseManage/DatabaseManage',
+    name: '地名地址服务应用系统',
+    routes: [
+      { path: '/databasemanage', redirect: '/databasemanage/dl' },
+      { c_id: 'home', path: '/home', name: '主页', component: './Home/Home_Auth' },
+      {
+        c_id: 'databasemanage.dl',
+        path: '/databasemanage/dl',
+        name: '道路管理',
+        component: './DatabaseManage/DL/Index_Auth',
+      },
+      {
+        c_id: 'databasemanage.ql',
+        path: '/databasemanage/ql',
+        name: '桥梁管理',
+        component: './DatabaseManage/QL/Index_Auth',
+      },
+      {
+        c_id: 'databasemanage.yl',
+        path: '/databasemanage/yl',
+        name: '院落管理',
+        component: './DatabaseManage/YL/Index_Auth',
+      },
+      {
+        c_id: 'databasemanage.poi',
+        path: '/databasemanage/poi',
+        name: 'POI管理',
+        component: './DatabaseManage/POI/Index_Auth',
+      },
+    ],
+  },
   /*
   // test
   {

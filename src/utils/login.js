@@ -54,10 +54,26 @@ let adminPrivileges = {
     edit: true,
     pass: true,
   },
-  // databasemanage: {
-  //   edit: true,
-  //   pass: true,
-  // },
+  databasemanage: {
+    edit: true,
+    pass: true,
+  },
+  "databasemanage.dl": {
+    edit: true,
+    pass: true,
+  },
+  "databasemanage.ql": {
+    edit: true,
+    pass: true,
+  },
+  "databasemanage.yl": {
+    edit: true,
+    pass: true,
+  },
+  "databasemanage.poi": {
+    edit: true,
+    pass: true,
+  },
   servicemanage: {
     edit: true,
     pass: true,
