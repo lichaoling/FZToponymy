@@ -289,8 +289,7 @@ class Home extends Component {
                   </div>
                   <div className="card-content content-first bg-e8e8e8">
                     <ul className="content-first-list">
-                      <li>道路管理</li>
-                      <li>桥梁管理</li>
+                      <li>道路、桥梁管理</li>
                       <li>院落管理</li>
                       <li>POI管理</li>
                     </ul>
@@ -314,17 +313,10 @@ class Home extends Component {
                       </button>
                     </div>
                     <ul className="other-info clearfix">
-                      <Tooltip title="点击进入道路管理">
+                      <Tooltip title="点击进入道路、桥梁管理">
                         <li className="other-info-list">
                           <a href={'#/databasemanage/dl'} className="no-effect">
-                            <span className="other-head">道路管理</span>
-                          </a>
-                        </li>
-                      </Tooltip>
-                      <Tooltip title="点击进入桥梁管理">
-                        <li className="other-info-list">
-                          <a href={'#/databasemanage/ql'} className="no-effect">
-                            <span className="other-head">桥梁管理</span>
+                            <span className="other-head">道路、桥梁管理</span>
                           </a>
                         </li>
                       </Tooltip>
