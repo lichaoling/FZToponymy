@@ -289,9 +289,10 @@ class Home extends Component {
                   </div>
                   <div className="card-content content-first bg-e8e8e8">
                     <ul className="content-first-list">
-                      <li>道路、桥梁管理</li>
-                      <li>小区、楼宇管理</li>
-                      <li>门牌号管理</li>
+                      <li>道路管理</li>
+                      <li>桥梁管理</li>
+                      <li>院落管理</li>
+                      <li>POI管理</li>
                     </ul>
                   </div>
 
@@ -313,24 +314,31 @@ class Home extends Component {
                       </button>
                     </div>
                     <ul className="other-info clearfix">
-                      <Tooltip title="点击进入道路、桥梁管理">
+                      <Tooltip title="点击进入道路管理">
                         <li className="other-info-list">
-                          <a href={'/DatabaseManage/Index?id=0'} className="no-effect">
-                            <span className="other-head">道路、桥梁管理</span>
+                          <a href={'#/databasemanage/dl'} className="no-effect">
+                            <span className="other-head">道路管理</span>
                           </a>
                         </li>
                       </Tooltip>
-                      <Tooltip title="点击进入小区、楼宇管理">
+                      <Tooltip title="点击进入桥梁管理">
                         <li className="other-info-list">
-                          <a href={'/DatabaseManage/Index?id=1'} className="no-effect">
-                            <span className="other-head">小区、楼宇管理</span>
+                          <a href={'#/databasemanage/ql'} className="no-effect">
+                            <span className="other-head">桥梁管理</span>
                           </a>
                         </li>
                       </Tooltip>
-                      <Tooltip title="点击进入门牌号管理">
+                      <Tooltip title="点击进入院落管理">
                         <li className="other-info-list">
-                          <a href={'/DatabaseManage/Index?id=2'} className="no-effect">
-                            <span className="other-head">门牌号管理</span>
+                          <a href={'#/databasemanage/yl'} className="no-effect">
+                            <span className="other-head">院落管理</span>
+                          </a>
+                        </li>
+                      </Tooltip>
+                      <Tooltip title="点击进入POI管理">
+                        <li className="other-info-list">
+                          <a href={'#/databasemanage/poi'} className="no-effect">
+                            <span className="other-head">POI管理</span>
                           </a>
                         </li>
                       </Tooltip>
