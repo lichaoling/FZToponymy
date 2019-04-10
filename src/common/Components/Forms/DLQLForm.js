@@ -720,6 +720,47 @@ class DLQLForm extends Component {
                         </Col>
                       </Row>
                       <Row>
+                        <Col span={8}>
+                          <FormItem
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            label="道路类别"
+                          >
+                            <Select
+                              defaultValue={
+                                [entity.DLLB, entity.DZFLBM]
+                                  ? [entity.DLLB, entity.DZFLBM]
+                                  : undefined
+                              }
+                              allowClear
+                              onChange={e => {
+                                this.mObj.DLLB = e[0];
+                                this.mObj.DZFLBM = e[1];
+                              }}
+                              placeholder="道路类别"
+                              disabled={approveState === 'notFirst' ? true : false}
+                            >
+                              <Select.Option key="31" value={['街', '11']}>
+                                街
+                              </Select.Option>
+                              <Select.Option key="32" value={['路', '12']}>
+                                路
+                              </Select.Option>
+                              <Select.Option key="33" value={['巷', '13']}>
+                                巷
+                              </Select.Option>
+                              <Select.Option key="34" value={['弄', '14']}>
+                                弄
+                              </Select.Option>
+                              <Select.Option key="15" value={['其它', '15']}>
+                                其它
+                              </Select.Option>
+                              <Select.Option key="16" value={['桥梁', '16']}>
+                                桥梁
+                              </Select.Option>
+                            </Select>
+                          </FormItem>
+                        </Col>
                         <Col span={16}>
                           <FormItem
                             labelCol={{ span: 5 }}
@@ -932,7 +973,14 @@ class DLQLForm extends Component {
                 let geometry = Terraformer.WKT.parse(GEOM_WKT);
                 lm.mpLayer = L.geoJSON(geometry, {
                   style: function(feature) {
-                    return shapeOptions;
+                    return {
+                      stroke: true,
+                      color: 'red',
+                      weight: 4,
+                      opacity: 0.5,
+                      fill: false,
+                      clickable: true,
+                    };
                   },
                 }).addTo(lm.map);
                 let coordinates = geometry.coordinates.map(e => {
@@ -944,11 +992,12 @@ class DLQLForm extends Component {
             onMapClear={lm => {
               lm.mpLayer && lm.mpLayer.remove();
               lm.mpLayer = null;
+
               let { entity } = this.state;
-              entity.Lat = null;
-              entity.Lng = null;
-              this.mObj.Lng = entity.Lng;
-              this.mObj.Lat = entity.Lat;
+              // entity.Lat = null;
+              // entity.Lng = null;
+              // this.mObj.Lng = entity.Lng;
+              // this.mObj.Lat = entity.Lat;
             }}
             beforeBtns={
               approveState === 'notFirst'
@@ -991,8 +1040,8 @@ class DLQLForm extends Component {
                       name: '保存定位',
                       icon: 'icon-save',
                       onClick: (dom, item, lm) => {
-                        let geometry = lm.mpLayer.toGeoJSON().geometry;
-                        entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
+                        let geometry = lm.mpLayer ? lm.mpLayer.toGeoJSON().geometry : null;
+                        entity.GEOM_WKT = geometry ? Terraformer.WKT.convert(geometry) : null;
                         this.mObj.GEOM_WKT = entity.GEOM_WKT;
                         this.setState({
                           entity: entity,

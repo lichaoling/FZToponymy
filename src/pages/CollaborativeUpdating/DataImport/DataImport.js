@@ -4,7 +4,7 @@ import st from './DataImport.less';
 import { Table, Button, Input, DatePicker, Icon, Cascader, Select, Spin, Pagination } from 'antd';
 import Map from '../../../common/Components/Maps/Map';
 import { ImportDataSearch } from '../../../services/CollaborativeUpdating';
-import { GetDistrictTree } from '../../../services/Common';
+import { getDistrictTreeByUID } from '../../../services/Common';
 import { getDistricts } from '../../../utils/utils';
 import { warn, error } from '../../../utils/notification';
 import {
@@ -225,7 +225,7 @@ class DataImport extends Component {
 
   async getDistricts() {
     this.setState({ districtLoading: true });
-    await GetDistrictTree(d => {
+    await getDistrictTreeByUID(d => {
       let districts = getDistricts(d);
       this.setState({ districts: districts, districtLoading: false });
     });

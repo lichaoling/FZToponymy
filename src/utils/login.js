@@ -98,6 +98,14 @@ let qmzjPrivileges = {
     pass: true,
   },
   'approval.xqly': {
+    edit: false,
+    pass: false,
+  },
+  'approval.mph': {
+    edit: true,
+    pass: true,
+  },
+  'approval.mpbz': {
     edit: true,
     pass: true,
   },
