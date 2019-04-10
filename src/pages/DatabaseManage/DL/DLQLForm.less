@@ -1,0 +1,55 @@
+@import '../../../default.less';
+
+.DLQLForm {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .header {
+        padding: 10px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .body {
+        flex: 1;
+        height: 0;
+        overflow: auto;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 5px;
+
+        .group {
+            box-shadow: 0 0 5px 1px #ccc;
+            border-radius: 3px;
+            position: relative;
+            padding-top: 15px;
+
+            .groupheader {
+                background: #efefef;
+                height: 32px;
+                display: flex;
+                align-items: center;
+
+                &::before {
+                    content: '';
+                    width: 5px;
+                    height: 100%;
+                    background: @primary-color;
+                    margin-right: 5px;
+                }
+            }
+
+            .groupbody {
+                padding: 10px;
+            }
+        }
+    }
+
+    .footer {
+        padding-right: 10px;
+        padding-top: 10px;
+        text-align: right;
+    }
+}

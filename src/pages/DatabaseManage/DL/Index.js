@@ -1,11 +1,23 @@
 import { Component } from 'react';
 import st from './Index.less';
 
-import { Table, Button, Input, DatePicker, Icon, Cascader, Select, Spin, Pagination } from 'antd';
+import {
+  Table,
+  Button,
+  Input,
+  DatePicker,
+  Icon,
+  Cascader,
+  Select,
+  Spin,
+  Pagination,
+  Modal,
+} from 'antd';
 import { getDistrictTreeByUID } from '../../../services/Common';
 import { RoadSearch, RoadDisable, RoadDel } from '../../../services/DataManage';
 import { getDistricts } from '../../../utils/utils';
 import { warn, error } from '../../../utils/notification';
+import DLQLForm from './DLQLForm';
 
 let condition = {
   end: moment(),
@@ -62,6 +74,11 @@ class Index extends Component {
     },
   ];
 
+  constructor(ps) {
+    super(ps);
+    console.log(this);
+  }
+
   condition = {
     ...condition,
   };
@@ -76,6 +93,7 @@ class Index extends Component {
     reload: false,
     tableLoading: false,
     reset: false,
+    showDLQLForm: false,
   };
 
   edit(i) {
@@ -139,6 +157,7 @@ class Index extends Component {
       reload,
       tableLoading,
       reset,
+      showDLQLForm,
     } = this.state;
 
     return (
@@ -232,6 +251,15 @@ class Index extends Component {
             }}
           />
         </div>
+        <Modal
+          wrapClassName="ct-modal-1200"
+          visible={true}
+          destroyOnClose
+          onCancel={e => this.setState({ showDLQLForm: false })}
+          footer={false}
+        >
+          <DLQLForm onCancel={e => this.setState({ showDLQLForm: false })} />
+        </Modal>
       </div>
     );
   }

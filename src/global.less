@@ -38,30 +38,37 @@ ol {
         // color: white !important;
         text-align: center !important;
     }
+
     .ant-table-row td {
         text-align: center !important;
     }
+
     .ant-spin-container {
         overflow: visible !important;
     }
+
     .global-spin {
         width: 100%;
         margin: 40px 0 !important;
     }
+
     /*必须有才能应用其他样式*/
     *::-webkit-scrollbar {
         width: 8px;
         height: 8px;
     }
+
     /*滚动条的轨道*/
     ::-webkit-scrollbar-track {
         background-color: #eee;
         /*可设置border、background等属性*/
     }
+
     /*上下按钮的样式*/
     ::-webkit-scrollbar-button {
         display: none;
     }
+
     /*拖动条的样式*/
     ::-webkit-scrollbar-thumb {
         background-color: #aaa;
@@ -70,17 +77,21 @@ ol {
         cursor: pointer;
         transition: 0.3s all ease;
     }
+
     ::-webkit-scrollbar-thumb:hover {
         background-color: #888;
     }
+
     .ant-table-thead {
         th {
             background: rgb(54, 138, 233) !important;
             color: white !important;
         }
     }
+
     .fullmodal {
         :global {
+
             .ant-modal,
             .ant-modal-content {
                 position: absolute;
@@ -90,6 +101,7 @@ ol {
                 bottom: 10px;
                 width: auto !important;
             }
+
             .ant-modal-body {
                 padding: 10px;
                 height: calc(~'100% - 45px');
@@ -97,8 +109,10 @@ ol {
             }
         }
     }
+
     .smallmodal {
         :global {
+
             .ant-modal,
             .ant-modal-content {
                 position: fixed !important;
@@ -109,6 +123,7 @@ ol {
                 left: 50%;
                 margin-left: -500px;
             }
+
             .ant-modal-body {
                 padding: 10px;
                 height: calc(~'100% - 45px');
@@ -116,12 +131,16 @@ ol {
             }
         }
     }
-    .ct-fullmodal,.ct-fullmodal2 {
+
+    .ct-fullmodal,
+    .ct-fullmodal2,
+    .ct-modal-1200 {
         position: fixed;
         top: 0;
         right: 0;
         left: 0;
         bottom: 0;
+
         .ant-modal,
         .ant-modal-content {
             position: absolute;
@@ -131,30 +150,40 @@ ol {
             bottom: 10px;
             width: auto !important;
         }
+
         .ant-modal-body {
             padding: 10px;
             height: calc(~'100%');
             background-color: #fafafa;
         }
     }
-    .ct-fullmodal2{
+
+    .ct-modal-1200 {
+        .ant-modal-content {
+            width: 1200px !important;
+            left: 50%;
+            margin-left: -600px;
+        }
+    }
+
+    .ct-fullmodal2 {
         .ant-modal-body {
             height: calc(~'100% - 45px');
         }
     }
 
-    .ct-fullmodal2.ct-map{
+    .ct-fullmodal2.ct-map {
         .ant-modal-body {
             padding: 0;
         }
     }
 
-    .ct-inline-loading{
+    .ct-inline-loading {
         // width: auto;
         display: inline-block;
     }
 
-    .ct-inline-loading-100{
+    .ct-inline-loading-100 {
         width: 100%;
     }
 }
