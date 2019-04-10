@@ -973,7 +973,14 @@ class DLQLForm extends Component {
                 let geometry = Terraformer.WKT.parse(GEOM_WKT);
                 lm.mpLayer = L.geoJSON(geometry, {
                   style: function(feature) {
-                    return shapeOptions;
+                    return {
+                      stroke: true,
+                      color: 'red',
+                      weight: 4,
+                      opacity: 0.5,
+                      fill: false,
+                      clickable: true,
+                    };
                   },
                 }).addTo(lm.map);
                 let coordinates = geometry.coordinates.map(e => {
@@ -985,11 +992,12 @@ class DLQLForm extends Component {
             onMapClear={lm => {
               lm.mpLayer && lm.mpLayer.remove();
               lm.mpLayer = null;
+
               let { entity } = this.state;
-              entity.Lat = null;
-              entity.Lng = null;
-              this.mObj.Lng = entity.Lng;
-              this.mObj.Lat = entity.Lat;
+              // entity.Lat = null;
+              // entity.Lng = null;
+              // this.mObj.Lng = entity.Lng;
+              // this.mObj.Lat = entity.Lat;
             }}
             beforeBtns={
               approveState === 'notFirst'
@@ -1032,8 +1040,8 @@ class DLQLForm extends Component {
                       name: '保存定位',
                       icon: 'icon-save',
                       onClick: (dom, item, lm) => {
-                        let geometry = lm.mpLayer.toGeoJSON().geometry;
-                        entity.GEOM_WKT = Terraformer.WKT.convert(geometry);
+                        let geometry = lm.mpLayer ? lm.mpLayer.toGeoJSON().geometry : null;
+                        entity.GEOM_WKT = geometry ? Terraformer.WKT.convert(geometry) : null;
                         this.mObj.GEOM_WKT = entity.GEOM_WKT;
                         this.setState({
                           entity: entity,

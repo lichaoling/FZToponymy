@@ -1,11 +1,24 @@
 import { Component } from 'react';
 import st from './Index.less';
+import DLForm from './DLForm';
 
-import { Table, Button, Input, DatePicker, Icon, Cascader, Select, Spin, Pagination } from 'antd';
+import {
+  Table,
+  Button,
+  Input,
+  DatePicker,
+  Icon,
+  Cascader,
+  Select,
+  Spin,
+  Pagination,
+  Popconfirm,
+  Modal,
+} from 'antd';
 import { getDistrictTreeByUID } from '../../../services/Common';
 import { RoadSearch, RoadDisable, RoadDel } from '../../../services/DataManage';
 import { getDistricts } from '../../../utils/utils';
-import { warn, error } from '../../../utils/notification';
+import { warn, error, success } from '../../../utils/notification';
 
 let condition = {
   end: moment(),
@@ -16,43 +29,37 @@ let condition = {
 class Index extends Component {
   columns = [
     { title: '序号', dataIndex: 'idx', key: 'idx' },
-    { title: '行政区划', dataIndex: 'name', key: 'name' },
-    { title: '名称', dataIndex: 'name', key: 'name' },
-    { title: '状态', dataIndex: 'name', key: 'name' },
-    { title: '长度（米）', dataIndex: 'name', key: 'name' },
-    { title: '宽度（米）', dataIndex: 'name', key: 'name' },
-    { title: '登记时间', dataIndex: 'name', key: 'name' },
+    { title: '行政区划', dataIndex: 'DISTRICTNAME', key: 'DISTRICTNAME' },
+    { title: '名称', dataIndex: 'NAME', key: 'NAME' },
+    { title: '状态', dataIndex: 'STATE', key: 'STATE' },
+    { title: '长度（米）', dataIndex: 'LENGTH', key: 'LENGTH' },
+    { title: '宽度（米）', dataIndex: 'WIDTH', key: 'WIDTH' },
+    { title: '登记时间', dataIndex: 'BZTIME', key: 'BZTIME' },
     {
       title: '操作',
       dataIndex: 'Id',
       key: 'action',
-      render(text, record, index) {
+      render: (text, record, index) => {
         return (
-          <span>
-            <Icon type="edit" title="编辑" onClick={this.edit(record)} />
+          <span className={st.operate}>
+            <Icon type="edit" title="编辑" onClick={e => this.edit(record)} />
             &ensp;
             <Popconfirm
-              title="确定禁用该条数据？"
-              icon={
-                <Icon
-                  type="question-circle-o"
-                  style={{ color: 'red' }}
-                  onConfirm={e => this.lock(record)}
-                />
-              }
+              title={'确定' + (record.STATE == '启用' ? '禁用' : '启用') + '该条数据？'}
+              onConfirm={e => this.lock(record)}
+              icon={<Icon type="question-circle-o" style={{ color: 'red' }} />}
             >
-              <Icon type="lock" title="禁用" />
+              {record.STATE == '启用' ? (
+                <Icon type="lock" title="禁用" />
+              ) : (
+                <Icon type="unlock" title="启用" />
+              )}
             </Popconfirm>
             &ensp;
             <Popconfirm
               title="确定删除该条数据？"
-              icon={
-                <Icon
-                  type="question-circle-o"
-                  style={{ color: 'red' }}
-                  onConfirm={e => this.delete(record)}
-                />
-              }
+              onConfirm={e => this.delete(record)}
+              icon={<Icon type="question-circle-o" style={{ color: 'red' }} />}
             >
               <Icon type="delete" title="删除" />
             </Popconfirm>
@@ -76,18 +83,46 @@ class Index extends Component {
     reload: false,
     tableLoading: false,
     reset: false,
+    showEditModal: false,
+    editModalData: null,
   };
 
   edit(i) {
-    console.log(i);
+    this.setState({
+      showEditModal: true,
+      editModalData: i,
+    });
+  }
+  closeModal() {
+    this.setState({
+      showEditModal: false,
+    });
+  }
+  save() {
+    this.dlform && this.dlform.save && this.dlform.save();
   }
 
   lock(i) {
-    console.log(i);
+    let state = i.STATE == '启用' ? 2 : i.STATE == '禁用' ? 1 : -1;
+    let stateMsg = i.STATE == '启用' ? '禁用' : i.STATE == '禁用' ? '启用' : '未知';
+    let id = i.ID;
+    RoadDisable({ id, state }, e => {
+      if (e) {
+        success(stateMsg + '成功！');
+        this.search();
+      } else {
+        warn('还有门牌关联该道路，请先禁用或删除关联的门牌再进行此操作!');
+      }
+    });
   }
 
   delete(i) {
-    console.log(i);
+    RoadDel({ id: i.ID, state: 0 }, e => {
+      if (e == null) {
+        success('删除成功！');
+        this.search();
+      }
+    });
   }
 
   clearCondition() {
@@ -112,9 +147,22 @@ class Index extends Component {
     if (districtID) searchCondition.districtID = districtID;
     if (state) searchCondition.state = state;
 
-    RoadSearch(searchCondition, d => {
-      console.log(d);
-    });
+    this.setState({ tableLoading: true });
+    RoadSearch(
+      searchCondition,
+      d => {
+        let { Data, totalCount } = d;
+        Data.map((i, idx) => {
+          i.STATE == '1' ? (i.STATE = '启用') : (i.STATE = '禁用');
+          i.idx = idx + 1;
+        });
+        this.setState({ rows: Data, total: totalCount, tableLoading: false });
+      },
+      e => {
+        this.setState({ tableLoading: false });
+        error(e.message);
+      }
+    );
   }
 
   async getDistricts() {
@@ -139,6 +187,8 @@ class Index extends Component {
       reload,
       tableLoading,
       reset,
+      showEditModal,
+      editModalData,
     } = this.state;
 
     return (
@@ -216,7 +266,7 @@ class Index extends Component {
           )}
         </div>
         <div className={st.body}>
-          <Table columns={this.columns} dataSource={rows} />
+          <Table columns={this.columns} dataSource={rows} pagination={false} loading={tableLoading}/>
         </div>
         <div className={st.footer}>
           <Pagination
@@ -232,6 +282,27 @@ class Index extends Component {
             }}
           />
         </div>
+        {showEditModal ? (
+          <Modal
+            bodyStyle={{ padding: 0 }}
+            width="90%"
+            title="道路、桥梁基本信息修改"
+            visible={true}
+            onOk={() => this.save()}
+            onCancel={() => this.closeModal()}
+          >
+            <DLForm
+              data={editModalData}
+              addRef={e => {
+                this.dlform = e;
+              }}
+              onSaveSuccess={() => {
+                this.closeModal();
+                this.search();
+              }}
+            />
+          </Modal>
+        ) : null}
       </div>
     );
   }

@@ -1,28 +1,38 @@
 @import '../../../common/default.less';
 
 .Index {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    .header {
-        padding: 10px;
-    }
+  .header {
+    padding: 10px;
+  }
 
-    .body {
-        flex: 1;
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
-        overflow: auto;
+  .body {
+    flex: 1;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    overflow: auto;
 
-        :global {
-            .ant-table-thead th:not(:last-child) {
-                border-right: 1px solid #eee;
-            }
+    .operate {
+      >i {
+        cursor: pointer;
+
+        &:hover {
+          color: @primary-color;
         }
+      }
     }
 
-    .footer {
-        padding: 10px;
-        text-align: right;
+    :global {
+      .ant-table-thead th:not(:last-child) {
+        border-right: 1px solid #eee;
+      }
     }
+  }
+
+  .footer {
+    padding: 10px;
+    text-align: right;
+  }
 }
