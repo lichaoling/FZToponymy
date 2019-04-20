@@ -98,7 +98,7 @@ class Index extends Component {
     reload: false,
     tableLoading: false,
     reset: false,
-    showEditModal: true,
+    showEditModal: false,
     editModalData: null,
   };
 
@@ -109,13 +109,11 @@ class Index extends Component {
       editModalData: i,
     });
   }
+
   closeModal() {
     this.setState({
       showEditModal: false,
     });
-  }
-  save() {
-    this.ylform && this.ylform.save && this.ylform.save();
   }
 
   lock(i) {
@@ -458,8 +456,7 @@ class Index extends Component {
             }}
           >
             <YLForm
-              // id={editModalData && editModalData.MPID}
-              id="3501820060000162092" //测试用
+              id={editModalData && editModalData.MPID}
               onCancel={e => {
                 this.setState({ showEditModal: false });
               }}
