@@ -31,20 +31,19 @@ export async function roadModify(params, sf, ef) {
   return rt;
 }
 
-
-
 export async function HouseSearch(parms, sf, ef) {
   let rt = await Post(`${baseUrl}/DataManage/HouseSearch`, parms, sf, ef);
   return rt;
 }
-export async function HouseDetails(parms, sf, ef) {
-  let rt = await Post(`${baseUrl}/DataManage/HouseDetails`, parms, sf, ef);
+export async function HouseDetails(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/HouseDetails`, { mpid: id }, sf, ef);
   return rt;
 }
 export async function HouseDisableOrDel(parms, sf, ef) {
   let rt = await Post(`${baseUrl}/DataManage/HouseDisableOrDel`, parms, sf, ef);
   return rt;
 }
+
 export async function HouseModify(parms, sf, ef) {
   let rt = await Post(`${baseUrl}/DataManage/HouseModify`, parms, sf, ef);
   return rt;
@@ -54,7 +53,53 @@ export async function SearchRoads(parms, sf, ef) {
   let rt = await Post(`${baseUrl}/Common/SearchRoads`, parms, sf, ef);
   return rt;
 }
+
 export async function SearchVillages(parms, sf, ef) {
   let rt = await Post(`${baseUrl}/Common/SearchVillages`, parms, sf, ef);
   return rt;
 }
+
+/**
+ * 兴趣点查询：DataManage/POISearch(int pageNum, int pageSize, string districtID, string name, string lx, DateTime? start, DateTime? end)
+ */
+export async function POISearch(parms, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/POISearch`, parms, sf, ef);
+  return rt;
+}
+/**
+ * 禁用POI DataManage/POIDisableOrDel(string id, int state)
+ */
+export async function LockPOI(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/POIDisableOrDel`, { id: id, state: 2 }, sf, ef);
+  return rt;
+}
+
+export async function UnLockPOI(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/POIDisableOrDel`, { id: id, state: 1 }, sf, ef);
+  return rt;
+}
+
+/**
+ * 删除POI DataManage/POIDisableOrDel(string id, int state)
+ */
+export async function DelPOI(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/POIDisableOrDel`, { id: id, state: 0 }, sf, ef);
+  return rt;
+}
+
+/**
+ * 获取POI详情 DataManage/POIDetails(string id)
+ */
+export async function POIDetails(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/POIDetails`, { id: id }, sf, ef);
+  return rt;
+}
+
+/**
+ * 新增或修改POI DataManage/POIModify(string dataJson)
+ */
+export async function POIModify(obj, sf, ef) {
+  let rt = await Post(`${baseUrl}/DataManage/POIModify`, { dataJson: JSON.stringify(obj) }, sf, ef);
+  return rt;
+}
+

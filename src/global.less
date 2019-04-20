@@ -1,189 +1,277 @@
+@import './default.less';
 html,
 body,
 #root {
-    height: 100%;
+  height: 100%;
 }
 
 .colorWeak {
-    filter: invert(80%);
+  filter: invert(80%);
 }
 
 .ant-layout {
-    min-height: 100vh;
+  min-height: 100vh;
 }
 
 canvas {
-    display: block;
+  display: block;
 }
 
 body {
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .globalSpin {
-    width: 100%;
-    margin: 40px 0 !important;
+  width: 100%;
+  margin: 40px 0 !important;
 }
 
 ul,
 ol {
-    list-style: none;
+  list-style: none;
 }
 
 :global {
-    .ant-table-thead th {
-        // background: @primary-color  !important;
-        // color: white !important;
-        text-align: center !important;
+  .ant-table-thead th {
+    // background: @primary-color  !important;
+    // color: white !important;
+    text-align: center !important;
+  }
+
+  .ant-table-row td {
+    text-align: center !important;
+  }
+
+  .ant-spin-container {
+    overflow: visible !important;
+  }
+
+  .global-spin {
+    width: 100%;
+    margin: 40px 0 !important;
+  }
+
+  /*必须有才能应用其他样式*/
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /*滚动条的轨道*/
+  ::-webkit-scrollbar-track {
+    background-color: #eee;
+    /*可设置border、background等属性*/
+  }
+
+  /*上下按钮的样式*/
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /*拖动条的样式*/
+  ::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    /*无法响应cursor、动画效果、宽度等*/
+    width: 10px;
+    cursor: pointer;
+    transition: 0.3s all ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #888;
+  }
+
+  .ant-table-thead {
+    th {
+      background: rgb(54, 138, 233) !important;
+      color: white !important;
+    }
+  }
+
+  .fullmodal {
+    :global {
+      .ant-modal,
+      .ant-modal-content {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: auto !important;
+      }
+
+      .ant-modal-body {
+        padding: 10px;
+        height: calc(~'100% - 45px');
+        background-color: #fafafa;
+      }
+    }
+  }
+
+  .smallmodal {
+    :global {
+      .ant-modal,
+      .ant-modal-content {
+        position: fixed !important;
+        height: 600px;
+        width: 1000px !important;
+        top: 50%;
+        margin-top: -300px;
+        left: 50%;
+        margin-left: -500px;
+      }
+
+      .ant-modal-body {
+        padding: 10px;
+        height: calc(~'100% - 45px');
+        background-color: #fafafa;
+      }
+    }
+  }
+
+  .ct-fullmodal,
+  .ct-fullmodal2,
+  .ct-modal-1200 {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+
+    .ant-modal,
+    .ant-modal-content {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      width: auto !important;
     }
 
-    .ant-table-row td {
-        text-align: center !important;
+    .ant-modal-body {
+      padding: 10px;
+      height: calc(~'100%');
+      background-color: #fafafa;
+    }
+  }
+
+  .ct-modal-1200 {
+    .ant-modal-content {
+      width: 1200px !important;
+      left: 50%;
+      margin-left: -600px;
+    }
+    .ant-modal-body {
+      height: calc(~'100% - 60px');
+    }
+  }
+
+  .ct-fullmodal2 {
+    .ant-modal-body {
+      height: calc(~'100% - 45px');
+    }
+  }
+
+  .ct-fullmodal2.ct-map {
+    .ant-modal-body {
+      padding: 0;
+    }
+  }
+
+  .ct-inline-loading {
+    // width: auto;
+    display: inline-block;
+  }
+
+  .ct-inline-loading-100 {
+    width: 100%;
+  }
+
+  .ct-search {
+    display: flex;
+    flex-direction: column;
+
+    .ct-search-header {
+      padding: 5px 10px;
+      border-bottom: 1px solid @border-color;
+      > * {
+        margin: 5px;
+      }
     }
 
-    .ant-spin-container {
-        overflow: visible !important;
+    .ct-search-content {
+      flex: 1;
+      width: 100%;
+      height: 0;
+      overflow: auto;
     }
 
-    .global-spin {
-        width: 100%;
-        margin: 40px 0 !important;
+    .ct-search-footer {
+      padding: 10px;
+      border-top: 1px solid @border-color;
+      text-align: right;
+    }
+  }
+
+  .ct-f-group {
+    padding: 10px 0;
+    background: white;
+    box-shadow: @box-shadow;
+    &:not(:first-child) {
+      margin-top: 20px;
     }
 
-    /*必须有才能应用其他样式*/
-    *::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
+    .ct-f-grouptitle {
+      position: relative;
+      padding: 5px 10px;
+      background: rgba(158, 158, 158, 0.06);
 
-    /*滚动条的轨道*/
-    ::-webkit-scrollbar-track {
-        background-color: #eee;
-        /*可设置border、background等属性*/
-    }
-
-    /*上下按钮的样式*/
-    ::-webkit-scrollbar-button {
-        display: none;
-    }
-
-    /*拖动条的样式*/
-    ::-webkit-scrollbar-thumb {
-        background-color: #aaa;
-        /*无法响应cursor、动画效果、宽度等*/
-        width: 10px;
-        cursor: pointer;
-        transition: 0.3s all ease;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background-color: #888;
-    }
-
-    .ant-table-thead {
-        th {
-            background: rgb(54, 138, 233) !important;
-            color: white !important;
-        }
-    }
-
-    .fullmodal {
-        :global {
-
-            .ant-modal,
-            .ant-modal-content {
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                right: 10px;
-                bottom: 10px;
-                width: auto !important;
-            }
-
-            .ant-modal-body {
-                padding: 10px;
-                height: calc(~'100% - 45px');
-                background-color: #fafafa;
-            }
-        }
-    }
-
-    .smallmodal {
-        :global {
-
-            .ant-modal,
-            .ant-modal-content {
-                position: fixed !important;
-                height: 600px;
-                width: 1000px !important;
-                top: 50%;
-                margin-top: -300px;
-                left: 50%;
-                margin-left: -500px;
-            }
-
-            .ant-modal-body {
-                padding: 10px;
-                height: calc(~'100% - 45px');
-                background-color: #fafafa;
-            }
-        }
-    }
-
-    .ct-fullmodal,
-    .ct-fullmodal2,
-    .ct-modal-1200 {
-        position: fixed;
+      &::before {
+        position: absolute;
         top: 0;
-        right: 0;
         left: 0;
-        bottom: 0;
+        content: '';
+        height: 100%;
+        width: 4px;
+        background-color: @primary-color;
+      }
 
-        .ant-modal,
-        .ant-modal-content {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            width: auto !important;
-        }
-
-        .ant-modal-body {
-            padding: 10px;
-            height: calc(~'100%');
-            background-color: #fafafa;
-        }
+      > span {
+        margin-right: 20px;
+        float: right;
+        color: red;
+      }
     }
 
-    .ct-modal-1200 {
-        .ant-modal-content {
-            width: 1200px !important;
-            left: 50%;
-            margin-left: -600px;
-        }
+    .ct-f-groupcontent {
+      width: 100%;
+      margin: 0;
+      padding: 0 30px;
+
+      .ant-row {
+        margin: 10px 0;
+      }
     }
 
-    .ct-fullmodal2 {
-        .ant-modal-body {
-            height: calc(~'100% - 45px');
-        }
+    .ct-f-ired {
+      color: red;
+      display: inline-block;
+      margin-right: 5px;
     }
-
-    .ct-fullmodal2.ct-map {
-        .ant-modal-body {
-            padding: 0;
-        }
-    }
-
-    .ct-inline-loading {
-        // width: auto;
-        display: inline-block;
-    }
-
-    .ct-inline-loading-100 {
-        width: 100%;
-    }
+  }
+  .ct-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.5);
+    flex-direction: column;
+  }
 }

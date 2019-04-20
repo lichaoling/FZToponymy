@@ -212,6 +212,7 @@ class MapService extends Component {
 
   componentDidMount() {
     this.initMap();
+    this.quickSearch = _.debounce(this.quickSearch, 1000);
   }
 
   render() {

@@ -1,0 +1,29 @@
+.sc {
+  display: flex;
+  flex-direction: column;
+
+  .schd {
+    padding: 5px;
+    > * {
+      margin: 5px;
+    }
+  }
+  .scbd {
+    flex: 1;
+    height: 0;
+  }
+  .scft {
+    padding: 10px;
+    text-align: right;
+  }
+  .rowbtns {
+    > * {
+      display: inline-block;
+      margin: 0 5px;
+      cursor: pointer;
+      &:hover {
+        color: @primary-color;
+      }
+    }
+  }
+}

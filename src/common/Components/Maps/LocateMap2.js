@@ -16,25 +16,19 @@ class LocateMap2 extends Component {
 
   defaultCenter = {
     zoom: 12,
-    center: [26.077768, 119.311231],//119.311231,26.077768
+    center: [26.077768, 119.311231], //119.311231,26.077768
   };
 
   baseLayers = {
     vec: {
       name: '地图',
       type: 'vec',
-      layer: L.layerGroup([
-        L.tileLayer.tdtgj_veco(),
-        L.tileLayer.tdtgj_veca(),
-      ]),
+      layer: L.layerGroup([L.tileLayer.tdtgj_veco(), L.tileLayer.tdtgj_veca()]),
     },
     img: {
       type: 'img',
       name: '影像',
-      layer: L.layerGroup([
-        L.tileLayer.tdtgj_imgo(),
-        L.tileLayer.tdtgj_imga(),
-      ]),
+      layer: L.layerGroup([L.tileLayer.tdtgj_imgo(), L.tileLayer.tdtgj_imga()]),
     },
   };
 
@@ -67,13 +61,13 @@ class LocateMap2 extends Component {
   getToolbar(cfg) {
     return cfg
       ? cfg.map(i => {
-        return (
-          <span key={i.id} onClick={e => i.onClick(e, i, this)}>
-            <span className={`iconfont ${i.icon}`} />
-            {i.name}
-          </span>
-        );
-      })
+          return (
+            <span key={i.id} onClick={e => i.onClick(e, i, this)}>
+              <span className={`iconfont ${i.icon}`} />
+              {i.name}
+            </span>
+          );
+        })
       : null;
   }
 
@@ -113,7 +107,7 @@ class LocateMap2 extends Component {
     let self = this;
     $(this.layerToggle)
       .find('>div')
-      .on('click', function () {
+      .on('click', function() {
         let type = $(this).data('type');
         self.changeLayer(type);
       });
@@ -328,89 +322,91 @@ class LocateMap2 extends Component {
 
   render() {
     let { showCDPanel } = this.state;
-
+    let { showToolbar } = this.props;
     return (
       <div className={st.locatemap2}>
         <div ref={e => (this.mapDom = e)} className={st.map} />
-        <div ref={e => (this.toolbar = e)} className={st.toolbar}>
-          {this.getBeforeButtons()}
-          <span
-            onClick={e => {
-              if (this.msCoordinates._enabled) {
-                this.disableMSTools();
-              } else {
-                this.activeMSCoordinates();
-              }
-            }}
-          >
-            <span className="iconfont icon-zuobiao" />
-            获取坐标
-          </span>
-          <span onClick={e => this.setState({ showCDPanel: !this.state.showCDPanel })}>
-            <span className="iconfont icon-location" />
-            坐标定位
-          </span>
-          <span
-            onClick={e => {
-              if (this.msLength._enabled) {
-                this.disableMSTools();
-              } else {
-                this.activeMSLength();
-              }
-            }}
-          >
-            <span className="iconfont icon-changduceliang" />
-            测距离
-          </span>
-          <span
-            onClick={e => {
-              if (this.msArea._enabled) {
-                this.disableMSTools();
-              } else {
-                this.activeMSArea();
-              }
-            }}
-          >
-            <span className="iconfont icon-mianji" />
-            测面积
-          </span>
-          <span
-            onClick={e => {
-              this.clearMap();
-            }}
-          >
-            <span className="iconfont icon-qingchu" />
-            清除
-          </span>
-          {this.getAfterButtons()}
-          <div className={st.coordinates + (showCDPanel ? ' active' : '')}>
-            <Input
-              addonBefore="经度"
-              defaultValue={this.lng}
-              onChange={e => (this.lng = e.target.value)}
-              type="number"
-              placeholder="经度"
-              style={{ width: 140 }}
-            />
-            &ensp;
-            <Input
-              addonBefore="维度"
-              defaultValue={this.lat}
-              onChange={e => (this.lat = e.target.value)}
-              type="number"
-              placeholder="维度"
-              style={{ width: 140 }}
-            />
-            &emsp;
-            <Button onClick={e => this.locate()} type="primary">
-              确定
-            </Button>
-            &ensp;
-            <Button onClick={e => this.clearLocateLayer()}>清除</Button>
-            &ensp;
-            <Icon type="close-circle" onClick={e => this.setState({ showCDPanel: false })} />
+        {showToolbar !== false ? (
+          <div ref={e => (this.toolbar = e)} className={st.toolbar}>
+            {this.getBeforeButtons()}
+            <span
+              onClick={e => {
+                if (this.msCoordinates._enabled) {
+                  this.disableMSTools();
+                } else {
+                  this.activeMSCoordinates();
+                }
+              }}
+            >
+              <span className="iconfont icon-zuobiao" />
+              获取坐标
+            </span>
+            <span onClick={e => this.setState({ showCDPanel: !this.state.showCDPanel })}>
+              <span className="iconfont icon-location" />
+              坐标定位
+            </span>
+            <span
+              onClick={e => {
+                if (this.msLength._enabled) {
+                  this.disableMSTools();
+                } else {
+                  this.activeMSLength();
+                }
+              }}
+            >
+              <span className="iconfont icon-changduceliang" />
+              测距离
+            </span>
+            <span
+              onClick={e => {
+                if (this.msArea._enabled) {
+                  this.disableMSTools();
+                } else {
+                  this.activeMSArea();
+                }
+              }}
+            >
+              <span className="iconfont icon-mianji" />
+              测面积
+            </span>
+            <span
+              onClick={e => {
+                this.clearMap();
+              }}
+            >
+              <span className="iconfont icon-qingchu" />
+              清除
+            </span>
+            {this.getAfterButtons()}
+            <div className={st.coordinates + (showCDPanel ? ' active' : '')}>
+              <Input
+                addonBefore="经度"
+                defaultValue={this.lng}
+                onChange={e => (this.lng = e.target.value)}
+                type="number"
+                placeholder="经度"
+                style={{ width: 140 }}
+              />
+              &ensp;
+              <Input
+                addonBefore="维度"
+                defaultValue={this.lat}
+                onChange={e => (this.lat = e.target.value)}
+                type="number"
+                placeholder="维度"
+                style={{ width: 140 }}
+              />
+              &emsp;
+              <Button onClick={e => this.locate()} type="primary">
+                确定
+              </Button>
+              &ensp;
+              <Button onClick={e => this.clearLocateLayer()}>清除</Button>
+              &ensp;
+              <Icon type="close-circle" onClick={e => this.setState({ showCDPanel: false })} />
+            </div>
           </div>
-        </div>
+        ) : null}
         <div ref={e => (this.layerToggle = e)} className={st.layerptoggle}>
           {this.getLayerToggle()}
         </div>

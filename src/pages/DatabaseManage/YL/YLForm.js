@@ -19,30 +19,40 @@ import {
   Radio,
   Tag,
 } from 'antd';
-import { getDistrictTreeByUID } from '../../../services/Common';
+import { getDistrictTreeByUID, GetNewGuid } from '../../../services/Common';
 import { checkRoadName } from '../../../services/DLQL';
-import { HouseModify, SearchRoads, SearchVillages } from '../../../services/DataManage';
+import {
+  HouseModify,
+  SearchRoads,
+  SearchVillages,
+  HouseDetails,
+} from '../../../services/DataManage';
 import { getDistricts } from '../../../utils/utils';
-import { warn, error } from '../../../utils/notification';
+import { warn, error, success } from '../../../utils/notification';
 import LocateMap from '../../../common/Components/Maps/LocateMap2.js';
 import icons from '../../../common/Components/Maps/icons';
+
+import { getRedIcon, redStyle } from '../../../common/LIcons';
 
 const FormItem = Form.Item;
 const { touchIcon } = icons;
 const { TextArea } = Input;
 
+
+
 class YLForm extends Component {
+  entity = {};
+
   state = {
     showLoading: false,
     districtLoading: false,
     districts: [],
-    showCheckIcon: 'empty',
-    nameCheckMessage: null,
-    showLocateMap: false,
-    data: this.props.data,
-    roadData: [],
-    villageData: [],
+    roads: [],
+    villages: [],
+    showYLLocateMap: false,
+    showMPLocateMap: false,
   };
+
   // 存储修改后的数据
   mObj = {};
 
@@ -55,176 +65,122 @@ class YLForm extends Component {
     });
   }
 
-  async roadSearch(e) {
-    await SearchRoads({ name: e }, d => {
-      this.setState({ roadData: d });
-    });
+  getFormData() {
+    let { id } = this.props;
+    if (id) {
+      this.setState({ showLoading: true });
+      HouseDetails(
+        id,
+        d => {
+          this.entity = d;
+          console.log(d);
+          this.setState({ reload: true, showLoading: false }, e => {
+            this.setState({ reload: false });
+          });
+          if (!d.HOUSEID) {
+            GetNewGuid(d => {
+              this.entity.HOUSEID = d;
+            });
+          }
+        },
+        e => {
+          error(e.message);
+          this.setState({ showLoading: false });
+        }
+      );
+    }
   }
-  async villageSearch(e) {
-    await SearchVillages({ name: e }, d => {
-      this.setState({ villageData: d });
+
+  searchRoads(v) {
+    SearchRoads({ name: v }, d => {
+      this.setState({
+        roads: (d || []).map(r => {
+          return {
+            NAME: r.NAME,
+            ID: r.ID,
+          };
+        }),
+      });
     });
   }
 
-  async checkName() {
-    if (this.state.data.DISTRICTID && this.state.data.NAME) {
-      let { ID, DISTRICTID, NAME } = this.state.data;
-      await checkRoadName({ ID, DISTRICTID, NAME }, e => {
-        if (e.length === 0) {
-          this.setState({
-            nameCheckMessage: '“命名”有效、可用！',
-            showCheckIcon: 'yes',
-          });
-        } else {
-          this.setState({
-            nameCheckMessage: e.map(t => <span>{t}</span>),
-            showCheckIcon: 'no',
-          });
-        }
-      });
-    } else {
+  searchVillages(v) {
+    SearchVillages({ name: v }, d => {
       this.setState({
-        nameCheckMessage: null,
-        showCheckIcon: 'empty',
+        villages: (d || []).map(r => {
+          return {
+            NAME: r.NAME,
+            ID: r.ID,
+          };
+        }),
       });
-    }
+    });
   }
-  validate(errs) {
-    errs = errs || [];
-    let { data } = this.state;
+
+  getRoads() {
+    let { roads } = this.state;
+    let { entity } = this;
+    roads = roads || [];
+    roads = entity.ROADID ? roads.concat({ ID: entity.ROADID, NAME: entity.ROADNAME }) : roads;
+    return roads.map(d => (
+      <Select.Option key={d.ID} value={d.ID}>
+        {d.NAME}
+      </Select.Option>
+    ));
+  }
+
+  getVillages() {
+    let { villages } = this.state;
+    let { entity } = this;
+    villages = villages || [];
+    villages = entity.VILLAGEID
+      ? villages.concat({ ID: entity.VILLAGEID, NAME: entity.VILLAGENAME })
+      : villages;
+    return villages.map(d => (
+      <Select.Option key={d.ID} value={d.ID}>
+        {d.NAME}
+      </Select.Option>
+    ));
+  }
+
+  save() {
     let saveObj = {
-      ID: data.ID,
+      ...this.entity,
       ...this.mObj,
     };
-    if (saveObj.districts) {
-      let ds = saveObj.districts;
-      saveObj.DISTRICTID = ds[ds.length - 1];
-      delete saveObj.districts;
-    }
-    if (saveObj.BZTIME) {
-      saveObj.BZTIME = saveObj.BZTIME.toISOString();
-    }
-    if (saveObj.JCSJ) {
-      saveObj.JCSJ = saveObj.JCSJ.toISOString();
-    }
-    let validateObj = {
-      ...data,
-      ...saveObj,
-    };
-    // 行政区必填
-    if (!validateObj.DISTRICTID) {
-      errs.push('请选择行政区');
-    }
-    // 标准名称
-    if (!validateObj.NAME) {
-      errs.push('请填写标准名称');
-    }
-    //命名时间
-    if (!validateObj.BZTIME) {
-      errs.push('请填写命名时间');
-    }
 
-    //联系人
-    if (!validateObj.LXR) {
-      errs.push('请填写联系人');
-    }
-
-    //联系电话
-    if (!validateObj.LXDH) {
-      errs.push('请填写联系电话');
-    }
-
-    //申报单位
-    if (!validateObj.SBDW) {
-      errs.push('请填写申报单位');
-    }
-    return { errs, saveObj, validateObj };
-  }
-  save() {
-    this.props.form.validateFields(
-      async function(err, values) {
-        let errors = [];
-        if (err) {
-          for (let i in err) {
-            let j = err[i];
-            if (j.errors) {
-              errors = errors.concat(j.errors.map(item => item.message));
-            }
-          }
-        }
-        this.checkName();
-        let msg = this.state.showCheckIcon == 'no' ? '命名检查未通过！' : null;
-        if (msg) errors = errors.concat(msg);
-        let { errs, saveObj } = this.validate(errors);
-        if (errs.length) {
-          Modal.error({
-            title: '错误',
-            okText: '知道了',
-            content: errs.map((e, i) => (
-              <div>
-                {i + 1}、{e}；
-              </div>
-            )),
-          });
-        } else {
-          await roadModify({ dataJson: JSON.stringify(saveObj) }, e => {
-            if (e == null) {
-              notification.success({ description: '保存成功！', message: '成功' });
-              this.mObj = {};
-              if (this.props.onSaveSuccess) {
-                this.props.onSaveSuccess();
-              }
-            }
-          });
-        }
-      }.bind(this)
-    );
-  }
-
-  showLocateMap() {
-    this.setState({ showLocateMap: true });
-  }
-
-  closeLocateMap() {
-    this.setState({ showLocateMap: false });
-  }
-
-  getCheckIcon() {
-    let { showCheckIcon } = this.state;
-    let dom = null;
-    if (showCheckIcon === 'yes') dom = <span className="iconfont icon-iconcorrect" />;
-    else if (showCheckIcon === 'no') dom = <span className="iconfont icon-cuowu" />;
-    return dom;
+    HouseModify(saveObj, e => {
+      success('保存成功');
+      this.mObj = {};
+      this.getFormData();
+    });
   }
 
   componentDidMount() {
-    if (this.state.data.ROADNAME) this.roadSearch(this.state.data.ROADNAME);
-    if (this.state.data.VILLAGENAME) this.villageSearch(this.state.data.VILLAGENAME);
+    this.searchRoads = _.debounce(this.searchRoads, 1000);
+    this.searchVillages = _.debounce(this.searchVillages, 1000);
     this.getDistricts();
-    this.props.addRef && this.props.addRef(this);
+    this.getFormData();
   }
+
   render() {
     let {
       showLoading,
       districts,
       districtLoading,
-      showCheckIcon,
-      nameCheckMessage,
-      showLocateMap,
-      data,
-      roadData,
-      villageData,
+      showYLLocateMap,
+      showMPLocateMap,
+      roads,
+      reload,
     } = this.state;
+    let { entity } = this;
     return (
       <div className={st.YLForm}>
-        <Spin
-          className={showLoading ? 'active' : ''}
-          spinning={showLoading}
-          size="large"
-          tip="数据加载中..."
-        />
-        <div className={st.content} style={showLoading ? { filter: 'blur(2px)' } : null}>
-          <Form>
+        {showLoading ? (
+          <Spin className={st.loading} spinning={showLoading} size="large" tip="数据加载中..." />
+        ) : null}
+        {reload ? null : (
+          <div className={st.content} style={showLoading ? { filter: 'blur(2px)' } : null}>
             <div className={st.group}>
               <div className={st.grouptitle}>
                 门牌信息<span>说明：“ * ”号标识的为必填项</span>
@@ -241,20 +197,19 @@ class YLForm extends Component {
                         </span>
                       }
                     >
-                      <Spin wrapperClassName="ct-inline-loading-100" spinning={districtLoading}>
-                        <Cascader
-                          defaultValue={data.FULLDISTRICTID.split('.')}
-                          expandTrigger="hover"
-                          changeOnSelect
-                          options={districts}
-                          placeholder="所在（跨）行政区"
-                          onChange={(a, b) => {
-                            this.mObj.districts = a;
-                            this.setState({ showCheckIcon: 'empty', nameCheckMessage: null });
-                            this.checkName();
-                          }}
-                        />
-                      </Spin>
+                      <Cascader
+                        defaultValue={
+                          entity.FULLDISTRICTID ? entity.FULLDISTRICTID.split('.') : undefined
+                        }
+                        expandTrigger="hover"
+                        changeOnSelect
+                        options={districts}
+                        placeholder="所在（跨）行政区"
+                        onChange={(a, b) => {
+                          this.mObj.FULLDISTRICTID = a && a.join('.');
+                        }}
+                        style={{ width: '100%' }}
+                      />
                     </FormItem>
                   </Col>
                   <Col span={8}>
@@ -269,18 +224,24 @@ class YLForm extends Component {
                     >
                       <Select
                         showSearch
-                        defaultValue={data.ROADNAME}
+                        allowClear
+                        defaultValue={entity.ROADID || undefined}
                         placeholder="所属道路"
-                        defaultActiveFirstOption={false}
-                        showArrow={false}
-                        filterOption={false}
-                        onSearch={e => this.roadSearch(e)}
-                        onChange={e => this.roadSearch(e)}
-                        notFoundContent={null}
+                        filterOption={(inputValue, option) => {
+                          return !!(
+                            option.props.children && option.props.children.indexOf(inputValue) != -1
+                          );
+                        }}
+                        onSearch={v => {
+                          this.searchRoads(v);
+                        }}
+                        onChange={(v, o) => {
+                          this.mObj.ROADID = v;
+                          this.mObj.ROADNAME = o.props.children;
+                        }}
+                        style={{ width: '100%' }}
                       >
-                        {roadData.map(d => (
-                          <Option key={d.ID}>{d.NAME}</Option>
-                        ))}
+                        {this.getRoads()}
                       </Select>
                     </FormItem>
                   </Col>
@@ -296,87 +257,390 @@ class YLForm extends Component {
                     >
                       <Select
                         showSearch
-                        defaultValue={data.VILLAGENAME}
+                        allowClear
+                        defaultValue={entity.VILLAGEID || undefined}
                         placeholder="所属自然村"
-                        defaultActiveFirstOption={false}
-                        showArrow={false}
-                        filterOption={false}
-                        onSearch={e => this.villageSearch(e)}
-                        onChange={e => this.villageSearch(e)}
-                        notFoundContent={null}
+                        filterOption={(inputValue, option) => {
+                          return !!(
+                            option.props.children && option.props.children.indexOf(inputValue) != -1
+                          );
+                        }}
+                        onSearch={v => {
+                          this.searchVillages(v);
+                        }}
+                        onChange={(v, o) => {
+                          this.mObj.VILLAGEID = v;
+                          this.mObj.VILLAGENAME = o.props.children;
+                        }}
+                        style={{ width: '100%' }}
                       >
-                        {villageData.map(d => (
-                          <Option key={d.ID}>{d.NAME}</Option>
-                        ))}
+                        {this.getVillages()}
                       </Select>
                     </FormItem>
                   </Col>
-                 
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>门牌规格</span>}
+                    >
+                      <Input
+                        placeholder="门牌规格"
+                        defaultValue={entity.MPSIZE}
+                        onChange={e => {
+                          this.mObj.MPSIZE = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>门牌号</span>}
+                    >
+                      <Input
+                        placeholder="门牌号"
+                        addonAfter="号"
+                        defaultValue={entity.MPNUM_NO}
+                        onChange={e => {
+                          this.mObj.MPNUM_NO = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <Button
+                      onClick={e => {
+                        this.setState({ showMPLocateMap: true });
+                      }}
+                      style={{ margin: '8px 0 0 30px' }}
+                      type="primary"
+                      shape="circle"
+                      icon="environment"
+                    />
+                  </Col>
                 </Row>
               </div>
             </div>
-          </Form>
+            <div className={st.group}>
+              <div className={st.grouptitle}>院落信息</div>
+              <div className={st.groupcontent}>
+                <Row>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>标准名称</span>}
+                    >
+                      <Input
+                        placeholder="标准名称"
+                        defaultValue={entity.HOUSENAME || undefined}
+                        onChange={e => {
+                          this.mObj.HOUSENAME = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>宣传名称</span>}
+                    >
+                      <Input
+                        placeholder="宣传名称"
+                        defaultValue={entity.HOUSEXCMC || undefined}
+                        onChange={e => {
+                          this.mObj.HOUSEXCMC = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>登记名称</span>}
+                    >
+                      <Input
+                        placeholder="登记名称"
+                        defaultValue={entity.HOUSEDJMC || undefined}
+                        onChange={e => {
+                          this.mObj.HOUSEDJMC = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>功能</span>}
+                    >
+                      <Input
+                        placeholder="功能"
+                        defaultValue={entity.HOUSEGN || undefined}
+                        onChange={e => {
+                          this.mObj.HOUSEGN = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>小区类型</span>}
+                    >
+                      <Select
+                        style={{ width: '100%' }}
+                        defaultValue={entity.HOUSEXQLX || undefined}
+                        placeholder="小区类型"
+                        onChange={e => {
+                          this.mObj.HOUSEXQLX = e.name;
+                          this.mObj.HOUSEDZBM = e.id;
+                        }}
+                      >
+                        <Select.Option key="31" value={{ id: '31', name: '小区' }}>
+                          小区
+                        </Select.Option>
+                        <Select.Option key="32" value={{ id: '32', name: '大厦院落' }}>
+                          大厦院落
+                        </Select.Option>
+                        <Select.Option key="33" value={{ id: '33', name: '单位院落' }}>
+                          单位院落
+                        </Select.Option>
+                        <Select.Option key="34" value={{ id: '34', name: '工矿企业' }}>
+                          工矿企业
+                        </Select.Option>
+                        <Select.Option key="35" value={{ id: '35', name: '文体娱乐' }}>
+                          文体娱乐
+                        </Select.Option>
+                        <Select.Option key="36" value={{ id: '36', name: '宗教场所' }}>
+                          宗教场所
+                        </Select.Option>
+                        <Select.Option key="37" value={{ id: '37', name: '其它' }}>
+                          其它
+                        </Select.Option>
+                      </Select>
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <Button
+                      onClick={e => {
+                        this.setState({ showYLLocateMap: true });
+                      }}
+                      style={{ margin: '8px 0 0 30px' }}
+                      type="primary"
+                      shape="circle"
+                      icon="environment"
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>建筑面积</span>}
+                    >
+                      <Input
+                        placeholder="建筑面积"
+                        defaultValue={entity.HOUSEJZMJ || undefined}
+                        type="number"
+                        onChange={e => {
+                          this.mObj.HOSUEJZMJ = e.target.value;
+                        }}
+                        addonAfter="m²"
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>占地面积</span>}
+                    >
+                      <Input
+                        placeholder="占地面积"
+                        type="number"
+                        defaultValue={entity.HOUSEZDMJ || undefined}
+                        onChange={e => {
+                          this.mObj.HOUSEZDMJ = e.target.value;
+                        }}
+                        addonAfter="m²"
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>绿化率</span>}
+                    >
+                      <Input
+                        placeholder="绿化率"
+                        type="number"
+                        defaultValue={entity.HOUSELHL || undefined}
+                        onChange={e => {
+                          this.mObj.HOUSELHL = e.target.value;
+                        }}
+                        addonAfter="%"
+                      />
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>始建时间</span>}
+                    >
+                      <DatePicker
+                        style={{ width: '100%' }}
+                        placeholder="始建时间"
+                        defaultValue={entity.HOUSESJSJ ? moment(entity.HOUSESJSJ) : undefined}
+                        onChange={e => {
+                          this.mObj.HOUSESJSJ = e && e.format('YYYY-MM-DD');
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                  <Col span={8}>
+                    <FormItem
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      label={<span>建成时间</span>}
+                    >
+                      <DatePicker
+                        style={{ width: '100%' }}
+                        placeholder="建成时间"
+                        defaultValue={entity.HOSUEJCSJ ? moment(entity.HOSUEJCSJ) : undefined}
+                        onChange={e => {
+                          this.mObj.HOSUEJCSJ = e && e.format('YYYY-MM-DD');
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={16}>
+                    <FormItem
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                      label={<span>名称来历及含义</span>}
+                    >
+                      <Input.TextArea
+                        style={{ height: 80 }}
+                        placeholder="名称来历及含义"
+                        defaultValue={entity.HOSUEMCHY || undefined}
+                        onChange={e => {
+                          this.mObj.HOSUEMCHY = e.target.value;
+                        }}
+                      />
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={16}>
+                    <FormItem
+                      labelCol={{ span: 4 }}
+                      wrapperCol={{ span: 20 }}
+                      label={<span>院落照片</span>}
+                    />
+                  </Col>
+                </Row>
+              </div>
+            </div>
+          </div>
+        )}
+        <div className={st.footer} style={showLoading ? { filter: 'blur(2px)' } : null}>
+          <Button type="primary" onClick={this.save.bind(this)}>
+            保存
+          </Button>
+          &emsp;
+          <Button onClick={e => this.props.onCancel && this.props.onCancel()}>取消</Button>
         </div>
         <Modal
           bodyStyle={{ padding: 0 }}
-          width="90%"
           style={{ top: 10 }}
           wrapClassName={st.locatemap}
-          visible={showLocateMap}
+          visible={showYLLocateMap}
           destroyOnClose={true}
-          onCancel={this.closeLocateMap.bind(this)}
-          title="定位"
+          onCancel={e => {
+            this.setState({ showYLLocateMap: false });
+          }}
+          title="院落位置"
           footer={null}
         >
           <LocateMap
             onMapReady={lm => {
-              let { GEOM_WKT } = data;
-              if (GEOM_WKT) {
-                let geometry = Terraformer.WKT.parse(GEOM_WKT);
-                lm.mpLayer = L.geoJSON(geometry, {
-                  style: function(feature) {
-                    return {
-                      stroke: true,
-                      color: 'red',
-                      weight: 4,
-                      opacity: 0.5,
-                      fill: false,
-                      clickable: true,
-                    };
+              let { HOUSEWKT } = this.entity;
+              if (HOUSEWKT) {
+                L.geoJSON(Terraformer.WKT.parse(HOUSEWKT), {
+                  onEachFeature: function(f, l) {
+                    l.setIcon(getRedIcon(''));
+                    lm.housePLayer = l;
+                    lm.map.setView(l._latlng, 16);
                   },
                 }).addTo(lm.map);
-                let coordinates = geometry.coordinates.map(e => {
-                  return e.reverse();
-                });
-                lm.map.fitBounds(coordinates);
+                // 另外一个面状定位
+              } else {
+                warn('院落尚未定位');
               }
             }}
-            onMapClear={lm => {
-              lm.mpLayer && lm.mpLayer.remove();
-              lm.mpLayer = null;
-            }}
-            beforeBtns={[
+            afterBtns={[
               {
-                id: 'locate',
-                name: '道路、桥梁定位',
+                id: 'locatepoint',
+                name: '院落定位（点）',
+                icon: 'icon-dingwei',
+                onClick: (dom, i, lm) => {
+                  if (!lm.locatePenP) {
+                    lm.locatePenP = new L.Draw.Marker(lm.map, {
+                      icon: getRedIcon(''),
+                    });
+                    lm.locatePenP.on(L.Draw.Event.CREATED, e => {
+                      lm.housePLayer && lm.housePLayer.remove();
+                      var { layer } = e;
+                      lm.housePLayer = layer;
+                      layer.addTo(lm.map);
+                    });
+                  }
+                  lm.disableMSTools();
+                  if (lm.locatePenP._enabled) {
+                    lm.locatePenP.disable();
+                  } else {
+                    lm.locatePenP.enable();
+                  }
+                },
+              },
+              {
+                id: 'locatepolygon',
+                name: '院落定位（面）',
                 icon: 'icon-dingwei',
                 onClick: (dom, i, lm) => {
                   if (!lm.locatePen) {
-                    lm.locatePen = new L.Draw.Polyline(lm.map, {
+                    lm.locatePen = new L.Draw.Polygon(lm.map, {
                       shapeOptions: {
                         stroke: true,
                         color: 'red',
                         weight: 4,
                         opacity: 0.5,
-                        fill: false,
+                        fill: true,
                         clickable: true,
                       },
                       icon: touchIcon,
                     });
                     lm.locatePen.on(L.Draw.Event.CREATED, e => {
-                      lm.mpLayer && lm.mpLayer.remove();
+                      lm.houseGLayer && lm.houseGLayer.remove();
                       var { layer } = e;
-                      lm.mpLayer = layer;
+                      lm.houseGLayer = layer;
                       layer.addTo(lm.map);
                     });
                   }
@@ -393,16 +657,87 @@ class YLForm extends Component {
                 name: '保存定位',
                 icon: 'icon-save',
                 onClick: (dom, item, lm) => {
-                  let geometry = lm.mpLayer ? lm.mpLayer.toGeoJSON().geometry : null;
-                  data.GEOM_WKT = geometry ? Terraformer.WKT.convert(geometry) : null;
-                  this.mObj.GEOM_WKT = data.GEOM_WKT;
-                  this.setState({
-                    data,
-                  });
-                  this.closeLocateMap();
+                  let geo1 = lm.housePLayer ? lm.housePLayer.toGeoJSON().geometry : null;
+                  this.entity.HOUSEWKT = geo1 ? Terraformer.WKT.convert(geo1) : null;
+                  this.setState({ showYLLocateMap: false });
                 },
               },
             ]}
+            onMapClear={lm => {
+              lm.housePLayer && lm.housePLayer.remove();
+              lm.housePLayer = null;
+              lm.houseGLayer && lm.houseGLayer.remove();
+              lm.houseGLayer = null;
+            }}
+          />
+        </Modal>
+        <Modal
+          bodyStyle={{ padding: 0 }}
+          style={{ top: 10 }}
+          wrapClassName={st.locatemap}
+          visible={showMPLocateMap}
+          destroyOnClose={true}
+          onCancel={e => {
+            this.setState({ showMPLocateMap: false });
+          }}
+          title="门牌位置"
+          footer={null}
+        >
+          <LocateMap
+            onMapReady={lm => {
+              let { MPWKT } = this.entity;
+              if (MPWKT) {
+                L.geoJSON(Terraformer.WKT.parse(MPWKT), {
+                  onEachFeature: function(f, l) {
+                    l.setIcon(getRedIcon(''));
+                    lm.mpLayer = l;
+                    lm.map.setView(l._latlng, 16);
+                  },
+                }).addTo(lm.map);
+              } else {
+                warn('门牌尚未定位');
+              }
+            }}
+            afterBtns={[
+              {
+                id: 'locatepoint',
+                name: '门牌定位',
+                icon: 'icon-dingwei',
+                onClick: (dom, i, lm) => {
+                  if (!lm.locatePenP) {
+                    lm.locatePenP = new L.Draw.Marker(lm.map, {
+                      icon: getRedIcon(''),
+                    });
+                    lm.locatePenP.on(L.Draw.Event.CREATED, e => {
+                      lm.mpLayer && lm.mpLayer.remove();
+                      var { layer } = e;
+                      lm.mpLayer = layer;
+                      layer.addTo(lm.map);
+                    });
+                  }
+                  lm.disableMSTools();
+                  if (lm.locatePenP._enabled) {
+                    lm.locatePenP.disable();
+                  } else {
+                    lm.locatePenP.enable();
+                  }
+                },
+              },
+              {
+                id: 'savelocation',
+                name: '保存定位',
+                icon: 'icon-save',
+                onClick: (dom, item, lm) => {
+                  let geo1 = lm.mpLayer ? lm.mpLayer.toGeoJSON().geometry : null;
+                  this.entity.MPWKT = geo1 ? Terraformer.WKT.convert(geo1) : null;
+                  this.setState({ showMPLocateMap: false });
+                },
+              },
+            ]}
+            onMapClear={lm => {
+              lm.mpLayer && lm.mpLayer.remove();
+              lm.mpLayer = null;
+            }}
           />
         </Modal>
       </div>

@@ -3,24 +3,36 @@
 .YLForm {
   height: 100%;
   width: 100%;
-
-  //display: flex;
+  display: flex;
+  flex-direction: column;
+  .loading {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
   .content {
     width: 100%;
-    background-color: #fff;
+    flex: 1;
+    overflow: auto;
+    padding: 5px;
     // display: flex;
-    // flex-direction: column;
+
     // align-items: center;
     // justify-content: center;
 
     .group {
-      margin: 20px;
       padding: 10px 0;
       background: white;
       box-shadow: @box-shadow;
-
-      &:first-child {
-        margin-top: 15px;
+      &:not(:first-child) {
+        margin-top: 20px;
       }
 
       .grouptitle {
@@ -38,7 +50,7 @@
           background-color: @primary-color;
         }
 
-        >span {
+        > span {
           margin-right: 20px;
           float: right;
           color: red;
@@ -81,7 +93,12 @@
       }
     }
   }
-
+  .footer {
+    padding: 10px 10px 10px 10px;
+    text-align: right;
+    background: white;
+    box-shadow: @box-shadow;
+  }
 }
 
 .locatemap {

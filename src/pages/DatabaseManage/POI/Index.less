@@ -1,5 +1,34 @@
 @import '../../../common/default.less';
 .Index {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+
+  .results {
+    flex: 1;
+
+    .rowbtns {
+      > * {
+        display: inline-block;
+        margin: 0 5px;
+        cursor: pointer;
+        &:hover {
+          color: @primary-color;
+        }
+      }
+    }
+  }
+
+  .map {
+    width: 500px;
+    border-left: 1px solid @border-color;
+  }
+
+  :global {
+    .ct-search-content {
+      display: flex;
+      > div {
+        height: 100%;
+      }
+    }
+  }
 }

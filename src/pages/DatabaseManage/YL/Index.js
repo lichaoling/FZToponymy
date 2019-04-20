@@ -98,11 +98,12 @@ class Index extends Component {
     reload: false,
     tableLoading: false,
     reset: false,
-    showEditModal: false,
+    showEditModal: true,
     editModalData: null,
   };
 
   edit(i) {
+    // console.log(i);
     this.setState({
       showEditModal: true,
       editModalData: i,
@@ -402,6 +403,7 @@ class Index extends Component {
               <Button icon="sync" onClick={e => this.clearCondition()}>
                 清空
               </Button>
+             
             </div>
           )}
         </div>
@@ -409,6 +411,7 @@ class Index extends Component {
           <div className={st.body}>
             <div className={st.tab}>
               <Table
+                bordered
                 columns={this.columns}
                 dataSource={rows}
                 pagination={false}
@@ -442,23 +445,25 @@ class Index extends Component {
             <Map ref={e => (this.refMap = e)} />
           </div>
         </div>
-
         {showEditModal ? (
           <Modal
-            bodyStyle={{ padding: 0}}
-            width="90%"
-            title="院落基本信息修改"
-            visible={true}
-            onOk={() => this.save()}
-            onCancel={() => this.closeModal()}
+            wrapClassName="ct-modal-1200"
+            title="院落信息"
+            visible={showEditModal}
+            // onOk={() => this.save()}
+            // onCancel={() => this.closeModal()}
+            footer={false}
+            onCancel={e => {
+              this.setState({ showEditModal: false });
+            }}
           >
             <YLForm
-              data={editModalData}
-              addRef={e => {
-                this.ylform = e;
+              // id={editModalData && editModalData.MPID}
+              id="3501820060000162092" //测试用
+              onCancel={e => {
+                this.setState({ showEditModal: false });
               }}
               onSaveSuccess={() => {
-                this.closeModal();
                 this.search();
               }}
             />
