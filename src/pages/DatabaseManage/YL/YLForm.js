@@ -31,14 +31,19 @@ import { getDistricts } from '../../../utils/utils';
 import { warn, error, success } from '../../../utils/notification';
 import LocateMap from '../../../common/Components/Maps/LocateMap2.js';
 import icons from '../../../common/Components/Maps/icons';
-
 import { getRedIcon, redStyle } from '../../../common/LIcons';
+import {
+  baseUrl,
+  fileBasePath,
+  url_UploadPicture,
+  url_RemovePicture,
+  url_GetPictureUrls,
+} from '../../../common/urls.js';
+import UploadPicture from '../../../components/UploadPicture/UploadPicture';
 
 const FormItem = Form.Item;
 const { touchIcon } = icons;
 const { TextArea } = Input;
-
-
 
 class YLForm extends Component {
   entity = {};
@@ -49,6 +54,8 @@ class YLForm extends Component {
     districts: [],
     roads: [],
     villages: [],
+    disabledRoad: false,
+    disabledVillage: false,
     showYLLocateMap: false,
     showMPLocateMap: false,
   };
@@ -74,9 +81,17 @@ class YLForm extends Component {
         d => {
           this.entity = d;
           console.log(d);
-          this.setState({ reload: true, showLoading: false }, e => {
-            this.setState({ reload: false });
-          });
+          this.setState(
+            {
+              disabledRoad: !!d.VILLAGEID,
+              disabledVillage: !!d.ROADID,
+              reload: true,
+              showLoading: false,
+            },
+            e => {
+              this.setState({ reload: false });
+            }
+          );
           if (!d.HOUSEID) {
             GetNewGuid(d => {
               this.entity.HOUSEID = d;
@@ -149,6 +164,17 @@ class YLForm extends Component {
       ...this.mObj,
     };
 
+    let { FULLDISTRICTID, VILLAGEID, ROADID } = saveObj;
+
+    if (!FULLDISTRICTID) {
+      error('请选择行政区划');
+      return;
+    }
+    if (!VILLAGEID && !ROADID) {
+      error('所属道路、所属自然村不能同时为空');
+      return;
+    }
+
     HouseModify(saveObj, e => {
       success('保存成功');
       this.mObj = {};
@@ -172,6 +198,8 @@ class YLForm extends Component {
       showMPLocateMap,
       roads,
       reload,
+      disabledRoad,
+      disabledVillage,
     } = this.state;
     let { entity } = this;
     return (
@@ -223,6 +251,7 @@ class YLForm extends Component {
                       }
                     >
                       <Select
+                        disabled={disabledRoad}
                         showSearch
                         allowClear
                         defaultValue={entity.ROADID || undefined}
@@ -237,7 +266,8 @@ class YLForm extends Component {
                         }}
                         onChange={(v, o) => {
                           this.mObj.ROADID = v;
-                          this.mObj.ROADNAME = o.props.children;
+                          this.mObj.ROADNAME = o && o.props.children;
+                          this.setState({ disabledRoad: false, disabledVillage: !!v });
                         }}
                         style={{ width: '100%' }}
                       >
@@ -256,6 +286,7 @@ class YLForm extends Component {
                       }
                     >
                       <Select
+                        disabled={disabledVillage}
                         showSearch
                         allowClear
                         defaultValue={entity.VILLAGEID || undefined}
@@ -270,7 +301,8 @@ class YLForm extends Component {
                         }}
                         onChange={(v, o) => {
                           this.mObj.VILLAGEID = v;
-                          this.mObj.VILLAGENAME = o.props.children;
+                          this.mObj.VILLAGENAME = o && o.props.children;
+                          this.setState({ disabledRoad: !!v, disabledVillage: false });
                         }}
                         style={{ width: '100%' }}
                       >
@@ -398,15 +430,16 @@ class YLForm extends Component {
                       label={<span>小区类型</span>}
                     >
                       <Select
+                        labelInValue
                         style={{ width: '100%' }}
                         defaultValue={entity.HOUSEXQLX || undefined}
                         placeholder="小区类型"
                         onChange={e => {
-                          this.mObj.HOUSEXQLX = e.name;
-                          this.mObj.HOUSEDZBM = e.id;
+                          this.mObj.HOUSEXQLX = e.key;
+                          this.mObj.HOUSEDZBM = e.label;
                         }}
                       >
-                        <Select.Option key="31" value={{ id: '31', name: '小区' }}>
+                        {/* <Select.Option key="31" value={{ id: '31', name: '小区' }}>
                           小区
                         </Select.Option>
                         <Select.Option key="32" value={{ id: '32', name: '大厦院落' }}>
@@ -425,6 +458,27 @@ class YLForm extends Component {
                           宗教场所
                         </Select.Option>
                         <Select.Option key="37" value={{ id: '37', name: '其它' }}>
+                          其它
+                        </Select.Option> */}
+                        <Select.Option key="31" name="小区">
+                          小区
+                        </Select.Option>
+                        <Select.Option key="32" name="大厦院落">
+                          大厦院落
+                        </Select.Option>
+                        <Select.Option key="33" name="单位院落">
+                          单位院落
+                        </Select.Option>
+                        <Select.Option key="34" name="工矿企业">
+                          工矿企业
+                        </Select.Option>
+                        <Select.Option key="35" name="文体娱乐">
+                          文体娱乐
+                        </Select.Option>
+                        <Select.Option key="36" name="宗教场所">
+                          宗教场所
+                        </Select.Option>
+                        <Select.Option key="37" name="其它">
                           其它
                         </Select.Option>
                       </Select>
@@ -553,7 +607,17 @@ class YLForm extends Component {
                       labelCol={{ span: 4 }}
                       wrapperCol={{ span: 20 }}
                       label={<span>院落照片</span>}
-                    />
+                    >
+                      <UploadPicture
+                        fileList={this.entity.SQB}
+                        id={this.entity.ID}
+                        fileBasePath={baseUrl}
+                        data={{ DOCTYPE: null, FileType: '小区（楼宇）照片' }}
+                        uploadAction={url_UploadPicture}
+                        removeAction={url_RemovePicture}
+                        getAction={url_GetPictureUrls}
+                      />
+                    </FormItem>
                   </Col>
                 </Row>
               </div>
@@ -581,16 +645,30 @@ class YLForm extends Component {
         >
           <LocateMap
             onMapReady={lm => {
-              let { HOUSEWKT } = this.entity;
-              if (HOUSEWKT) {
-                L.geoJSON(Terraformer.WKT.parse(HOUSEWKT), {
-                  onEachFeature: function(f, l) {
-                    l.setIcon(getRedIcon(''));
-                    lm.housePLayer = l;
-                    lm.map.setView(l._latlng, 16);
-                  },
-                }).addTo(lm.map);
-                // 另外一个面状定位
+              let { HOUSEWKT, HOUSEWKT2 } = this.entity;
+              if (HOUSEWKT || HOUSEWKT2) {
+                if (HOUSEWKT)
+                  L.geoJSON(Terraformer.WKT.parse(HOUSEWKT), {
+                    onEachFeature: function(f, l) {
+                      l.setIcon(getRedIcon(''));
+                      lm.housePLayer = l;
+                      lm.map.setView(l._latlng, 16);
+                    },
+                  }).addTo(lm.map);
+                if (HOUSEWKT2)
+                  L.geoJSON(Terraformer.WKT.parse(HOUSEWKT2), {
+                    onEachFeature: function(f, l) {
+                      l.setStyle({
+                        stroke: true,
+                        color: 'red',
+                        weight: 4,
+                        opacity: 0.5,
+                        fill: true,
+                        clickable: true,
+                      });
+                      lm.houseGLayer = l;
+                    },
+                  }).addTo(lm.map);
               } else {
                 warn('院落尚未定位');
               }
@@ -659,6 +737,8 @@ class YLForm extends Component {
                 onClick: (dom, item, lm) => {
                   let geo1 = lm.housePLayer ? lm.housePLayer.toGeoJSON().geometry : null;
                   this.entity.HOUSEWKT = geo1 ? Terraformer.WKT.convert(geo1) : null;
+                  let geo2 = lm.houseGLayer ? lm.houseGLayer.toGeoJSON().geometry : null;
+                  this.entity.HOUSEWKT2 = geo2 ? Terraformer.WKT.convert(geo2) : null;
                   this.setState({ showYLLocateMap: false });
                 },
               },

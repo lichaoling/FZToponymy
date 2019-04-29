@@ -8,12 +8,22 @@ import {
   SearchHouseByMP,
   SearchLZByHouse,
   GetNewGuid,
+  SearchRoadsByDistrictID,
+  SearchVillagesByDistrictID,
 } from '../../../services/Common';
 import { getDistricts2 } from '../../../utils/utils';
 import { SearchRoads, POIModify, POIDetails } from '../../../services/DataManage';
 import { warn, error, success } from '../../../utils/notification';
 import LocateMap from '../../../common/Components/Maps/LocateMap2.js';
+import UploadPicture from '../../../components/UploadPicture/UploadPicture';
 import { getRedIcon } from '../../../common/LIcons';
+import {
+  baseUrl,
+  fileBasePath,
+  url_UploadPicture,
+  url_RemovePicture,
+  url_GetPictureUrls,
+} from '../../../common/urls.js';
 
 let FormItem = Form.Item;
 
@@ -21,6 +31,7 @@ class POIForm extends Component {
   state = {
     districts: [],
     roads: [],
+    villages: [],
     mps: [],
     houses: [],
     lzs: [],
@@ -28,6 +39,15 @@ class POIForm extends Component {
     fullAddress: '',
     showLocateMap: false,
     showLoading: false,
+    disabledRoad: false,
+    disabledVillage: false,
+    districtLoading: false,
+    roadLoading: false,
+    villageLoading: false,
+    houseLoading: false,
+    mpLoading: false,
+    lzLoading: false,
+    isMP: false,
   };
 
   entity = {};
@@ -40,30 +60,51 @@ class POIForm extends Component {
       this.setState({ showLoading: true });
       await POIDetails(id, d => {
         this.entity = d;
-        this.setState({ reload: true, fullAddress: this.entity.ADDRESS }, e => {
+        this.setState({ isMP: d.LX === '1', reload: true, fullAddress: this.entity.ADDRESS }, e => {
           this.setState({ reload: false });
         });
       });
       this.setState({ showLoading: false });
     } else {
       // 获取新id
-      GetNewGuid(d => {
+      await GetNewGuid(d => {
         this.entity = {
           ID: d,
         };
+        this.setState({ reload: true }, e => {
+          this.setState({ reload: false });
+        });
       });
     }
   }
 
-  getDistricts() {
-    GetDistrictTree(d => {
+  async getDistricts() {
+    this.setState({ districtLoading: true });
+    await GetDistrictTree(d => {
       let districts = getDistricts2(d);
       this.setState({ districts: districts });
     });
+    this.setState({ districtLoading: false });
   }
 
-  searchRoads(v) {
-    SearchRoads({ name: v }, d => {
+  async searchVillages(districtId) {
+    this.setState({ villageLoading: true });
+    await SearchVillagesByDistrictID(districtId, d => {
+      this.setState({
+        villages: (d || []).map(r => {
+          return {
+            name: r.NAME,
+            id: r.ID,
+          };
+        }),
+      });
+    });
+    this.setState({ villageLoading: false });
+  }
+
+  async searchRoads(districtId) {
+    this.setState({ roadLoading: true });
+    await SearchRoadsByDistrictID(districtId, d => {
       this.setState({
         roads: (d || []).map(r => {
           return {
@@ -73,10 +114,12 @@ class POIForm extends Component {
         }),
       });
     });
+    this.setState({ roadLoading: false });
   }
 
-  searchMP(roadid) {
-    SearchMPByRoad(roadid, d => {
+  async searchMP(roadid) {
+    this.setState({ mpLoading: true });
+    await SearchMPByRoad(roadid, d => {
       this.setState({
         mps: (d || []).map(r => {
           return {
@@ -86,10 +129,12 @@ class POIForm extends Component {
         }),
       });
     });
+    this.setState({ mpLoading: false });
   }
 
-  searchHouse(mpid) {
-    SearchHouseByMP(mpid, d => {
+  async searchHouse(mpid) {
+    this.setState({ houseLoading: true });
+    await SearchHouseByMP(mpid, d => {
       this.setState({
         houses: (d || []).map(r => {
           return {
@@ -99,10 +144,12 @@ class POIForm extends Component {
         }),
       });
     });
+    this.setState({ houseLoading: false });
   }
 
-  searchLZ(houseid) {
-    SearchLZByHouse(houseid, d => {
+  async searchLZ(houseid) {
+    this.setState({ houseLoading: true });
+    await SearchLZByHouse(houseid, d => {
       this.setState({
         lzs: (d || []).map(r => {
           return {
@@ -112,6 +159,7 @@ class POIForm extends Component {
         }),
       });
     });
+    this.setState({ houseLoading: false });
   }
 
   getFullAddress() {
@@ -131,6 +179,52 @@ class POIForm extends Component {
       ...this.mObj,
       ID: this.entity.ID,
     };
+
+    let vObj = {
+      ...this.entity,
+      ...this.mObj,
+    };
+
+    if (!vObj.NAME) {
+      error('名称不能为空');
+      return;
+    }
+
+    if (!vObj.LX) {
+      error('类型不能为空');
+      return;
+    }
+
+    if (!vObj.CREATETIME) {
+      error('登记时间不能为空');
+      return;
+    }
+
+    if (!vObj.DISTRICTID) {
+      error('所属行政区不能为空');
+      return;
+    }
+
+    if (!vObj.ROADID || !vObj.VILLAGEID) {
+      error('所属行政区、所属自然村不能同时为空');
+      return;
+    }
+
+    if (!vObj.MPID) {
+      error('所属门牌不能同时为空');
+      return;
+    }
+
+    if (vObj.LX === '1') {
+      if (!vObj.HOUSEID) {
+        error('所属小区不能同时为空');
+        return;
+      }
+      if (!vObj.LZID) {
+        error('所属楼栋不能同时为空');
+        return;
+      }
+    }
 
     POIModify(obj, d => {
       success('保存成功');
@@ -158,6 +252,15 @@ class POIForm extends Component {
       fullAddress,
       showLocateMap,
       showLoading,
+      disabledRoad,
+      disabledVillage,
+      districtLoading,
+      roadLoading,
+      villageLoading,
+      houseLoading,
+      mpLoading,
+      lzLoading,
+      isMP,
     } = this.state;
 
     return (
@@ -171,36 +274,89 @@ class POIForm extends Component {
                 <div className={st.fmgrpctt}>
                   <Row>
                     <Col span={8}>
-                      <FormItem label="名称" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>名称
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
                         {getInput(this, 'NAME', '名称')}
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem label="类型" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
-                        {getSelect(this, 'LX', null, '类型', [
-                          { id: '1', name: '门牌' },
-                          { id: '2', name: '楼幢' },
-                        ])}
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>类型
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
+                        {getSelect(
+                          this,
+                          'LX',
+                          null,
+                          '类型',
+                          [{ id: '1', name: '门牌' }, { id: '2', name: '楼幢' }],
+                          null,
+                          (v, o) => {
+                            this.setState({ isMP: v === '1' });
+                          }
+                        )}
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem label="登记时间" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>登记时间
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
                         {getDatePicker(this, 'CREATETIME', '登记时间')}
                       </FormItem>
                     </Col>
                   </Row>
                   <Row>
                     <Col span={8}>
-                      <FormItem label="所属行政区" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>所属行政区
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
+                        {districtLoading ? <Spin /> : null}
                         {getCascader(this, 'DISTRICTID', '所属行政区', districts, (v, o) => {
                           this.mObj.DISTRICTNAME = o.map(i => i.label).join('');
-                          this.mObj.DISTRICTID = v && v.length && v[v.length - 1];
+                          let districtId = v && v.length && v[v.length - 1];
+                          this.mObj.DISTRICTID = districtId;
+
+                          this.searchRoads(districtId);
+                          this.searchVillages(districtId);
+
                           this.getFullAddress();
                         })}
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem label="所属道路" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>所属道路
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
                         {getSelect(
                           this,
                           'ROADID',
@@ -208,18 +364,59 @@ class POIForm extends Component {
                           '所属道路',
                           roads,
                           e => {
-                            this.searchRoads(e);
+                            // this.searchRoads(e);
                           },
                           (v, o) => {
                             this.searchMP(v);
                             this.getFullAddress();
+                            this.setState({ disabledRoad: false, disabledVillage: !!v });
                           },
-                          true
+                          true,
+                          disabledRoad
                         )}
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem label="所属门牌" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>所属自然村
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
+                        {getSelect(
+                          this,
+                          'VILLAGEID',
+                          'VILLAGENAME',
+                          '所属自然村',
+                          roads,
+                          e => {
+                            // this.searchRoads(e);
+                          },
+                          (v, o) => {
+                            this.searchMP(v);
+                            this.getFullAddress();
+                            this.setState({ disabledRoad: !!v, disabledVillage: false });
+                          },
+                          true,
+                          disabledVillage
+                        )}
+                      </FormItem>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col span={8}>
+                      <FormItem
+                        label={
+                          <span>
+                            <span className={st.ired}>*</span>所属门牌
+                          </span>
+                        }
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                      >
                         {getSelect(
                           this,
                           'MPID',
@@ -235,78 +432,100 @@ class POIForm extends Component {
                         )}
                       </FormItem>
                     </Col>
+                    {isMP ? null : (
+                      <Col span={8}>
+                        <FormItem
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>所属小区
+                            </span>
+                          }
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                        >
+                          {getSelect(
+                            this,
+                            'HOUSEID',
+                            'HOUSENAME',
+                            '所属小区',
+                            houses,
+                            null,
+                            e => {
+                              this.searchLZ();
+                              this.getFullAddress();
+                            },
+                            false
+                          )}
+                        </FormItem>
+                      </Col>
+                    )}
+                    {isMP ? null : (
+                      <Col span={8}>
+                        <FormItem
+                          label={
+                            <span>
+                              <span className={st.ired}>*</span>所属楼栋
+                            </span>
+                          }
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                        >
+                          {getSelect(
+                            this,
+                            'LZID',
+                            'LZNAME',
+                            '所属楼栋',
+                            lzs,
+                            null,
+                            (v, o) => {
+                              this.getFullAddress();
+                            },
+                            false
+                          )}
+                        </FormItem>
+                      </Col>
+                    )}
                   </Row>
+                  {isMP ? null : (
+                    <Row>
+                      <Col span={8}>
+                        <FormItem
+                          label="梯位（层）号"
+                          labelCol={{ span: 8 }}
+                          wrapperCol={{ span: 16 }}
+                        >
+                          {getInput(
+                            this,
+                            'CELL',
+                            '梯位（层）号',
+                            null,
+                            null,
+                            this.getFullAddress.bind(this)
+                          )}
+                        </FormItem>
+                      </Col>
+                      <Col span={8}>
+                        <FormItem label="户室号" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                          {getInput(
+                            this,
+                            'ROOM',
+                            '户室号',
+                            null,
+                            null,
+                            this.getFullAddress.bind(this)
+                          )}
+                        </FormItem>
+                      </Col>
+                    </Row>
+                  )}
                   <Row>
-                    <Col span={8}>
-                      <FormItem label="所属小区" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
-                        {getSelect(
-                          this,
-                          'HOUSEID',
-                          'HOUSENAME',
-                          '所属小区',
-                          houses,
-                          null,
-                          e => {
-                            this.searchLZ();
-                            this.getFullAddress();
-                          },
-                          false
-                        )}
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem label="所属楼栋" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
-                        {getSelect(
-                          this,
-                          'LZID',
-                          'LZNAME',
-                          '所属楼栋',
-                          lzs,
-                          null,
-                          (v, o) => {
-                            this.getFullAddress();
-                          },
-                          false
-                        )}
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem
-                        label="梯位（层）号"
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                      >
-                        {getInput(
-                          this,
-                          'CELL',
-                          '梯位（层）号',
-                          null,
-                          null,
-                          this.getFullAddress.bind(this)
-                        )}
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={8}>
-                      <FormItem label="户室号" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
-                        {getInput(
-                          this,
-                          'ROOM',
-                          '户室号',
-                          null,
-                          null,
-                          this.getFullAddress.bind(this)
-                        )}
-                      </FormItem>
-                    </Col>
                     <Col span={16}>
                       <FormItem label="完整地址" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                         <Input value={fullAddress} disabled />
                       </FormItem>
                     </Col>
                     <Button
-                      style={{ position: 'absolute', right: ' -40px' }}
+                      style={{ position: 'absolute', right: '320px' }}
                       icon="environment"
                       shape="circle"
                       type="primary"
@@ -317,12 +536,22 @@ class POIForm extends Component {
                   </Row>
                 </div>
               </div>
+              <div className={st.fmgrp}>
+                <div className={st.fmgrphd}>图片</div>
+                <div style={{ padding: '20px' }} className={st.fmgrpctt}>
+                  <UploadPicture
+                    fileList={this.entity.SQB}
+                    id={this.entity.ID}
+                    fileBasePath={baseUrl}
+                    data={{ DOCTYPE: null, FileType: '兴趣点照片' }}
+                    uploadAction={url_UploadPicture}
+                    removeAction={url_RemovePicture}
+                    getAction={url_GetPictureUrls}
+                  />
+                </div>
+              </div>
             </div>
           )}
-          <div className={st.fmgrp}>
-            <div className={st.fmgrphd}>图片</div>
-            <div className={st.fmgrpctt}>fmgrpctt</div>
-          </div>
         </div>
         <div className={st.fmft}>
           <Button type="primary" icon="save" onClick={e => this.save()}>

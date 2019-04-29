@@ -72,7 +72,17 @@ function getTextArea(context, field, placeholder, height) {
   );
 }
 
-function getSelect(context, iField, nField, placeholder, options, onSearch, onChange, showSearch) {
+function getSelect(
+  context,
+  iField,
+  nField,
+  placeholder,
+  options,
+  onSearch,
+  onChange,
+  showSearch,
+  disabled
+) {
   nField = nField || iField;
   let dv = context.entity[iField] || undefined;
   if (dv) {
@@ -81,8 +91,10 @@ function getSelect(context, iField, nField, placeholder, options, onSearch, onCh
     }
   }
 
+  disabled = disabled === undefined ? false : !!disabled;
   return (
     <Select
+      disabled={disabled}
       allowClear
       showSearch={showSearch}
       defaultValue={dv}
@@ -93,8 +105,9 @@ function getSelect(context, iField, nField, placeholder, options, onSearch, onCh
         return !!(option.props.children && option.props.children.indexOf(inputValue) != -1);
       }}
       onChange={((v, option) => {
-        context.mObj[iField] = option.props.value;
+        // 可能 nField、iField相等 后赋值iField
         context.mObj[nField] = option.props.children;
+        context.mObj[iField] = option.props.value;
         if (onChange) {
           onChange(v, option);
         }

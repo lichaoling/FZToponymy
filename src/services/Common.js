@@ -48,3 +48,19 @@ export async function SearchLZByHouse(id, sf, ef) {
   let rt = await Post(`${baseUrl}/Common/SearchLZByHouse`, { houseID: id }, sf, ef);
   return rt;
 }
+
+/**
+ * 根据行政区id相关道路：Common/SearchRoadsByDistrictID(string districtID)
+ */
+export async function SearchRoadsByDistrictID(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/Common/SearchRoadsByDistrictID`, { districtID: id }, sf, ef);
+  return rt;
+}
+
+/**
+ * 根据行政区id相关自然村：Common/SearchVillagesByDistrictID(districtID)
+ */
+export async function SearchVillagesByDistrictID(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/Common/SearchVillagesByDistrictID`, { districtID: id }, sf, ef);
+  return rt;
+}
