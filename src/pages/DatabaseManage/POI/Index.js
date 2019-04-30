@@ -27,6 +27,7 @@ let defaultCondition = {
     .subtract(1, 'years')
     .format('YYYY-MM-DD'),
   end: moment().format('YYYY-MM-DD'),
+  state: 1,
 };
 
 class Index extends Component {
@@ -44,15 +45,18 @@ class Index extends Component {
       render: (v, r) => {
         return (
           <div className={st.rowbtns}>
-            <Icon type="edit" onClick={e => this.showPOIForm(r)} />
+            <Icon type="edit" onClick={e => this.showPOIForm(r)} title="编辑" />
             <Popconfirm
               title={`确定${r.STATE == 1 ? '禁用该数据' : '解除禁用'}？`}
               onConfirm={e => this.toggleLock(r)}
             >
-              <Icon type={r.STATE == 1 ? 'lock' : 'unlock'} />
+              <Icon
+                type={r.STATE == 1 ? 'lock' : 'unlock'}
+                title={`${r.STATE == 1 ? '禁用' : '启用'}`}
+              />
             </Popconfirm>
             <Popconfirm title={`确定删除该数据？`} onConfirm={e => this.delete(r)}>
-              <Icon type="delete" />
+              <Icon type="delete" title="删除" />
             </Popconfirm>
           </div>
         );
@@ -221,6 +225,18 @@ class Index extends Component {
               <Select.Option value="1">门牌</Select.Option>
               <Select.Option value="2">楼栋</Select.Option>
             </Select>
+            <Select
+              placeholder="状态"
+              style={{ width: 120 }}
+              defaultValue={this.condition.state}
+              onChange={e => {
+                this.condition.state = e;
+              }}
+            >
+              <Select.Option value={1}>启用</Select.Option>
+              <Select.Option value={2}>禁用</Select.Option>
+            </Select>
+            &ensp;
             <DatePicker
               style={{ width: 140 }}
               defaultValue={moment(condition.start)}
