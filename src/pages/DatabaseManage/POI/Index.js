@@ -33,7 +33,7 @@ class Index extends Component {
   //行政区划、名称、所在地址、操作
   columns = [
     { title: '序号', dataIndex: 'index', key: 'index', width: 80 },
-    { title: '行政区划', dataIndex: 'DISTRICTID', key: 'DISTRICTID' },
+    { title: '行政区划', dataIndex: 'DISTRICTNAME', key: 'DISTRICTNAME' },
     { title: '名称', dataIndex: 'NAME', key: 'NAME' },
     { title: '所在地址', dataIndex: 'ADDRESS', key: 'ADDRESS' },
     {

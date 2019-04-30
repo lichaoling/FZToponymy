@@ -95,6 +95,14 @@ class YLForm extends Component {
           if (!d.HOUSEID) {
             GetNewGuid(d => {
               this.entity.HOUSEID = d;
+              this.setState(
+                {
+                  reload: true,
+                },
+                e => {
+                  this.setState({ reload: false });
+                }
+              );
             });
           }
         },
@@ -435,8 +443,8 @@ class YLForm extends Component {
                         defaultValue={entity.HOUSEXQLX || undefined}
                         placeholder="小区类型"
                         onChange={e => {
-                          this.mObj.HOUSEXQLX = e.key;
-                          this.mObj.HOUSEDZBM = e.label;
+                          this.mObj.HOUSEXQLX = e.label;
+                          this.mObj.HOUSEDZBM = e.key;
                         }}
                       >
                         {/* <Select.Option key="31" value={{ id: '31', name: '小区' }}>
@@ -609,8 +617,8 @@ class YLForm extends Component {
                       label={<span>院落照片</span>}
                     >
                       <UploadPicture
-                        fileList={this.entity.SQB}
-                        id={this.entity.ID}
+                        fileList={this.entity.Pics}
+                        id={this.entity.HOUSEID}
                         fileBasePath={baseUrl}
                         data={{ DOCTYPE: null, FileType: '小区（楼宇）照片' }}
                         uploadAction={url_UploadPicture}

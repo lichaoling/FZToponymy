@@ -5,6 +5,7 @@ import { getInput, getDatePicker, getSelect, getCascader } from '../../../utils/
 import {
   GetDistrictTree,
   SearchMPByRoad,
+  SearchMPByVillage,
   SearchHouseByMP,
   SearchLZByHouse,
   GetNewGuid,
@@ -93,8 +94,8 @@ class POIForm extends Component {
       this.setState({
         villages: (d || []).map(r => {
           return {
-            name: r.NAME,
-            id: r.ID,
+            name: r.VILLAGENAME,
+            id: r.VILLAGEID,
           };
         }),
       });
@@ -108,8 +109,8 @@ class POIForm extends Component {
       this.setState({
         roads: (d || []).map(r => {
           return {
-            name: r.NAME,
-            id: r.ID,
+            name: r.ROADID,
+            id: r.ROADNAME,
           };
         }),
       });
@@ -117,9 +118,24 @@ class POIForm extends Component {
     this.setState({ roadLoading: false });
   }
 
-  async searchMP(roadid) {
+  async searchMPByRoad(roadid) {
     this.setState({ mpLoading: true });
     await SearchMPByRoad(roadid, d => {
+      this.setState({
+        mps: (d || []).map(r => {
+          return {
+            id: r.ID,
+            name: r.MPNUM,
+          };
+        }),
+      });
+    });
+    this.setState({ mpLoading: false });
+  }
+
+  async searchMPByVillage(villageId) {
+    this.setState({ mpLoading: true });
+    await SearchMPByVillage(villageId, d => {
       this.setState({
         mps: (d || []).map(r => {
           return {
@@ -357,6 +373,7 @@ class POIForm extends Component {
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
                       >
+                        {roadLoading ? <Spin /> : null}
                         {getSelect(
                           this,
                           'ROADID',
@@ -367,7 +384,7 @@ class POIForm extends Component {
                             // this.searchRoads(e);
                           },
                           (v, o) => {
-                            this.searchMP(v);
+                            this.searchMPByRoad(v);
                             this.getFullAddress();
                             this.setState({ disabledRoad: false, disabledVillage: !!v });
                           },
@@ -386,6 +403,7 @@ class POIForm extends Component {
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
                       >
+                        {villageLoading ? <Spin /> : null}
                         {getSelect(
                           this,
                           'VILLAGEID',
@@ -396,7 +414,7 @@ class POIForm extends Component {
                             // this.searchRoads(e);
                           },
                           (v, o) => {
-                            this.searchMP(v);
+                            this.searchMPByVillage(v);
                             this.getFullAddress();
                             this.setState({ disabledRoad: !!v, disabledVillage: false });
                           },
@@ -417,6 +435,7 @@ class POIForm extends Component {
                         labelCol={{ span: 8 }}
                         wrapperCol={{ span: 16 }}
                       >
+                        {mpLoading ? <Spin /> : null}
                         {getSelect(
                           this,
                           'MPID',
@@ -443,6 +462,7 @@ class POIForm extends Component {
                           labelCol={{ span: 8 }}
                           wrapperCol={{ span: 16 }}
                         >
+                          {houseLoading ? <Spin /> : null}
                           {getSelect(
                             this,
                             'HOUSEID',
@@ -470,6 +490,7 @@ class POIForm extends Component {
                           labelCol={{ span: 8 }}
                           wrapperCol={{ span: 16 }}
                         >
+                          {lzLoading ? <Spin /> : null}
                           {getSelect(
                             this,
                             'LZID',
@@ -540,7 +561,7 @@ class POIForm extends Component {
                 <div className={st.fmgrphd}>图片</div>
                 <div style={{ padding: '20px' }} className={st.fmgrpctt}>
                   <UploadPicture
-                    fileList={this.entity.SQB}
+                    fileList={this.entity.Pics}
                     id={this.entity.ID}
                     fileBasePath={baseUrl}
                     data={{ DOCTYPE: null, FileType: '兴趣点照片' }}
