@@ -173,7 +173,8 @@ class Index extends Component {
         });
       }
     }
-    this.locateMap.map.fitBounds(this.fg.getBounds());
+    let bounds = this.fg.getBounds();
+    if (bounds.isValid()) this.locateMap.map.fitBounds(this.fg.getBounds());
   }
 
   componentDidMount() {
@@ -217,8 +218,8 @@ class Index extends Component {
                 this.condition.lx = e;
               }}
             >
-              <Select.Option value="门牌">门牌</Select.Option>
-              <Select.Option value="楼栋">楼栋</Select.Option>
+              <Select.Option value="1">门牌</Select.Option>
+              <Select.Option value="2">楼栋</Select.Option>
             </Select>
             <DatePicker
               style={{ width: 140 }}

@@ -61,9 +61,18 @@ class POIForm extends Component {
       this.setState({ showLoading: true });
       await POIDetails(id, d => {
         this.entity = d;
-        this.setState({ isMP: d.LX === '1', reload: true, fullAddress: this.entity.ADDRESS }, e => {
-          this.setState({ reload: false });
-        });
+        this.setState(
+          {
+            disabledVillage: !!d.ROADID,
+            disabledRoad: !!d.VILLAGEID,
+            isMP: d.LX === '1',
+            reload: true,
+            fullAddress: this.entity.ADDRESS,
+          },
+          e => {
+            this.setState({ reload: false });
+          }
+        );
       });
       this.setState({ showLoading: false });
     } else {
@@ -109,8 +118,8 @@ class POIForm extends Component {
       this.setState({
         roads: (d || []).map(r => {
           return {
-            name: r.ROADID,
-            id: r.ROADNAME,
+            name: r.ROADNAME,
+            id: r.ROADID,
           };
         }),
       });
@@ -184,8 +193,15 @@ class POIForm extends Component {
       ...this.mObj,
     };
     let ept = '';
-    let fullAddress = `${obj.DISTRICTNAME || ept}${obj.ROADNAME || ept}${obj.MPNUM ||
-      ept}${obj.HOUSENAME || ept}${obj.LZNAME || ept}${obj.CELL || ept}${obj.ROOM || ept}`;
+    let fullAddress = '';
+    if (obj.LX === '1') {
+      fullAddress = `${obj.DISTRICTNAME || ept}${obj.ROADName || ept}${obj.VILLAGEName ||
+        ept}${obj.MPNum || ept}`;
+    } else {
+      fullAddress = `${obj.DISTRICTNAME || ept}${obj.ROADName || ept}${obj.VILLAGEName ||
+        ept}${obj.MPNum || ept}${obj.HOUSEName || ept}${obj.LZNum || ept}${obj.CELL ||
+        ept}${obj.ROOM || ept}`;
+    }
     this.mObj.ADDRESS = fullAddress;
     this.setState({ fullAddress: fullAddress });
   }
@@ -221,23 +237,23 @@ class POIForm extends Component {
       return;
     }
 
-    if (!vObj.ROADID || !vObj.VILLAGEID) {
-      error('所属行政区、所属自然村不能同时为空');
+    if (!vObj.ROADID && !vObj.VILLAGEID) {
+      error('所属道路、所属自然村不能同时为空');
       return;
     }
 
     if (!vObj.MPID) {
-      error('所属门牌不能同时为空');
+      error('所属门牌不能为空');
       return;
     }
 
-    if (vObj.LX === '1') {
+    if (vObj.LX === '2') {
       if (!vObj.HOUSEID) {
-        error('所属小区不能同时为空');
+        error('所属小区不能为空');
         return;
       }
       if (!vObj.LZID) {
-        error('所属楼栋不能同时为空');
+        error('所属楼栋不能为空');
         return;
       }
     }
@@ -321,6 +337,7 @@ class POIForm extends Component {
                           null,
                           (v, o) => {
                             this.setState({ isMP: v === '1' });
+                            this.getFullAddress();
                           }
                         )}
                       </FormItem>
@@ -377,7 +394,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'ROADID',
-                          'ROADNAME',
+                          'ROADName',
                           '所属道路',
                           roads,
                           e => {
@@ -407,7 +424,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'VILLAGEID',
-                          'VILLAGENAME',
+                          'VILLAGEName',
                           '所属自然村',
                           roads,
                           e => {
@@ -439,7 +456,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'MPID',
-                          'MPNUM',
+                          'MPNum',
                           '所属门牌',
                           mps,
                           null,
@@ -466,7 +483,7 @@ class POIForm extends Component {
                           {getSelect(
                             this,
                             'HOUSEID',
-                            'HOUSENAME',
+                            'HOUSEName',
                             '所属小区',
                             houses,
                             null,
@@ -494,7 +511,7 @@ class POIForm extends Component {
                           {getSelect(
                             this,
                             'LZID',
-                            'LZNAME',
+                            'LZNum',
                             '所属楼栋',
                             lzs,
                             null,

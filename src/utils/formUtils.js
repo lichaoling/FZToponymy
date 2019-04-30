@@ -106,8 +106,8 @@ function getSelect(
       }}
       onChange={((v, option) => {
         // 可能 nField、iField相等 后赋值iField
-        context.mObj[nField] = option.props.children;
-        context.mObj[iField] = option.props.value;
+        context.mObj[nField] = option ? option.props.children : undefined;
+        context.mObj[iField] = option ? option.props.value : undefined;
         if (onChange) {
           onChange(v, option);
         }
