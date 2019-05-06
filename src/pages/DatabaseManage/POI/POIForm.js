@@ -81,8 +81,9 @@ class POIForm extends Component {
         this.entity = {
           ID: d,
           LX: '1',
+          CREATETIME: moment(),
         };
-        this.mObj = { LX: '1' };
+        this.mObj = { LX: '1', CREATETIME: moment().format('YYYY-MM-DD') };
         this.setState({ reload: true, isMP: true }, e => {
           this.setState({ reload: false });
         });
