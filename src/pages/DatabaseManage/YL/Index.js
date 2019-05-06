@@ -93,7 +93,7 @@ class Index extends Component {
     districtLoading: false,
     rows: [],
     total: 0,
-    pageSize: 8,
+    pageSize: 10,
     pageNum: 0,
     reload: false,
     tableLoading: false,
@@ -425,6 +425,7 @@ class Index extends Component {
             </div>
             <div className={st.footer}>
               <Pagination
+                showSizeChanger
                 pageNum={pageNum}
                 pageSize={pageSize}
                 total={total}

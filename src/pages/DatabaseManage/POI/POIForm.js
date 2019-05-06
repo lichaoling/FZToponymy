@@ -385,8 +385,8 @@ class POIForm extends Component {
                           let districtId = v && v.length && v[v.length - 1];
                           this.mObj.DISTRICTID = districtId;
 
-                          this.searchRoads(districtId);
-                          this.searchVillages(districtId);
+                          districtId && this.searchRoads(districtId);
+                          districtId && this.searchVillages(districtId);
 
                           this.getFullAddress();
                         })}
@@ -413,7 +413,7 @@ class POIForm extends Component {
                             // this.searchRoads(e);
                           },
                           (v, o) => {
-                            this.searchMPByRoad(v);
+                            v && this.searchMPByRoad(v);
                             this.getFullAddress();
                             this.setState({ disabledRoad: false, disabledVillage: !!v });
                           },
@@ -443,7 +443,7 @@ class POIForm extends Component {
                             // this.searchRoads(e);
                           },
                           (v, o) => {
-                            this.searchMPByVillage(v);
+                            v && this.searchMPByVillage(v);
                             this.getFullAddress();
                             this.setState({ disabledRoad: !!v, disabledVillage: false });
                           },
@@ -473,7 +473,7 @@ class POIForm extends Component {
                           mps,
                           null,
                           e => {
-                            this.searchHouse(e);
+                            e && this.searchHouse(e);
                             this.getFullAddress();
                           },
                           true
@@ -500,7 +500,7 @@ class POIForm extends Component {
                             houses,
                             null,
                             e => {
-                              this.searchLZ();
+                              e && this.searchLZ(e);
                               this.getFullAddress();
                             },
                             true
