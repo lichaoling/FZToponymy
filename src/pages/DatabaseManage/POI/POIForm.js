@@ -278,6 +278,7 @@ class POIForm extends Component {
       reload,
       districts,
       roads,
+      villages,
       mps,
       houses,
       lzs,
@@ -426,7 +427,7 @@ class POIForm extends Component {
                           'VILLAGEID',
                           'VILLAGEName',
                           '所属自然村',
-                          roads,
+                          villages,
                           e => {
                             // this.searchRoads(e);
                           },
