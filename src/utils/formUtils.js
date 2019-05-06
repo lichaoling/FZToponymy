@@ -81,7 +81,8 @@ function getSelect(
   onSearch,
   onChange,
   showSearch,
-  disabled
+  disabled,
+  allowClear
 ) {
   nField = nField || iField;
   let dv = context.entity[iField] || undefined;
@@ -90,7 +91,7 @@ function getSelect(
       options = [{ id: dv, name: context.entity[nField] }].concat(options);
     }
   }
-
+  allowClear = allowClear === undefined ? true : !!allowClear;
   disabled = disabled === undefined ? false : !!disabled;
   return (
     <Select

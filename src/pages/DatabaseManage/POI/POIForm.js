@@ -80,8 +80,10 @@ class POIForm extends Component {
       await GetNewGuid(d => {
         this.entity = {
           ID: d,
+          LX: '1',
         };
-        this.setState({ reload: true }, e => {
+        this.mObj = { LX: '1' };
+        this.setState({ reload: true, isMP: true }, e => {
           this.setState({ reload: false });
         });
       });
@@ -129,31 +131,37 @@ class POIForm extends Component {
 
   async searchMPByRoad(roadid) {
     this.setState({ mpLoading: true });
-    await SearchMPByRoad(roadid, d => {
-      this.setState({
-        mps: (d || []).map(r => {
-          return {
-            id: r.ID,
-            name: r.MPNUM,
-          };
-        }),
+    let lx = this.entity.LX || this.mObj.LX;
+    if (lx) {
+      await SearchMPByRoad(roadid, lx, d => {
+        this.setState({
+          mps: (d || []).map(r => {
+            return {
+              id: r.ID,
+              name: r.MPNUM,
+            };
+          }),
+        });
       });
-    });
+    }
     this.setState({ mpLoading: false });
   }
 
   async searchMPByVillage(villageId) {
     this.setState({ mpLoading: true });
-    await SearchMPByVillage(villageId, d => {
-      this.setState({
-        mps: (d || []).map(r => {
-          return {
-            id: r.ID,
-            name: r.MPNUM,
-          };
-        }),
+    let lx = this.entity.LX || this.mObj.LX;
+    if (lx) {
+      await SearchMPByVillage(villageId, lx, d => {
+        this.setState({
+          mps: (d || []).map(r => {
+            return {
+              id: r.ID,
+              name: r.MPNUM,
+            };
+          }),
+        });
       });
-    });
+    }
     this.setState({ mpLoading: false });
   }
 
@@ -339,7 +347,10 @@ class POIForm extends Component {
                           (v, o) => {
                             this.setState({ isMP: v === '1' });
                             this.getFullAddress();
-                          }
+                          },
+                          false,
+                          false,
+                          true
                         )}
                       </FormItem>
                     </Col>
@@ -465,7 +476,7 @@ class POIForm extends Component {
                             this.searchHouse(e);
                             this.getFullAddress();
                           },
-                          false
+                          true
                         )}
                       </FormItem>
                     </Col>
@@ -492,7 +503,7 @@ class POIForm extends Component {
                               this.searchLZ();
                               this.getFullAddress();
                             },
-                            false
+                            true
                           )}
                         </FormItem>
                       </Col>
@@ -519,7 +530,7 @@ class POIForm extends Component {
                             (v, o) => {
                               this.getFullAddress();
                             },
-                            false
+                            true
                           )}
                         </FormItem>
                       </Col>
