@@ -206,6 +206,7 @@ class Index extends Component {
         {resetCondition ? null : (
           <div className="ct-search-header">
             <Cascader
+              defaultValue={['3501030000000000000']}
               style={{ width: 260 }}
               placeholder="请选择行政区"
               onChange={e => {
@@ -305,7 +306,7 @@ class Index extends Component {
         <div className="ct-search-footer">
           <Pagination
             showSizeChanger
-            pageNum={pageNum}
+            current={pageNum}
             pageSize={pageSize}
             total={total}
             pageSizeOptions={['10', '25', '50', '100']}

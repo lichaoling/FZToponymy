@@ -20,16 +20,16 @@ export async function GetNewGuid(sf, ef) {
 /**
  * 根据道路id获取门牌数据：Common/SearchMPByRoad(string )
  */
-export async function SearchMPByRoad(id, type, sf, ef) {
-  let rt = await Post(`${baseUrl}/Common/SearchMPByRoad`, { roadID: id, type: type }, sf, ef);
+export async function SearchMPByRoad(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/Common/SearchMPByRoad`, { roadID: id }, sf, ef);
   return rt;
 }
 
 /**
  * 根据自然村id获取门牌数据：Common/SearchMPByVillage(string villageID)
  */
-export async function SearchMPByVillage(id, type, sf, ef) {
-  let rt = await Post(`${baseUrl}/Common/SearchMPByVillage`, { villageID: id, type: type }, sf, ef);
+export async function SearchMPByVillage(id, sf, ef) {
+  let rt = await Post(`${baseUrl}/Common/SearchMPByVillage`, { villageID: id }, sf, ef);
   return rt;
 }
 

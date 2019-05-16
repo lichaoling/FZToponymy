@@ -229,7 +229,17 @@ class Index extends Component {
     if (rows && rows.length) {
       var { layerGroup } = this;
       rows.map((i, idx) => {
-        let { HOUSEWKT, MPWKT } = i;
+        let { HOUSEWKT, HOUSEWKT2, MPWKT } = i;
+        if (HOUSEWKT2) {
+          let l = L.geoJSON(Terraformer.WKT.parse(HOUSEWKT2), {
+            onEachFeature: (f, l) => {
+              if (l.setStyle) {
+                l.setStyle(redStyle);
+              }
+            },
+          });
+          this.layerGroup.addLayer(l);
+        }
         if (HOUSEWKT || MPWKT) {
           let dom = $('<div></div>').get(0);
           let l = L.geoJSON(Terraformer.WKT.parse(HOUSEWKT || MPWKT), {
@@ -265,11 +275,12 @@ class Index extends Component {
       pageSize,
       pageNum,
     };
-    let { start, end, roadName, houseName, districtID, state } = this.condition;
+    let { start, end, roadName, houseName, districtID, state, mpNum } = this.condition;
     if (start) searchCondition.start = start.format('YYYY-MM-DD');
     if (end) searchCondition.end = end.format('YYYY-MM-DD');
     if (roadName) searchCondition.roadName = roadName;
     if (houseName) searchCondition.houseName = houseName;
+    if (mpNum) searchCondition.mpNum = mpNum;
     if (districtID) searchCondition.districtID = districtID;
     if (state) searchCondition.state = state;
 
@@ -278,6 +289,7 @@ class Index extends Component {
       searchCondition,
       d => {
         let { Data, totalCount } = d;
+        // let { pageSize, pageNum } = this.state;
         Data.map((i, idx) => {
           i.STATE == '1' ? (i.STATE = '启用') : (i.STATE = '禁用');
           i.idx = idx + 1;
@@ -333,7 +345,8 @@ class Index extends Component {
                   options={districts}
                   placeholder="行政区划"
                   changeOnSelect
-                  style={{ width: 250 }}
+                  defaultValue={['3501030000000000000']}
+                  style={{ width: 260 }}
                   onChange={e => {
                     this.condition.districtID = e && e.length ? e[e.length - 1] : null;
                   }}
@@ -341,7 +354,7 @@ class Index extends Component {
               </span>
               &ensp;
               <Input
-                style={{ width: 200 }}
+                style={{ width: 180 }}
                 placeholder="道路名称"
                 onChange={e => {
                   this.condition.roadName = e.target.value;
@@ -349,16 +362,24 @@ class Index extends Component {
               />
               &ensp;
               <Input
-                style={{ width: 200 }}
+                style={{ width: 180 }}
                 placeholder="小区名称"
                 onChange={e => {
                   this.condition.houseName = e.target.value;
                 }}
               />
               &ensp;
+              <Input
+                style={{ width: 120 }}
+                placeholder="门牌"
+                onChange={e => {
+                  this.condition.mpNum = e.target.value;
+                }}
+              />
+              &ensp;
               <Select
                 placeholder="状态"
-                style={{ width: 120 }}
+                style={{ width: 80 }}
                 defaultValue={this.condition.state}
                 onChange={e => {
                   this.condition.state = e;
@@ -371,6 +392,7 @@ class Index extends Component {
               <DatePicker
                 placeholder="登记时间|起"
                 allowClear
+                style={{ width: 120 }}
                 defaultValue={this.condition.start}
                 onChange={e => {
                   this.condition.start = e;
@@ -380,6 +402,7 @@ class Index extends Component {
               <DatePicker
                 placeholder="登记时间|止"
                 allowClear
+                style={{ width: 120 }}
                 defaultValue={this.condition.end}
                 onChange={e => {
                   this.condition.end = e;
@@ -426,7 +449,7 @@ class Index extends Component {
             <div className={st.footer}>
               <Pagination
                 showSizeChanger
-                pageNum={pageNum}
+                current={pageNum}
                 pageSize={pageSize}
                 total={total}
                 pageSizeOptions={['10', '25', '50', '100']}

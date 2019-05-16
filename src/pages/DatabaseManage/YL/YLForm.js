@@ -666,14 +666,7 @@ class YLForm extends Component {
                 if (HOUSEWKT2)
                   L.geoJSON(Terraformer.WKT.parse(HOUSEWKT2), {
                     onEachFeature: function(f, l) {
-                      l.setStyle({
-                        stroke: true,
-                        color: 'red',
-                        weight: 4,
-                        opacity: 0.5,
-                        fill: true,
-                        clickable: true,
-                      });
+                      l.setStyle(redStyle);
                       lm.houseGLayer = l;
                     },
                   }).addTo(lm.map);
