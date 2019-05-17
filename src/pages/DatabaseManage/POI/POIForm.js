@@ -184,8 +184,8 @@ class POIForm extends Component {
     let fullAddress = '';
     let { houseName } = this.state;
 
-    fullAddress = `${obj.DISTRICTNAME || ept}${obj.ROADName || ept}${obj.VILLAGEName ||
-      ept}${obj.MPNum || ept}${houseName || ept}${obj.LZNum || ept}${obj.CELL || ept}${obj.ROOM ||
+    fullAddress = `${obj.DISTRICTNAME || ept}${obj.ROADNAME || ept}${obj.VILLAGENAME ||
+      ept}${obj.MPNUM || ept}${houseName || ept}${obj.LZNUM || ept}${obj.CELL || ept}${obj.ROOM ||
       ept}`;
 
     this.mObj.ADDRESS = fullAddress;
@@ -324,7 +324,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'ROADID',
-                          'ROADName',
+                          'ROADNAME',
                           '所属道路',
                           roads,
                           e => {
@@ -354,7 +354,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'VILLAGEID',
-                          'VILLAGEName',
+                          'VILLAGENAME',
                           '所属自然村',
                           villages,
                           e => {
@@ -384,7 +384,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'MPID',
-                          'MPNum',
+                          'MPNUM',
                           '所属门牌',
                           mps,
                           null,
@@ -421,7 +421,7 @@ class POIForm extends Component {
                         {getSelect(
                           this,
                           'LZID',
-                          'LZNum',
+                          'LZNUM',
                           '所属楼栋',
                           lzs,
                           null,
