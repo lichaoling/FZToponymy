@@ -37,6 +37,7 @@ class MapService extends Component {
   }
 
   quickSearch(v) {
+    if (this.searching) return;
     this.hideFinalSearchResultPanel(true);
     this.showQuickSearchResultPanel();
     this.setState({ qsLoading: true });
@@ -61,9 +62,15 @@ class MapService extends Component {
   _finalSearch(pageNum, pageSize, word, sf, ef) {
     let newCondition = { pageSize, pageNum, word };
     this.setState({ fsLoading: true });
+    // 解决点击搜索和快速搜索（延迟1s执行）的时差矛盾
+    this.searching = true;
     SearchAllAddress(
       newCondition,
       e => {
+        setTimeout(e => {
+          this.searching = false;
+        }, 3000);
+
         this.condition = newCondition;
         let rows = (e && e.Data) || [];
         this.setState(
@@ -81,6 +88,10 @@ class MapService extends Component {
         );
       },
       e => {
+        setTimeout(e => {
+          this.searching = false;
+        }, 3000);
+
         ef && ef();
         message.error(e.message);
         this.setState({ fsLoading: false });

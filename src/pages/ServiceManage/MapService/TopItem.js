@@ -14,14 +14,24 @@ import LZPopup from './LZPopup';
 import './TopItem.less';
 
 class TopItem {
-  constructor(topItem, map, onLayerClick, content = 1, wktField = 'GEOM_WKT') {
+  constructor(
+    topItem,
+    map,
+    onLayerClick,
+    content = 1,
+    wktField = 'GEOM_WKT',
+    wktField2 = 'GEOM_WKT2'
+  ) {
     this.item = topItem;
     this.wktField = wktField;
+    this.wktField2 = wktField2;
     this.map = map;
     let wkt = this.item[this.wktField];
+    let wkt2 = this.item[this.wktField2];
     //console.log(this.item);
     if (wkt) {
-      this.layer = L.geoJSON(Terraformer.WKT.parse(this.item.GEOM_WKT), {
+      // console.log(wkt);
+      this.layer = L.geoJSON(Terraformer.WKT.parse(wkt), {
         onEachFeature: (f, l) => {
           let centerPoint = null;
           if (l.setIcon) {
@@ -57,6 +67,16 @@ class TopItem {
         onLayerClick && onLayerClick(this);
       });
       this.layer.addLayer(this.defaultMarker);
+      if (wkt2) {
+        L.geoJSON(Terraformer.WKT.parse(wkt2), {
+          onEachFeature: (f, l) => {
+            if (l.setStyle) {
+              l.setStyle({ fill: true, weight: 1, color: 'blue' });
+              this.layer.addLayer(l);
+            }
+          },
+        });
+      }
     }
   }
 
